@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "MassDeviceController": {
+      "commandName": "Project"
+    },
+    "Watch": {
+      "commandName": "Executable",
+      "commandLineArgs": "watch run",
+      "executablePath": "dotnet.exe",
+      "workingDirectory": "$(ProjectDir)",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DOTNET_WATCH_RESTART_ON_RUDE_EDIT": "1"
+      }
+    }
+  }
+}

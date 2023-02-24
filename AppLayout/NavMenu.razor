@@ -1,0 +1,45 @@
+﻿<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3 fixed-top">
+    <div class="container" style="height:30px">
+        <button class="navbar-toggler" @onclick="ToggleNavMenu" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="@NavMenuCssClass navbar-collapse d-sm-inline-flex flex-sm-row-reverse" @onclick="CollapseNavMenu">
+            <ul class="navbar-nav flex-grow-1">
+                <li class="nav-item-top">
+                    <a class="nav-link text-light nav-dropdown" href="@Counter.Location" Match="NavLinkMatch.All">Counter</a>
+                </li>
+                <li class="nav-item-top">
+                    <a class="nav-link text-light nav-dropdown" href="@Counter.Location" Match="NavLinkMatch.All">Counter 2</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<style>
+    .container {
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+
+    nav {
+        padding: 0px;
+        width: 100%;
+        max-width: 100%;
+    }
+</style>
+
+@code {
+    private bool _collapseNavMenu;
+    private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
+
+    void ToggleNavMenu()
+    {
+        _collapseNavMenu = !_collapseNavMenu;
+    }
+
+    void CollapseNavMenu()
+    {
+        _collapseNavMenu = true;
+    }
+}

@@ -1,4 +1,6 @@
-﻿namespace TheCardEditor;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace TheCardEditor;
 
 internal static class Program
 {
@@ -6,6 +8,13 @@ internal static class Program
     private static void Main()
     {
         ApplicationConfiguration.Initialize();
-        Application.Run(new Form1());
+        var services = new ServiceCollection();
+        services.AddWindowsFormsBlazorWebView();
+#if DEBUG
+        services.AddBlazorWebViewDeveloperTools();
+#endif
+        services.AddSingleton<MainForm>();
+        var mainForm = services.BuildServiceProvider().GetService<MainForm>();
+        Application.Run(mainForm);
     }
 }

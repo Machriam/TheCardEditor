@@ -1,6 +1,6 @@
 ﻿namespace TheCardEditor;
 
-partial class Form1
+partial class MainForm
 {
     /// <summary>
     ///  Required designer variable.
@@ -40,14 +40,14 @@ partial class Form1
         blazorWebView1.TabIndex = 0;
         blazorWebView1.Text = "blazorWebView1";
         // 
-        // Form1
+        // MainForm
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(800, 450);
         Controls.Add(blazorWebView1);
-        Name = "Form1";
-        Text = "Form1";
+        Name = "MainForm";
+        Text = "TheCardEditor";
         ResumeLayout(false);
     }
 
