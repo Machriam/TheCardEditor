@@ -1,7 +1,8 @@
 {
   "profiles": {
-    "MassDeviceController": {
-      "commandName": "Project"
+    "Debug": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
     },
     "Watch": {
       "commandName": "Executable",

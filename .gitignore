@@ -6,3 +6,4 @@
 **/temp
 **/*.pubxml.user
 **/*.sqlite3
+appsettings.Development.json

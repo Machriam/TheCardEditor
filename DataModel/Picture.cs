@@ -1,4 +1,4 @@
-﻿namespace TheCardEditor.DataContext;
+﻿namespace TheCardEditor.DataModel;
 
 public partial class Picture
 {
