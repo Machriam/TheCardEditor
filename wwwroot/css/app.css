@@ -1,0 +1,123 @@
+﻿html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+a, .btn-link {
+    color: #524b77;
+}
+
+body {
+    padding-top: 30px;
+    padding-bottom: 0;
+}
+
+.nav-item-top a {
+    color: #d7d7d7;
+    border-radius: 4px;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    line-height: 3rem;
+}
+
+    .nav-item-top a.active {
+        background-color: rgba(255,255,255,0.25);
+        color: white;
+    }
+
+    .nav-item-top a:hover {
+        background-color: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+.navbar-toggler {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid red;
+}
+
+.validation-message {
+    color: red;
+    font-size: 12px;
+}
+
+@media (min-width: 768px) {
+    .navbar-toggler {
+        display: none;
+    }
+}
+
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+
+@media (max-width: 767.98px) {
+    .main .top-row:not(.auth) {
+        display: none;
+    }
+
+    .main .top-row.auth {
+        justify-content: space-between;
+    }
+
+    .main .top-row a, .main .top-row .btn-link {
+        margin-left: 0;
+    }
+}
+
+.big-ag-grid .ag-row,
+.big-ag-grid .ag-header-row {
+    font-size: 18px !important;
+}
+
+.normal-ag-grid .ag-cell {
+    line-height: normal !important;
+    display: flex;
+    align-items: center;
+}
+
+.small-ag-grid .ag-row {
+    height: 18px !important;
+    font-size: 13px !important;
+}
+
+.small-ag-grid .ag-cell {
+    line-height: 12px !important;
+}
+
+.small-ag-grid .ag-header-row {
+    height: 25px !important;
+    position: relative;
+    top: unset !important;
+    padding-bottom: 2px;
+}
+
+.small-ag-grid .ag-header {
+    height: 65px !important;
+    min-height: unset !important;
+}
+
+.same-space-ag-grid .ag-cell {
+    font-family: Courier New, Courier, monospace
+}
