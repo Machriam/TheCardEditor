@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.WebView.WindowsForms;
-using TheCardEditor.AppLayout;
+using TheCardEditor.Main.AppLayout;
 
 namespace TheCardEditor;
 

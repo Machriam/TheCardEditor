@@ -2,8 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TheCardEditor.DataModel;
+using TheCardEditor.Main.Core;
 
-namespace TheCardEditor;
+namespace TheCardEditor.Main;
 
 internal static class Program
 {

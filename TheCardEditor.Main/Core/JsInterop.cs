@@ -1,6 +1,6 @@
 ﻿using Microsoft.JSInterop;
 
-namespace TheCardEditor;
+namespace TheCardEditor.Main.Core;
 
 public interface IErrorLogger
 {

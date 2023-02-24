@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace TheCardEditor;
+namespace TheCardEditor.Main.Core;
 public class EnvironmentConfiguration
 {
     private readonly IConfiguration _configuration;
