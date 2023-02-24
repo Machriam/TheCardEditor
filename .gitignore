@@ -1,0 +1,7 @@
+**/obj/*
+**/bin/*
+**/*.class
+**/*.vs
+**/*.lst
+**/temp
+**/*.pubxml.user
