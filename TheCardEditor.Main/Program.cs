@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.Main.Core;
+using TheCardEditor.Shared;
 
 namespace TheCardEditor.Main;
 

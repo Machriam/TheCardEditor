@@ -1,11 +1,7 @@
 ﻿using Microsoft.JSInterop;
+using TheCardEditor.Shared;
 
 namespace TheCardEditor.Main.Core;
-
-public interface IErrorLogger
-{
-    Task LogError(string message, string stackTrace = "");
-}
 
 public class JsInterop : IErrorLogger
 {
