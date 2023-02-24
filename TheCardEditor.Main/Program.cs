@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TheCardEditor.DataModel;
+using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.Main.Core;
 
 namespace TheCardEditor.Main;

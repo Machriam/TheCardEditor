@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TheCardEditor.DataModel.DataModel;
 
-namespace TheCardEditor.DataModel;
+namespace TheCardEditor.DataModel.DataModel;
 
 public partial class DataContext : DbContext
 {

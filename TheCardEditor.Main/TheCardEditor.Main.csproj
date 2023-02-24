@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CodeTemplates\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\TheCardEditor.Services\TheCardEditor.Services.csproj" />
   </ItemGroup>
 
