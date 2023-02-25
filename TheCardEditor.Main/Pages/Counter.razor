@@ -1,19 +1,37 @@
+@implements IDisposable
 @using TheCardEditor.DataModel.DataModel;
 @using TheCardEditor.Main.Core;
+@using TheCardEditor.Shared;
 @attribute [Route(Location)]
 <h1>Counter</h1>
 
 <p>Current count: @currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<canvas id="@CanvasId" width="300" height="300"></canvas>
 
 @code {
     [Inject] IErrorLogger ErrorLogger { get; set; } = default!;
+    [Inject] ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
+    private ICanvasInterop _canvasInterop = default!;
     public const string Location = "";
+    private const string CanvasId = "MySweetCanvas";
     private int currentCount = 0;
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender) return;
+        _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId);
+    }
 
-    private void IncrementCount()
+    private async Task IncrementCount()
     {
         currentCount++;
+        await _canvasInterop.DrawText(10, 20, currentCount.ToString());
+        var png = await _canvasInterop.ExportPng();
+        await ErrorLogger.LogError(png);
+    }
+    public void Dispose()
+    {
+        _canvasInterop?.Dispose();
     }
 }
