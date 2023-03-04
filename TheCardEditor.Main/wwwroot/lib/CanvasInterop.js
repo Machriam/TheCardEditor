@@ -10,8 +10,8 @@
     static removeInstance(divId) {
         delete window.canvasInteropFunctions.instance[divId];
     }
-    getContext() {
-        return document.getElementById(this.divId).getContext("2d");
+    getElement() {
+        return document.getElementById(this.divId);
     }
     getDataUrl() {
         const canvas = document.getElementById(this.divId);
@@ -25,29 +25,31 @@ window.canvasInteropFunctions = {
         instance.canvas = new fabric.Canvas(divId);
         instance.divId = divId;
     },
-    drawText: function (xPos, yPos, text, divId) {
+    drawText: function (xPos, yPos, text, tag, divId) {
         const instance = CanvasInterop.getInstance(divId);
-        const name = "Lovely Shape " + Math.round(Math.random() * 100);
-        const canvasText = new fabric.Text(text, {
+        const canvasText = new fabric.Textbox(text, {
             fontSize: 30,
             left: xPos,
+            editable: true,
             top: yPos,
-            styles: {
-                comment: "Item 1",
-                0: {
-                    0: { fontWeight: "bold", fontSize: 100 }
-                }
-            }
         });
         canvasText.toObject = (function (toObject) {
             return function () {
-                return fabric.util.object.extend(toObject.call(this), { name: name });
+                return fabric.util.object.extend(toObject.call(this), { tag: tag });
             };
         })(canvasText.toObject);
         instance.canvas.add(canvasText);
     },
     drawImage: function (xPos, yPos, image, divId) {
         const instance = CanvasInterop.getInstance(divId);
+    },
+    exportJson: function (divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        return instance.canvas.toJSON(["tag"]);
+    },
+    importJson: function (divId, json) {
+        const instance = CanvasInterop.getInstance(divId);
+        return instance.canvas.loadFromJSON(json);
     },
     exportCanvas: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
