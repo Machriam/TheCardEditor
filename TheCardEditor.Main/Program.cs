@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Shared;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 namespace TheCardEditor.Main;
 
@@ -27,6 +28,7 @@ internal static class Program
         var environmentConfiguration = new EnvironmentConfiguration(configuration);
         var services = new ServiceCollection();
         services.AddWindowsFormsBlazorWebView();
+        services.AddHotKeys2();
         services.AddEntityFrameworkSqlite();
         services.AddDbContext<DataContext>(opt =>
                     opt.UseSqlite($"Data Source={environmentConfiguration.DatabasePath}", a =>

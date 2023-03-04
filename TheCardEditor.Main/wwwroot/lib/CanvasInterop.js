@@ -40,6 +40,31 @@ window.canvasInteropFunctions = {
         })(canvasText.toObject);
         instance.canvas.add(canvasText);
     },
+    onKeyDown(key, divId) {
+        const canvas = CanvasInterop.getInstance(divId).canvas;
+        const step = 1;
+        const activeGroup = canvas.getActiveObjects();
+        if (Array.isArray(activeGroup) && activeGroup.length > 0) {
+            activeGroup.forEach(obj => {
+                switch (key) {
+                    case "ArrowLeft":
+                        obj.left = obj.left - step;
+                        break;
+                    case "ArrowUp":
+                        obj.top = obj.top - step;
+                        break;
+                    case "ArrowRight":
+                        obj.left = obj.left + step;
+                        break;
+                    case "ArrowDown":
+                        obj.top = obj.top + step;
+                        break;
+                }
+                obj.setCoords();
+            });
+            canvas.renderAll();
+        }
+    },
     drawImage: function (xPos, yPos, image, divId) {
         const instance = CanvasInterop.getInstance(divId);
     },

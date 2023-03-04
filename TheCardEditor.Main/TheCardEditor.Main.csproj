@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.WindowsForms" Version="7.0.52" />
+    <PackageReference Include="Toolbelt.Blazor.HotKeys2" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
