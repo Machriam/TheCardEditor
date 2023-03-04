@@ -27,6 +27,7 @@ public interface ICanvasInterop : IDisposable
     ValueTask DrawPicture(int xPos, int yPos, byte[] image);
 
     ValueTask DrawText(int xPos, int yPos, string text);
+
     ValueTask<string> ExportPng();
 }
 
@@ -61,7 +62,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     public async ValueTask<string> ExportPng()
     {
         await Initialize();
-        return await _jsRuntime.InvokeAsync<string>(JsExport,_divId);
+        return await _jsRuntime.InvokeAsync<string>(JsExport, _divId);
     }
 
     public async ValueTask DrawText(int xPos, int yPos, string text)
