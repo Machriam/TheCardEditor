@@ -8,6 +8,7 @@
 <p>Current count: @currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="AddPicture">Picture</button>
 <canvas style="border:1px solid #000000" id="@CanvasId" width="300" height="300"></canvas>
 
 @code {
@@ -23,6 +24,11 @@
         _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId);
     }
 
+    private async Task AddPicture()
+    {
+        currentCount++;
+        await _canvasInterop.DrawPicture(10, 20, "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAASCAIAAADkPnhmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIxSURBVDhPJVLbctMwEJVWsiTHl6RJyrTAYwktD53hYxj4e+Cx0DjxTdZdrIsfPJZ1dvfsOYf++P6N0FRtNkqVhGQheF2VTV3VdSll0bbV3d1t111+/voNdaXwDv9yTkXBi4ID0BDCYqyPKcRsjI0pciFgt2uO7/bNttrU6ni7223rnNOsdd+PQiqh1OvrX2vt/rAHrW2MlHOlVMV5oaTc79ptUyrJcgzeuhQzIYwxAdO0mMXHSCjlhACi26ZCVlKwFLy3NmeSUg4+soeHT84645zzniFQFIxBiDHlCID1mVHQi3k9X6EoS2PtOEyXru+HeZqNcSETYIXAwTnnQvCU0zjOcLi/p0LgtuOoz11/uY6LdgiVagNMoCJ1U0mpcgJo2+bpy+P+cIM7mMUM49z1U8ooYhNCHvrlcpn7fp5nDWVRnD4/HA43yB4Jz/PSXWfnc1EoY3x3GV9erudumLRmT0+P0zh257N3jpI3dpnE4KZpvPaDdQ7t0Is11rHT6bQsxnlHEZgTviihaA+CYoxY532weHAeaM6oDG7MpOCrs6gXvH1IITaMSx+SxU7OAZq+jswZKBVy9ZJhCmCl4rzRGj3WBgVEKF4jjsQIKZVSqFICo6g8yUHrcRiu8zShMsiYPX99fv/hY4XhWocyzpgS/70tjVmcRYpAUB3sRSlgOpq2rqoNBhEJ7rbNtl2hDABTxoCtaEKhqTeX8x89DSiQdx4DcDzeYBmCcCg+GclgQ4B/wx9tcrPlIgoAAAAASUVORK5CYII=");
+    }
     private async Task IncrementCount()
     {
         currentCount++;

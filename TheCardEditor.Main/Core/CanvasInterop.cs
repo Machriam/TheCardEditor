@@ -27,7 +27,7 @@ public class CanvasInteropFactory : ICanvasInteropFactory
 
 public interface ICanvasInterop : IDisposable
 {
-    ValueTask DrawPicture(int xPos, int yPos, byte[] image);
+    ValueTask DrawPicture(int xPos, int yPos, string base64Image);
 
     ValueTask DrawText(int xPos, int yPos, string text, string tag);
 
@@ -87,10 +87,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await _jsRuntime.HandledInvokeVoid(JsDrawText, xPos, yPos, text, tag, _divId);
     }
 
-    public async ValueTask DrawPicture(int xPos, int yPos, byte[] image)
+    public async ValueTask DrawPicture(int xPos, int yPos, string base64Image)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, image, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, base64Image, _divId);
     }
 
     public async void Dispose()

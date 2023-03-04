@@ -65,8 +65,12 @@ window.canvasInteropFunctions = {
             canvas.renderAll();
         }
     },
-    drawImage: function (xPos, yPos, image, divId) {
+    drawPicture: function (xPos, yPos, image, divId) {
         const instance = CanvasInterop.getInstance(divId);
+        fabric.Image.fromURL(image, function (img) {
+            img.set({ left: xPos, top: yPos });
+            instance.canvas.add(img);
+        })
     },
     exportJson: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
