@@ -4,7 +4,7 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup>
-    <ActiveDebugProfile>Watch</ActiveDebugProfile>
+    <ActiveDebugProfile>Debug</ActiveDebugProfile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Update="MainForm.cs">

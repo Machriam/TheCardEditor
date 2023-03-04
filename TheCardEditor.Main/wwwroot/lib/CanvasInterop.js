@@ -1,5 +1,6 @@
 ﻿class CanvasInterop {
     divId;
+    canvas;
     static getInstance(divId) {
         if (!window.canvasInteropFunctions.instance.hasOwnProperty(divId)) {
             window.canvasInteropFunctions.instance[divId] = new CanvasInterop();
@@ -16,26 +17,43 @@
         const canvas = document.getElementById(this.divId);
         return canvas.toDataURL("image/png");
     }
-
 }
 window.canvasInteropFunctions = {
     instance: {},
     initialize: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
+        instance.canvas = new fabric.Canvas(divId);
         instance.divId = divId;
     },
     drawText: function (xPos, yPos, text, divId) {
         const instance = CanvasInterop.getInstance(divId);
-        const context = instance.getContext();
-        context.font = "30px Arial";
-        context.strokeText(text, xPos, yPos);
+        const name = "Lovely Shape " + Math.round(Math.random() * 100);
+        const canvasText = new fabric.Text(text, {
+            fontSize: 30,
+            left: xPos,
+            top: yPos,
+            styles: {
+                comment: "Item 1",
+                0: {
+                    0: { fontWeight: "bold", fontSize: 100 }
+                }
+            }
+        });
+        canvasText.toObject = (function (toObject) {
+            return function () {
+                return fabric.util.object.extend(toObject.call(this), { name: name });
+            };
+        })(canvasText.toObject);
+        instance.canvas.add(canvasText);
     },
     drawImage: function (xPos, yPos, image, divId) {
         const instance = CanvasInterop.getInstance(divId);
     },
     exportCanvas: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
-        return instance.getDataUrl();
+        const result = instance.getDataUrl();
+        console.log(result);
+        return result;
     },
     dispose: function (divId) {
         CanvasInterop.removeInstance(divId);

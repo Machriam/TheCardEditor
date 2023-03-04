@@ -55,30 +55,30 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private async ValueTask Initialize()
     {
         if (_initialized) return;
-        await _jsRuntime.InvokeVoidAsync(JsInitialize, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsInitialize, _divId);
         _initialized = true;
     }
 
     public async ValueTask<string> ExportPng()
     {
         await Initialize();
-        return await _jsRuntime.InvokeAsync<string>(JsExport, _divId);
+        return await _jsRuntime.HandledInvoke<string>(JsExport, _divId) ?? "";
     }
 
     public async ValueTask DrawText(int xPos, int yPos, string text)
     {
         await Initialize();
-        await _jsRuntime.InvokeVoidAsync(JsDrawText, xPos, yPos, text, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsDrawText, xPos, yPos, text, _divId);
     }
 
     public async ValueTask DrawPicture(int xPos, int yPos, byte[] image)
     {
         await Initialize();
-        await _jsRuntime.InvokeVoidAsync(JsDrawPicture, xPos, yPos, image, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, image, _divId);
     }
 
     public async void Dispose()
     {
-        await _jsRuntime.InvokeVoidAsync(JsDispose, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsDispose, _divId);
     }
 }
