@@ -25,11 +25,10 @@ window.canvasInteropFunctions = {
         instance.canvas = new fabric.Canvas(divId);
         instance.divId = divId;
     },
-    selectObject: function () {
-
-    },
-    getObjects: function () {
-
+    selectObject: function (index, divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        instance.canvas.setActiveObject(instance.canvas.item(index));
+        instance.canvas.renderAll();
     },
     drawText: function (xPos, yPos, text, tag, divId) {
         const instance = CanvasInterop.getInstance(divId);
@@ -38,6 +37,7 @@ window.canvasInteropFunctions = {
             left: xPos,
             editable: true,
             top: yPos,
+            lockScalingY: true
         });
         canvasText.toObject = (function (toObject) {
             return function () {

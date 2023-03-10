@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿using System.Text.Json.Nodes;
 using Microsoft.JSInterop;
 using Toolbelt.Blazor.HotKeys2;
 
@@ -30,13 +30,15 @@ public interface ICanvasInterop : IDisposable
 {
     ValueTask<string> ExportPng();
 
-    ValueTask<JsonDocument> ExportJson();
+    ValueTask<JsonObject> ExportJson();
 
-    ValueTask ImportJson(JsonDocument json);
+    ValueTask ImportJson(JsonObject json);
 
     ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image);
 
     ValueTask DrawText(int xPos, int yPos, string text, string tag);
+
+    ValueTask SelectObject(int index);
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -53,6 +55,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string JsDrawText => Namespace + ".drawText";
     private static string JsDrawPicture => Namespace + ".drawPicture";
     private static string JsExport => Namespace + ".exportCanvas";
+    private static string JsSelectObject => Namespace + ".selectObject";
     private static string JsonExport => Namespace + ".exportJson";
     private static string JsonImport => Namespace + ".importJson";
     private static string OnKeyDown => Namespace + ".onKeyDown";
@@ -80,6 +83,12 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await _jsRuntime.HandledInvokeVoid(OnKeyDown, e.Key, _divId);
     }
 
+    public async ValueTask SelectObject(int index)
+    {
+        await Initialize();
+        await _jsRuntime.HandledInvokeVoid(JsSelectObject, index, _divId);
+    }
+
     public async ValueTask<string> ExportPng()
     {
         await Initialize();
@@ -98,16 +107,16 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, id, name, base64Image, _divId);
     }
 
-    public async ValueTask ImportJson(JsonDocument json)
+    public async ValueTask ImportJson(JsonObject json)
     {
         await Initialize();
         await _jsRuntime.HandledInvokeVoid(JsonImport, json, _divId);
     }
 
-    public async ValueTask<JsonDocument> ExportJson()
+    public async ValueTask<JsonObject> ExportJson()
     {
         await Initialize();
-        return await _jsRuntime.HandledInvoke<JsonDocument>(JsonExport, _divId) ?? throw new Exception("JsonExport method not found");
+        return await _jsRuntime.HandledInvoke<JsonObject>(JsonExport, _divId) ?? throw new Exception("JsonExport method not found");
     }
 
     public async void Dispose()

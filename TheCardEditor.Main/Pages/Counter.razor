@@ -1,5 +1,6 @@
 @implements IDisposable
 @using System.Text.Json;
+@using System.Text.Json.Nodes;
 @using TheCardEditor.DataModel.DataModel;
 @using TheCardEditor.Main.Core;
 @using TheCardEditor.Shared;
@@ -8,20 +9,39 @@
 
 <p>Current count: @currentCount</p>
 
-<Button class="btn btn-primary" OnClickAsync="IncrementCount">Click me</Button>
-<Button class="btn btn-primary" OnClickAsync="AddPicture">Picture</Button>
-<Button class="btn btn-primary" OnClickAsync="LoadJson">Load Json</Button>
-<Button class="btn btn-primary" OnClickAsync="SaveJson">Save Json</Button>
+<div class="col-md-12 row">
+    <Button class="btn btn-primary col-md-1" OnClickAsync="IncrementCount">Click me</Button>
+    <Button class="btn btn-primary col-md-1" OnClickAsync="AddPicture">Picture</Button>
+    <Button class="btn btn-primary col-md-1" OnClickAsync="LoadJson">Load Json</Button>
+    <Button class="btn btn-primary col-md-1" OnClickAsync="SaveJson">Save Json</Button>
+    <div class="col-md-2">
+        <input class="form-control" @bind="SelectIndex" />
+        <Button class="btn btn-primary" OnClickAsync="SelectObject">Select Object @SelectIndex</Button>
+    </div>
+    <div class="col-md-2">
+        @if (_canvasObjects != null)
+        {
+            @foreach (var item in _canvasObjects)
+            {
+                <div style="cursor:pointer;" class="hovery"
+                @onclick="@(async ()=>{SelectIndex=item.Index; await SelectObject();})"><span>@item.Name</span><span>@item.Tag</span><span>@item.Index</span></div>
+            }
+        }
+    </div>
+</div>
 <canvas style="border:1px solid #000000" id="@CanvasId" width="300" height="300"></canvas>
+
 
 @code {
     [Inject] IErrorLogger ErrorLogger { get; set; } = default!;
     [Inject] ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
     private ICanvasInterop _canvasInterop = default!;
     public const string Location = "";
-    private JsonDocument? _json;
+    private JsonObject? _json;
+    IEnumerable<(string? Name, string? Tag, int Index)>? _canvasObjects;
     private const string CanvasId = "MySweetCanvas";
     private int currentCount = 0;
+    private int SelectIndex { get; set; } = 0;
     protected override void OnAfterRender(bool firstRender)
     {
         if (!firstRender) return;
@@ -32,9 +52,26 @@
         if (_json == null) return;
         await _canvasInterop.ImportJson(_json);
     }
+    private async Task SelectObject()
+    {
+        await _canvasInterop.SelectObject(SelectIndex);
+    }
+    private IEnumerable<(string? Name, string? Tag, int Index)> GetObjects()
+    {
+        var result = new List<(string?, string?, int)>();
+        if (_json == null) return result;
+        var jsonArray = (JsonArray)_json["objects"]!;
+        for (var i = 0; i < jsonArray.Count; i++)
+        {
+            result.Add((jsonArray[i]?["name"]?.GetValue<string>(), jsonArray[i]?["tag"]?.GetValue<string>(), i));
+        }
+        return result;
+    }
     private async Task SaveJson()
     {
         _json = await _canvasInterop.ExportJson();
+        _canvasObjects = GetObjects();
+        StateHasChanged();
     }
     private async Task AddPicture()
     {
@@ -52,3 +89,8 @@
         _canvasInterop?.Dispose();
     }
 }
+<style>
+    .hovery:hover{
+        background-color:palevioletred;
+    }
+</style>
