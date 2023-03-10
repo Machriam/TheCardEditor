@@ -1,4 +1,5 @@
 @implements IDisposable
+@using System.Text.Json;
 @using TheCardEditor.DataModel.DataModel;
 @using TheCardEditor.Main.Core;
 @using TheCardEditor.Shared;
@@ -7,8 +8,10 @@
 
 <p>Current count: @currentCount</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
-<button class="btn btn-primary" @onclick="AddPicture">Picture</button>
+<Button class="btn btn-primary" OnClickAsync="IncrementCount">Click me</Button>
+<Button class="btn btn-primary" OnClickAsync="AddPicture">Picture</Button>
+<Button class="btn btn-primary" OnClickAsync="LoadJson">Load Json</Button>
+<Button class="btn btn-primary" OnClickAsync="SaveJson">Save Json</Button>
 <canvas style="border:1px solid #000000" id="@CanvasId" width="300" height="300"></canvas>
 
 @code {
@@ -16,12 +19,22 @@
     [Inject] ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
     private ICanvasInterop _canvasInterop = default!;
     public const string Location = "";
+    private JsonDocument? _json;
     private const string CanvasId = "MySweetCanvas";
     private int currentCount = 0;
     protected override void OnAfterRender(bool firstRender)
     {
         if (!firstRender) return;
         _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId);
+    }
+    private async Task LoadJson()
+    {
+        if (_json == null) return;
+        await _canvasInterop.ImportJson(_json);
+    }
+    private async Task SaveJson()
+    {
+        _json = await _canvasInterop.ExportJson();
     }
 
     private async Task AddPicture()

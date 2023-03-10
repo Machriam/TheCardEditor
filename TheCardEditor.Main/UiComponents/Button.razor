@@ -1,0 +1,27 @@
+@using Microsoft.JSInterop;
+@using TheCardEditor.Shared;
+<button @attributes="Attributes" @onclick=ExecuteMethod>@ChildContent</button>
+@code {
+    [Inject] IErrorLogger ErrorLogger { get; set; } = default!;
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; } = new();
+    [Parameter]
+    public Action? OnClick { get; set; } = default!;
+    [Parameter]
+    public Func<Task>? OnClickAsync { get; set; } = default!;
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = default!;
+    public async Task ExecuteMethod()
+    {
+        try
+        {
+            if (OnClick == null && OnClickAsync == null) throw new Exception("One Clickhandler must be defined");
+            if (OnClick != null) OnClick.Invoke();
+            if (OnClickAsync != null) await OnClickAsync.Invoke();
+        }
+        catch (Exception ex)
+        {
+            await ErrorLogger.LogError(ex.Message, ex.StackTrace ?? "");
+        }
+    }
+}

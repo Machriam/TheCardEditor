@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using System.Text.Json;
+using Microsoft.JSInterop;
 using Toolbelt.Blazor.HotKeys2;
 
 namespace TheCardEditor.Main.Core;
@@ -32,6 +33,10 @@ public interface ICanvasInterop : IDisposable
     ValueTask DrawText(int xPos, int yPos, string text, string tag);
 
     ValueTask<string> ExportPng();
+
+    ValueTask<JsonDocument> ExportJson();
+
+    ValueTask ImportJson(JsonDocument json);
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -91,6 +96,18 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     {
         await Initialize();
         await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, base64Image, _divId);
+    }
+
+    public async ValueTask ImportJson(JsonDocument json)
+    {
+        await Initialize();
+        await _jsRuntime.HandledInvokeVoid(JsonImport, json, _divId);
+    }
+
+    public async ValueTask<JsonDocument> ExportJson()
+    {
+        await Initialize();
+        return await _jsRuntime.HandledInvoke<JsonDocument>(JsonExport, _divId) ?? throw new Exception("JsonExport method not found");
     }
 
     public async void Dispose()

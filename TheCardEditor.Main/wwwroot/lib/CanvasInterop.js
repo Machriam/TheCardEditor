@@ -76,7 +76,7 @@ window.canvasInteropFunctions = {
         const instance = CanvasInterop.getInstance(divId);
         return instance.canvas.toJSON(["tag"]);
     },
-    importJson: function (divId, json) {
+    importJson: function (json, divId) {
         const instance = CanvasInterop.getInstance(divId);
         return instance.canvas.loadFromJSON(json);
     },
