@@ -25,6 +25,12 @@ window.canvasInteropFunctions = {
         instance.canvas = new fabric.Canvas(divId);
         instance.divId = divId;
     },
+    selectObject: function () {
+
+    },
+    getObjects: function () {
+
+    },
     drawText: function (xPos, yPos, text, tag, divId) {
         const instance = CanvasInterop.getInstance(divId);
         const canvasText = new fabric.Textbox(text, {
@@ -65,16 +71,22 @@ window.canvasInteropFunctions = {
             canvas.renderAll();
         }
     },
-    drawPicture: function (xPos, yPos, image, divId) {
+    drawPicture: function (xPos, yPos, pictureId, name, image, divId) {
         const instance = CanvasInterop.getInstance(divId);
         fabric.Image.fromURL(image, function (img) {
             img.set({ left: xPos, top: yPos });
+            img.toObject = (function (toObject) {
+                return function () {
+                    return fabric.util.object.extend(toObject.call(this),
+                        { pictureId: pictureId, name: name });
+                };
+            })(img.toObject);
             instance.canvas.add(img);
         })
     },
     exportJson: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
-        return instance.canvas.toJSON(["tag"]);
+        return instance.canvas.toJSON(["tag", "pictureId", "name"]);
     },
     importJson: function (json, divId) {
         const instance = CanvasInterop.getInstance(divId);

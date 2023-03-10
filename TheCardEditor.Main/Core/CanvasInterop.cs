@@ -28,15 +28,15 @@ public class CanvasInteropFactory : ICanvasInteropFactory
 
 public interface ICanvasInterop : IDisposable
 {
-    ValueTask DrawPicture(int xPos, int yPos, string base64Image);
-
-    ValueTask DrawText(int xPos, int yPos, string text, string tag);
-
     ValueTask<string> ExportPng();
 
     ValueTask<JsonDocument> ExportJson();
 
     ValueTask ImportJson(JsonDocument json);
+
+    ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image);
+
+    ValueTask DrawText(int xPos, int yPos, string text, string tag);
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -92,10 +92,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await _jsRuntime.HandledInvokeVoid(JsDrawText, xPos, yPos, text, tag, _divId);
     }
 
-    public async ValueTask DrawPicture(int xPos, int yPos, string base64Image)
+    public async ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, base64Image, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, id, name, base64Image, _divId);
     }
 
     public async ValueTask ImportJson(JsonDocument json)
