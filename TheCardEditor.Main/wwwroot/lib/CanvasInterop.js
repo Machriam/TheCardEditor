@@ -30,6 +30,28 @@ window.canvasInteropFunctions = {
         instance.canvas.setActiveObject(instance.canvas.item(index));
         instance.canvas.renderAll();
     },
+    applyFont: function (styleName, value, divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        const object = instance.canvas.getActiveObject();
+        if (object.type != "textbox") return;
+        let line = 0;
+        let index = 0;
+        for (let i = 0; i < object.text.length; i++) {
+            if (object.selectionStart <= i && object.selectionEnd >= i) {
+                const lineDefined = object.styles[line] != undefined;
+                if (!lineDefined) object.styles[line] = {};
+                const indexDefined = object.styles[line][index] != undefined;
+                if (!indexDefined) object.styles[line][index] = {};
+                object.styles[line][index][styleName] = value;
+            }
+            index++;
+            if (object.text[i] == '\n') {
+                line++;
+                index = 0;
+            }
+        }
+        instance.canvas.renderAll();
+    },
     drawText: function (xPos, yPos, text, tag, divId) {
         const instance = CanvasInterop.getInstance(divId);
         const canvasText = new fabric.Textbox(text, {
@@ -41,7 +63,7 @@ window.canvasInteropFunctions = {
         });
         canvasText.toObject = (function (toObject) {
             return function () {
-                return fabric.util.object.extend(toObject.call(this), { tag: tag });
+                return fabric.util.object.extend(toObject.call(this), { tag: tag, lockScalingY: true });
             };
         })(canvasText.toObject);
         instance.canvas.add(canvasText);
@@ -86,7 +108,7 @@ window.canvasInteropFunctions = {
     },
     exportJson: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
-        return instance.canvas.toJSON(["tag", "pictureId", "name"]);
+        return instance.canvas.toJSON(["tag", "pictureId", "name", "lockScalingY"]);
     },
     importJson: function (json, divId) {
         const instance = CanvasInterop.getInstance(divId);

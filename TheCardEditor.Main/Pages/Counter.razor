@@ -24,12 +24,23 @@
             @foreach (var item in _canvasObjects)
             {
                 <div style="cursor:pointer;" class="hovery"
-                @onclick="@(async ()=>{SelectIndex=item.Index; await SelectObject();})"><span>@item.Name</span><span>@item.Tag</span><span>@item.Index</span></div>
+             @onclick="@(async ()=>{SelectIndex=item.Index; await SelectObject();})">
+                    <span>@item.Name</span><span>@item.Tag</span><span>@item.Index</span>
+                </div>
             }
         }
     </div>
 </div>
-<canvas style="border:1px solid #000000" id="@CanvasId" width="300" height="300"></canvas>
+<div class="col-md-12">
+    <canvas style="border:1px solid #000000" id="@CanvasId" width="300" height="300"></canvas>
+    <div class="col-md-2">
+        <Button OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.FontWeight,500))">Change Bold</Button>
+        <div class="col-md-12">
+            <input @bind="FontSize" />
+            <Button OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.FontSize,FontSize))">Change Font Size</Button>
+        </div>
+    </div>
+</div>
 
 
 @code {
@@ -41,6 +52,7 @@
     IEnumerable<(string? Name, string? Tag, int Index)>? _canvasObjects;
     private const string CanvasId = "MySweetCanvas";
     private int currentCount = 0;
+    private int FontSize { get; set; } = 12;
     private int SelectIndex { get; set; } = 0;
     protected override void OnAfterRender(bool firstRender)
     {
@@ -55,6 +67,10 @@
     private async Task SelectObject()
     {
         await _canvasInterop.SelectObject(SelectIndex);
+    }
+    private async Task ApplyFont(CanvasFontStyle style, object value)
+    {
+        await _canvasInterop.ApplyFont(style, value);
     }
     private IEnumerable<(string? Name, string? Tag, int Index)> GetObjects()
     {
@@ -90,7 +106,7 @@
     }
 }
 <style>
-    .hovery:hover{
-        background-color:palevioletred;
+    .hovery:hover {
+        background-color: palevioletred;
     }
 </style>
