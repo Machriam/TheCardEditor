@@ -5,7 +5,7 @@
 @using TheCardEditor.Main.Core;
 @using TheCardEditor.Shared;
 @attribute [Route(Location)]
-<h1>Counter</h1>
+<h1 style="font-family:'Shitty Test Font'">Counter</h1>
 
 <p>Current count: @currentCount</p>
 
@@ -45,17 +45,29 @@
         <Button class="btn btn-primary col-md-12" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.Overline,true))">Overline</Button>
         <Button class="btn btn-primary col-md-12" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.Clear,true))">Clear</Button>
         <div class="col-md-12 row">
+            <select @onchange="@(arg=>selectedFont=arg.Value?.ToString()??"")" class="form-control">
+                @foreach (var option in AvailableFonts)
+                {
+                    <option value="@option">@option</option>
+                }
+            </select>
+            <Button class="btn btn-primary" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.FontFamily,selectedFont))">Apply Font</Button>
+        </div>
+        <div class="col-md-12 row">
             <div class="col-md-3">
                 <input class="form-control" @bind="FontSize" />
             </div>
             <Button class="btn btn-primary col-md-8" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.FontSize,FontSize))">Change Font Size</Button>
         </div>
     </div>
+    <div class="col-md-12">
+        <Button class="btn btn-primary" OnClickAsync="@(async ()=>await LoadFont())">Load Shitty Font</Button>
+    </div>
 </div>
 
 
 @code {
-    [Inject] IErrorLogger ErrorLogger { get; set; } = default!;
+    [Inject] IJsInterop JsInterop { get; set; } = default!;
     [Inject] ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
     private ICanvasInterop _canvasInterop = default!;
     public const string Location = "";
@@ -65,10 +77,21 @@
     private int currentCount = 0;
     private int FontSize { get; set; } = 12;
     private int SelectIndex { get; set; } = 0;
-    protected override void OnAfterRender(bool firstRender)
+    private string selectedFont = "";
+    private List<string> AvailableFonts = new();
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
+        AvailableFonts.AddRange(await JsInterop.GetAvailableFonts());
         _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId);
+        StateHasChanged();
+    }
+    private async Task LoadFont()
+    {
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ShittyFont.woff2");
+        await JsInterop.LoadFont("Shitty Test Font", Convert.ToBase64String(File.ReadAllBytes(path)));
+        AvailableFonts.Add("Shitty Test Font");
+        StateHasChanged();
     }
     private async Task LoadJson()
     {

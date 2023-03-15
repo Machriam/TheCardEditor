@@ -3,7 +3,13 @@ using TheCardEditor.Shared;
 
 namespace TheCardEditor.Main.Core;
 
-public class JsInterop : IErrorLogger
+public interface IJsInterop : IErrorLogger
+{
+    Task<IEnumerable<string>> GetAvailableFonts();
+    Task LoadFont(string fontName, string base64Data);
+}
+
+public class JsInterop : IJsInterop
 {
     private readonly IJSRuntime _jsRuntime;
 
@@ -15,5 +21,15 @@ public class JsInterop : IErrorLogger
     public async Task LogError(string message, string stackTrace = "")
     {
         await _jsRuntime.InvokeVoidAsync("alert", message + "\n" + stackTrace);
+    }
+
+    public async Task<IEnumerable<string>> GetAvailableFonts()
+    {
+        return await _jsRuntime.InvokeAsync<IEnumerable<string>>("coreFunctions.getAvailableFonts");
+    }
+
+    public async Task LoadFont(string fontName, string base64Data)
+    {
+        await _jsRuntime.InvokeVoidAsync("coreFunctions.loadFont", fontName, base64Data);
     }
 }

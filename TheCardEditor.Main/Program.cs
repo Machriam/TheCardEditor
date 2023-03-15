@@ -40,6 +40,7 @@ internal static class Program
 #endif
         services.AddSingleton<MainForm>();
         services.AddTransient<IErrorLogger, JsInterop>();
+        services.AddTransient<IJsInterop, JsInterop>();
         services.AddTransient<ICanvasInteropFactory, CanvasInteropFactory>();
         var mainForm = services.BuildServiceProvider().GetService<MainForm>();
         Application.Run(mainForm);
