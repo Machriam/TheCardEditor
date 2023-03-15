@@ -30,6 +30,17 @@ window.canvasInteropFunctions = {
         instance.canvas.setActiveObject(instance.canvas.item(index));
         instance.canvas.renderAll();
     },
+    bringForward: function (index, divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        instance.canvas.bringForward(instance.canvas.item(index));
+        instance.canvas.discardActiveObject().renderAll();
+        return Math.min(instance.canvas._objects.length, index + 1);
+    },
+    sendBackwards: function (index, divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        instance.canvas.sendBackwards(instance.canvas.item(index));
+        instance.canvas.discardActiveObject().renderAll();
+    },
     applyFont: function (styleName, value, divId) {
         const instance = CanvasInterop.getInstance(divId);
         const object = instance.canvas.getActiveObject();

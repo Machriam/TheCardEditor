@@ -30,6 +30,10 @@
             }
         }
     </div>
+    <div class="col-md-2">
+        <Button class="btn btn-primary col-md-12" OnClickAsync="SendBackwards">Send Backwards</Button>
+        <Button class="btn btn-primary col-md-12" OnClickAsync="BringForward">Bring Forward</Button>
+    </div>
 </div>
 <div class="col-md-12 row ps-3 pt-3">
     <canvas style="border:1px solid #000000" id="@CanvasId" width="300" height="300"></canvas>
@@ -89,6 +93,14 @@
             result.Add((jsonArray[i]?["name"]?.GetValue<string>(), jsonArray[i]?["tag"]?.GetValue<string>(), i));
         }
         return result;
+    }
+    private async Task BringForward()
+    {
+        SelectIndex = await _canvasInterop.BringForward(SelectIndex);
+    }
+    private async Task SendBackwards()
+    {
+        SelectIndex = await _canvasInterop.SendBackwards(SelectIndex);
     }
     private async Task SaveJson()
     {

@@ -31,6 +31,7 @@ public enum CanvasFontStyle
 
     [Description("linethrough")]
     Linethrough,
+
     [Description("clear")]
     Clear
 }
@@ -72,6 +73,10 @@ public interface ICanvasInterop : IDisposable
     ValueTask SelectObject(int index);
 
     ValueTask ApplyFont(CanvasFontStyle style, object value);
+
+    ValueTask<int> SendBackwards(int index);
+
+    ValueTask<int> BringForward(int index);
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -90,8 +95,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string JsExport => Namespace + ".exportCanvas";
     private static string JsSelectObject => Namespace + ".selectObject";
     private static string JsApplyFont => Namespace + ".applyFont";
-    private static string JsonExport => Namespace + ".exportJson";
-    private static string JsonImport => Namespace + ".importJson";
+    private static string JsJsonExport => Namespace + ".exportJson";
+    private static string JsBringForward => Namespace + ".bringForward";
+    private static string JsSendBackwards => Namespace + ".sendBackwards";
+    private static string JsJsonImport => Namespace + ".importJson";
     private static string OnKeyDown => Namespace + ".onKeyDown";
     private static string JsDispose => Namespace + ".dispose";
 
@@ -129,6 +136,19 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await _jsRuntime.HandledInvokeVoid(JsSelectObject, index, _divId);
     }
 
+    public async ValueTask<int> SendBackwards(int index)
+    {
+        await Initialize();
+        await _jsRuntime.HandledInvokeVoid(JsSendBackwards, index, _divId);
+        return index == 0 ? 0 : index - 1;
+    }
+
+    public async ValueTask<int> BringForward(int index)
+    {
+        await Initialize();
+        return await _jsRuntime.HandledInvoke<int>(JsBringForward, index, _divId);
+    }
+
     public async ValueTask<string> ExportPng()
     {
         await Initialize();
@@ -150,13 +170,13 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     public async ValueTask ImportJson(JsonObject json)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsonImport, json, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsJsonImport, json, _divId);
     }
 
     public async ValueTask<JsonObject> ExportJson()
     {
         await Initialize();
-        return await _jsRuntime.HandledInvoke<JsonObject>(JsonExport, _divId) ?? throw new Exception("JsonExport method not found");
+        return await _jsRuntime.HandledInvoke<JsonObject>(JsJsonExport, _divId) ?? throw new Exception("JsonExport method not found");
     }
 
     public async void Dispose()
