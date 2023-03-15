@@ -31,13 +31,20 @@
         }
     </div>
 </div>
-<div class="col-md-12">
+<div class="col-md-12 row ps-3 pt-3">
     <canvas style="border:1px solid #000000" id="@CanvasId" width="300" height="300"></canvas>
-    <div class="col-md-2">
-        <Button OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.FontWeight,500))">Change Bold</Button>
-        <div class="col-md-12">
-            <input @bind="FontSize" />
-            <Button OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.FontSize,FontSize))">Change Font Size</Button>
+    <div class="col-md-2 d-flex flex-column justify-content-between">
+        <Button class="btn btn-primary col-md-12" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.FontWeight,"bold"))">Change Bold</Button>
+        <Button class="btn btn-primary col-md-12" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.Stroke,"red"))">Red Stroke</Button>
+        <Button class="btn btn-primary col-md-12" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.Linethrough,true))">Linethrough</Button>
+        <Button class="btn btn-primary col-md-12" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.Underline,true))">Underline</Button>
+        <Button class="btn btn-primary col-md-12" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.Overline,true))">Overline</Button>
+        <Button class="btn btn-primary col-md-12" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.Clear,true))">Clear</Button>
+        <div class="col-md-12 row">
+            <div class="col-md-3">
+                <input class="form-control" @bind="FontSize" />
+            </div>
+            <Button class="btn btn-primary col-md-8" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.FontSize,FontSize))">Change Font Size</Button>
         </div>
     </div>
 </div>

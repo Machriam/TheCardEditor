@@ -30,7 +30,9 @@ public enum CanvasFontStyle
     Overline,
 
     [Description("linethrough")]
-    Linethrough
+    Linethrough,
+    [Description("clear")]
+    Clear
 }
 
 public interface ICanvasInteropFactory

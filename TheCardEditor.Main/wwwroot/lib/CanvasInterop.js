@@ -33,16 +33,17 @@ window.canvasInteropFunctions = {
     applyFont: function (styleName, value, divId) {
         const instance = CanvasInterop.getInstance(divId);
         const object = instance.canvas.getActiveObject();
-        if (object.type != "textbox") return;
+        if (object?.type != "textbox") return;
         let line = 0;
         let index = 0;
         for (let i = 0; i < object.text.length; i++) {
-            if (object.selectionStart <= i && object.selectionEnd >= i) {
+            if (object.selectionStart <= i && object.selectionEnd > i) {
                 const lineDefined = object.styles[line] != undefined;
                 if (!lineDefined) object.styles[line] = {};
                 const indexDefined = object.styles[line][index] != undefined;
                 if (!indexDefined) object.styles[line][index] = {};
-                object.styles[line][index][styleName] = value;
+                if (styleName == "clear") object.styles[line][index] = {};
+                else object.styles[line][index][styleName] = value;
             }
             index++;
             if (object.text[i] == '\n') {
