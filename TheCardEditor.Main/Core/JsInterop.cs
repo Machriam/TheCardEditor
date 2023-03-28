@@ -20,7 +20,8 @@ public class JsInterop : IJsInterop
 
     public async Task LogError(string message, string stackTrace = "")
     {
-        await _jsRuntime.InvokeVoidAsync("alert", message + "\n" + stackTrace);
+        await _jsRuntime.InvokeVoidAsync("console.log", message + "\n" + stackTrace);
+        await _jsRuntime.InvokeVoidAsync("alert", message);
     }
 
     public async Task<IEnumerable<string>> GetAvailableFonts()

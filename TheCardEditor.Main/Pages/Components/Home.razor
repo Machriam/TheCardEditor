@@ -2,11 +2,24 @@
 @using TheCardEditor.DataModel.DTO;
 @using Microsoft.AspNetCore.Components.Forms
 <div class="col-md-12 row">
-    <div class="col-md-9">
+    <div class="col-md-4">
+        <h2>Games</h2>
+        @foreach (var game in Games)
+        {
+            <div @onclick="@(()=>_selectedGame=game)" style="background-color:@(_selectedGame.Id==game.Id?"lightblue":"")">
+                <label class="col-form-label-lg">@game.Name</label>
+            </div>
+        }
+        <FloatingInput ValueSelector="()=>_selectedGame.Name" Label="Game Name" InputChanged="a=>_selectedGame.Name=a" />
+        <Button class="btn btn-primary" OnClick="()=>{_selectedGame.Id=0; AddGame();}">Add Game</Button>
+        <Button disabled="@(_selectedGame.Id==0)" class="btn btn-primary" OnClick="AddGame">Update Game</Button>
+        <Button disabled="@(_selectedGame.Id==0)" class="btn btn-primary" OnClick="DeleteGame">Delete Game</Button>
         <h2>Card Set</h2>
 
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
+    </div>
+    <div class="col-md-4">
         <h2>Fonts</h2>
         @foreach (var font in Fonts)
         {
@@ -34,15 +47,37 @@
     [Inject] private IJsInterop JsInterop { get; set; } = default!;
     private FontModel _selectedFont = new();
     private IEnumerable<FontModel> Fonts { get; set; } = new List<FontModel>();
+    private IEnumerable<GameModel> Games { get; set; } = new List<GameModel>();
+    private IEnumerable<CardSetModel> CardSets { get; set; } = new List<CardSetModel>();
+    private GameModel _selectedGame = new();
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
         Fonts = FontService.Execute(f => f.GetFonts());
+        Games = GameService.Execute(s => s.GetGames());
         foreach (var font in Fonts)
         {
             await JsInterop.LoadFont(font.Name, font.Base64Data);
         }
         StateHasChanged();
+    }
+    private void ReloadGames()
+    {
+        Games = GameService.Execute(s => s.GetGames());
+        _selectedGame = new();
+        StateHasChanged();
+
+    }
+    public void AddGame()
+    {
+        GameService.Execute((s, g) => s.UpdateGame(g), _selectedGame);
+        ReloadGames();
+    }
+
+    public void DeleteGame()
+    {
+        GameService.Execute((s, g) => s.DeleteGame(g), _selectedGame);
+        ReloadGames();
     }
 
     public async Task LoadFile(InputFileChangeEventArgs args)
@@ -55,12 +90,20 @@
     public void DeleteFont()
     {
         FontService.Execute((s, f) => s.DeleteFont(f), _selectedFont);
-        StateHasChanged();
+        ReloadFonts();
     }
+
     public async Task AddFont()
     {
         FontService.Execute((s, f) => s.UpdateFont(f), _selectedFont);
         await JsInterop.LoadFont(_selectedFont.Name, _selectedFont.Base64Data);
+        ReloadFonts();
+    }
+
+    private void ReloadFonts()
+    {
+        Fonts = FontService.Execute(f => f.GetFonts());
+        _selectedFont = new();
         StateHasChanged();
     }
 }

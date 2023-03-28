@@ -21,7 +21,7 @@
         }
         catch (Exception ex)
         {
-            await ErrorLogger.LogError(ex.Message, ex.StackTrace ?? "");
+            await ErrorLogger.LogError(ex.Message + "\n" + ex.InnerException, ex.StackTrace ?? "");
         }
     }
 }

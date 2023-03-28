@@ -42,9 +42,10 @@ internal static class Program
         services.AddSingleton<MainForm>();
         services.AddTransient<IErrorLogger, JsInterop>();
         services.AddTransient<IJsInterop, JsInterop>();
-        services.AddTransient(s => new ServiceAccessor<FontService>(new FontService(s.GetRequiredService<DataContext>())));
-        services.AddTransient(s => new ServiceAccessor<GameService>(new GameService(s.GetRequiredService<DataContext>())));
-        services.AddTransient(s => new ServiceAccessor<CardSetService>(new CardSetService(s.GetRequiredService<DataContext>())));
+        services.AddSingleton<ApplicationStorage>();
+        services.AddTransient(s => new ServiceAccessor<FontService>(s));
+        services.AddTransient(s => new ServiceAccessor<GameService>(s));
+        services.AddTransient(s => new ServiceAccessor<CardSetService>(s));
         services.AddTransient<ICanvasInteropFactory, CanvasInteropFactory>();
         var mainForm = services.BuildServiceProvider().GetService<MainForm>();
         Application.Run(mainForm);
