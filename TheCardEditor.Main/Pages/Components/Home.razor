@@ -1,0 +1,61 @@
+@using System.Security.Cryptography;
+@using TheCardEditor.DataModel.DTO;
+@using Microsoft.AspNetCore.Components.Forms
+<div class="col-md-12 row">
+    <div class="col-md-9">
+    </div>
+    <div class="col-md-3">
+        @foreach (var font in Fonts)
+        {
+            <div class="col-md-12 row" style="background-color:@(_selectedFont?.Id==font.Id?"lightblue":"")" @onclick="@(()=>_selectedFont=font)">
+                <label style="font-family:@font.Name" class="col-form-label-lg col-md-6">@font.Name</label>
+                <label class="col-form-label col-md-6">@(Convert.ToBase64String(MD5.HashData(Convert.FromBase64String(font.Base64Data)))[..12])</label>
+            </div>
+        }
+        <div class="col-md-12">
+            <div class="col-md-4">
+                <FloatingInput ValueSelector="()=>_selectedFont.Name" Label="Font Name" InputChanged="a=>_selectedFont.Name=a" />
+                <InputFile class="form-control" OnChange="LoadFile"></InputFile>
+            </div>
+            <Button OnClickAsync="async ()=>{_selectedFont.Id=0; await AddFont();}" class="btn btn-primary">Add Font</Button>
+            <Button disabled="@(_selectedFont.Id==0)" OnClickAsync="async ()=>await AddFont()" class="btn btn-primary">Update Font</Button>
+            <Button disabled="@(_selectedFont.Id==0)" OnClick="DeleteFont" class="btn btn-primary">Delete Font</Button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] private ServiceAccessor<FontService> FontService { get; set; } = default!;
+    [Inject] private IJsInterop JsInterop { get; set; } = default!;
+    private FontModel _selectedFont = new();
+    private IEnumerable<FontModel> Fonts { get; set; } = new List<FontModel>();
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        Fonts = FontService.Execute(f => f.GetFonts());
+        foreach (var font in Fonts)
+        {
+            await JsInterop.LoadFont(font.Name, font.Base64Data);
+        }
+        StateHasChanged();
+    }
+
+    public async Task LoadFile(InputFileChangeEventArgs args)
+    {
+        var memoryStream = new MemoryStream();
+        await args.File.OpenReadStream(1024 * 1014 * 4).CopyToAsync(memoryStream);
+        var base64File = Convert.ToBase64String(memoryStream.ToArray());
+        _selectedFont.Base64Data = base64File;
+    }
+    public void DeleteFont()
+    {
+        FontService.Execute((s, f) => s.DeleteFont(f), _selectedFont);
+        StateHasChanged();
+    }
+    public async Task AddFont()
+    {
+        FontService.Execute((s, f) => s.UpdateFont(f), _selectedFont);
+        await JsInterop.LoadFont(_selectedFont.Name, _selectedFont.Base64Data);
+        StateHasChanged();
+    }
+}

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.Main.Core;
+using TheCardEditor.Services;
 using TheCardEditor.Shared;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
@@ -41,6 +42,7 @@ internal static class Program
         services.AddSingleton<MainForm>();
         services.AddTransient<IErrorLogger, JsInterop>();
         services.AddTransient<IJsInterop, JsInterop>();
+        services.AddTransient(s => new ServiceAccessor<FontService>(new FontService(s.GetRequiredService<DataContext>())));
         services.AddTransient<ICanvasInteropFactory, CanvasInteropFactory>();
         var mainForm = services.BuildServiceProvider().GetService<MainForm>();
         Application.Run(mainForm);

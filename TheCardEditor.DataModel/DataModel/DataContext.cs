@@ -5,6 +5,7 @@ namespace TheCardEditor.DataModel.DataModel;
 public partial class DataContext : DbContext
 {
     public virtual DbSet<Card> Cards { get; set; }
+    public virtual DbSet<Font> Fonts { get; set; }
     public virtual DbSet<Game> Games { get; set; }
     public virtual DbSet<Layer> Layers { get; set; }
     public virtual DbSet<Picture> Pictures { get; set; }
@@ -22,6 +23,13 @@ public partial class DataContext : DbContext
             entity.HasOne(d => d.GameFkNavigation).WithMany(p => p.Cards)
                 .HasForeignKey(d => d.GameFk)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        modelBuilder.Entity<Font>(entity =>
+        {
+            entity.ToTable("Font");
+
+            entity.Property(e => e.Name).HasDefaultValueSql("'Unnamed Font'");
         });
 
         modelBuilder.Entity<Game>(entity =>
