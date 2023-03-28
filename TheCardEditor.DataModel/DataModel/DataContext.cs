@@ -5,12 +5,11 @@ namespace TheCardEditor.DataModel.DataModel;
 public partial class DataContext : DbContext
 {
     public virtual DbSet<Card> Cards { get; set; }
+    public virtual DbSet<CardSet> CardSets { get; set; }
     public virtual DbSet<Font> Fonts { get; set; }
     public virtual DbSet<Game> Games { get; set; }
-    public virtual DbSet<Layer> Layers { get; set; }
     public virtual DbSet<Picture> Pictures { get; set; }
     public virtual DbSet<Template> Templates { get; set; }
-    public virtual DbSet<TemplateLayerAssociation> TemplateLayerAssociations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,7 +19,14 @@ public partial class DataContext : DbContext
 
             entity.HasIndex(e => e.Name, "IX_Card_Name").IsUnique();
 
-            entity.HasOne(d => d.GameFkNavigation).WithMany(p => p.Cards)
+            entity.HasOne(d => d.CardSetFkNavigation).WithMany(p => p.Cards).HasForeignKey(d => d.CardSetFk);
+        });
+
+        modelBuilder.Entity<CardSet>(entity =>
+        {
+            entity.ToTable("CardSet");
+
+            entity.HasOne(d => d.GameFkNavigation).WithMany(p => p.CardSets)
                 .HasForeignKey(d => d.GameFk)
                 .OnDelete(DeleteBehavior.ClientSetNull);
         });
@@ -39,21 +45,6 @@ public partial class DataContext : DbContext
             entity.HasIndex(e => e.Name, "IX_Game_Name").IsUnique();
         });
 
-        modelBuilder.Entity<Layer>(entity =>
-        {
-            entity.ToTable("Layer");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-
-            entity.HasOne(d => d.CardFkNavigation).WithMany(p => p.Layers)
-                .HasForeignKey(d => d.CardFk)
-                .OnDelete(DeleteBehavior.ClientSetNull);
-
-            entity.HasOne(d => d.PictureFkNavigation).WithMany(p => p.Layers)
-                .HasForeignKey(d => d.PictureFk)
-                .OnDelete(DeleteBehavior.ClientSetNull);
-        });
-
         modelBuilder.Entity<Picture>(entity =>
         {
             entity.ToTable("Picture");
@@ -64,19 +55,6 @@ public partial class DataContext : DbContext
             entity.ToTable("Template");
 
             entity.HasIndex(e => e.Name, "IX_Template_Name").IsUnique();
-        });
-
-        modelBuilder.Entity<TemplateLayerAssociation>(entity =>
-        {
-            entity.ToTable("TemplateLayerAssociation");
-
-            entity.HasOne(d => d.LayerFkNavigation).WithMany(p => p.TemplateLayerAssociations)
-                .HasForeignKey(d => d.LayerFk)
-                .OnDelete(DeleteBehavior.ClientSetNull);
-
-            entity.HasOne(d => d.TemplateFkNavigation).WithMany(p => p.TemplateLayerAssociations)
-                .HasForeignKey(d => d.TemplateFk)
-                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -8,5 +8,5 @@ public partial class Template
 
     public long Id { get; set; }
     public string? Name { get; set; }
-    public virtual ICollection<TemplateLayerAssociation> TemplateLayerAssociations { get; init; } = new List<TemplateLayerAssociation>();
+    public string Data { get; set; } = null!;
 }
