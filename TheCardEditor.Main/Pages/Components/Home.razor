@@ -61,7 +61,7 @@
         </div>
     </div>
     <div class="col-md-12 d-flex flex-row-reverse">
-        <Button disabled="@(_selectedCardSet.Id==0 || _selectedGame.Id==0)" class="mt-5 btn btn-success">Select Card Set and Game</Button>
+        <Button OnClickAsync="async ()=>await SelectCardAndGame()" disabled="@(_selectedCardSet.Id==0 || _selectedGame.Id==0)" class="mt-5 btn btn-success">Select Card Set and Game</Button>
     </div>
 </div>
 
@@ -70,6 +70,7 @@
     [Inject] private ServiceAccessor<GameService> GameService { get; set; } = default!;
     [Inject] private ServiceAccessor<CardSetService> CardSetService { get; set; } = default!;
     [Inject] private IJsInterop JsInterop { get; set; } = default!;
+    [Inject] private ApplicationStorage ApplicationStorage { get; set; } = default!;
     private FontModel _selectedFont = new();
     private IEnumerable<FontModel> Fonts { get; set; } = new List<FontModel>();
     private IEnumerable<GameModel> Games { get; set; } = new List<GameModel>();
@@ -87,8 +88,11 @@
         }
         StateHasChanged();
     }
-    public void SelectCardAndGame()
+    public async Task SelectCardAndGame()
     {
+        ApplicationStorage.SelectedCardSet = _selectedCardSet;
+        ApplicationStorage.SelectedGame = _selectedGame;
+        await ApplicationStorage.OnCardSelectionChanged();
     }
     public void GameSelected(GameModel model)
     {

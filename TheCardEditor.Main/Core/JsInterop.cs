@@ -6,6 +6,7 @@ namespace TheCardEditor.Main.Core;
 public interface IJsInterop : IErrorLogger
 {
     Task<IEnumerable<string>> GetAvailableFonts();
+
     Task LoadFont(string fontName, string base64Data);
 }
 

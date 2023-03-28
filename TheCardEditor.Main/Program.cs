@@ -42,6 +42,7 @@ internal static class Program
         services.AddSingleton<MainForm>();
         services.AddTransient<IErrorLogger, JsInterop>();
         services.AddTransient<IJsInterop, JsInterop>();
+        services.AddTransient<ILocalStorageInterop, LocalStorageInterop>();
         services.AddSingleton<ApplicationStorage>();
         services.AddTransient(s => new ServiceAccessor<FontService>(s));
         services.AddTransient(s => new ServiceAccessor<GameService>(s));

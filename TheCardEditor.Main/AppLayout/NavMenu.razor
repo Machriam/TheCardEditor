@@ -1,4 +1,6 @@
-﻿<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3 fixed-top">
+﻿@using System.Text.Json;
+@using TheCardEditor.DataModel.DTO;
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3 fixed-top">
     <div class="container" style="height:30px">
         <button class="navbar-toggler" @onclick="ToggleNavMenu" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                 aria-expanded="false" aria-label="Toggle navigation">
@@ -15,6 +17,11 @@
                         <a class="nav-link text-light nav-dropdown" href="@CounterPage.Location">Counter</a>
                     </li>
                 }
+                <div style="flex:auto"></div>
+                <li class="col-md-1 row">
+                    <label style="color:white;font-size:14px" class="col-form-label col-md-12 p-0">@(ApplicationStorage.SelectedGame?.Name ?? "No Game selected")</label>
+                    <label style="color:white;font-size:14px" class="col-form-label col-md-12 p-0">@(ApplicationStorage.SelectedCardSet?.Name ?? "No Set selected")</label>
+                </li>
             </ul>
             }
         </div>
@@ -34,6 +41,28 @@
 </style>
 
 @code {
+    private class SelectedGameObject
+    {
+        public GameModel Game { get; set; } = new();
+        public CardSetModel CardSet { get; set; } = new();
+    }
+    [Inject] ApplicationStorage ApplicationStorage { get; set; } = default!;
+    [Inject] ILocalStorageInterop LocalStorageInterop { get; set; } = default!;
+    [Inject] ServiceAccessor<CardSetService> CardSetService { get; set; } = default!;
+    [Inject] ServiceAccessor<GameService> GameService { get; set; } = default!;
+    private const string SelectedGameData = nameof(SelectedGameData);
+    protected override async Task OnInitializedAsync()
+    {
+        ApplicationStorage.CardSelectionChanged += OnCardSelectionChanged;
+        var gameData = await LocalStorageInterop.GetItem(SelectedGameData);
+        if (string.IsNullOrEmpty(gameData)) return;
+        var gameObject = JsonSerializer.Deserialize<SelectedGameObject>(gameData);
+        if (gameObject == null || gameObject.Game.Id == 0 || gameObject.CardSet.Id == 0) return;
+        var cardSets = CardSetService.Execute((s, g) => s.GetCardSets(g.Id), gameObject.Game);
+        var games = GameService.Execute(s => s.GetGames());
+        ApplicationStorage.SelectedCardSet = cardSets.FirstOrDefault(c => c.Id == gameObject.CardSet.Id);
+        ApplicationStorage.SelectedGame = games.FirstOrDefault(g => g.Id == gameObject.Game.Id);
+    }
     private bool _collapseNavMenu;
     private bool IsDebug
     {
@@ -47,6 +76,15 @@
         }
     }
     private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
+    async Task OnCardSelectionChanged()
+    {
+        await LocalStorageInterop.SetItem(SelectedGameData, JsonSerializer.Serialize(new SelectedGameObject()
+            {
+                CardSet = ApplicationStorage.SelectedCardSet ?? new(),
+                Game = ApplicationStorage.SelectedGame ?? new()
+            }));
+        StateHasChanged();
+    }
 
     void ToggleNavMenu()
     {
