@@ -70,7 +70,7 @@
     [Inject] IJsInterop JsInterop { get; set; } = default!;
     [Inject] ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
     private ICanvasInterop _canvasInterop = default!;
-    public const string Location = "";
+    public const string Location = "Counter";
     private JsonObject? _json;
     IEnumerable<(string? Name, string? Tag, int Index)>? _canvasObjects;
     private const string CanvasId = "MySweetCanvas";

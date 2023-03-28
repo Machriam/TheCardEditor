@@ -7,9 +7,16 @@
         <div class="@NavMenuCssClass navbar-collapse d-sm-inline-flex flex-sm-row-reverse" @onclick="CollapseNavMenu">
             <ul class="navbar-nav flex-grow-1">
                 <li class="nav-item-top">
-                    <a class="nav-link text-light nav-dropdown" href="@Counter.Location" Match="NavLinkMatch.All">Counter</a>
+                    <a class="nav-link text-light nav-dropdown" href="@Home.Location" Match="NavLinkMatch.All">Home</a>
                 </li>
+                @if (IsDebug)
+                {
+                    <li class="nav-item-top">
+                        <a class="nav-link text-light nav-dropdown" href="@Counter.Location">Counter</a>
+                    </li>
+                }
             </ul>
+            }
         </div>
     </div>
 </nav>
@@ -28,6 +35,17 @@
 
 @code {
     private bool _collapseNavMenu;
+    private bool IsDebug
+    {
+        get
+        {
+#if DEBUG
+    return true;
+#else
+            return false;
+#endif
+        }
+    }
     private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
 
     void ToggleNavMenu()
