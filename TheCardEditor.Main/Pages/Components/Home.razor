@@ -6,18 +6,40 @@
         <h2>Games</h2>
         @foreach (var game in Games)
         {
-            <div @onclick="@(()=>_selectedGame=game)" style="background-color:@(_selectedGame.Id==game.Id?"lightblue":"")">
+            <div @onclick="()=>GameSelected(game)" style="background-color:@(_selectedGame.Id==game.Id?"lightblue":"")">
                 <label class="col-form-label-lg">@game.Name</label>
             </div>
         }
         <FloatingInput ValueSelector="()=>_selectedGame.Name" Label="Game Name" InputChanged="a=>_selectedGame.Name=a" />
-        <Button class="btn btn-primary" OnClick="()=>{_selectedGame.Id=0; AddGame();}">Add Game</Button>
-        <Button disabled="@(_selectedGame.Id==0)" class="btn btn-primary" OnClick="AddGame">Update Game</Button>
+        <Button class="btn btn-primary" OnClick="()=>{_selectedGame.Id=0; UpsertGame();}">Add Game</Button>
+        <Button disabled="@(_selectedGame.Id==0)" class="btn btn-primary" OnClick="UpsertGame">Update Game</Button>
         <Button disabled="@(_selectedGame.Id==0)" class="btn btn-primary" OnClick="DeleteGame">Delete Game</Button>
-        <h2>Card Set</h2>
-
     </div>
     <div class="col-md-4">
+        <h2>Card Set</h2>
+        @if (_selectedGame.Id != 0)
+        {
+            @foreach (var cardSet in CardSets)
+            {
+                <div @onclick="@(()=>_selectedCardSet=cardSet)" style="background-color:@(_selectedCardSet.Id==cardSet.Id?"lightblue":"")">
+                    <label class="col-form-label-lg">@cardSet.Name</label>
+                </div>
+            }
+            <div class="col-md-12 row">
+                <div class="col-md-6">
+                    <FloatingInput ValueSelector="()=>_selectedCardSet.Name" Label="Name" InputChanged="a=>_selectedCardSet.Name=a" />
+                </div>
+                <div class="col-md-3">
+                    <FloatingNumericInput ValueSelector="()=>_selectedCardSet.Height" Label="Height" InputChanged="a=>_selectedCardSet.Height=(long)a" />
+                </div>
+                <div class="col-md-3">
+                    <FloatingNumericInput ValueSelector="()=>_selectedCardSet.Width" Label="Width" InputChanged="a=>_selectedCardSet.Width=(long)a" />
+                </div>
+            </div>
+            <Button class="btn btn-primary" OnClick="()=>{_selectedCardSet.Id=0; UpsertCardSet();}">Add Card Set</Button>
+            <Button class="btn btn-primary" OnClick="()=>UpsertCardSet()">Update Set Name</Button>
+            <Button disabled="@(_selectedCardSet.Id==0)" class="btn btn-primary" OnClick="DeleteCardSet">Delete Card Set</Button>
+        }
     </div>
     <div class="col-md-4">
         <h2>Fonts</h2>
@@ -33,10 +55,13 @@
                 <FloatingInput ValueSelector="()=>_selectedFont.Name" Label="Font Name" InputChanged="a=>_selectedFont.Name=a" />
                 <InputFile class="form-control" OnChange="LoadFile"></InputFile>
             </div>
-            <Button OnClickAsync="async ()=>{_selectedFont.Id=0; await AddFont();}" class="btn btn-primary">Add Font</Button>
-            <Button disabled="@(_selectedFont.Id==0)" OnClickAsync="async ()=>await AddFont()" class="btn btn-primary">Update Font</Button>
+            <Button OnClickAsync="async ()=>{_selectedFont.Id=0; await UpsertFont();}" class="btn btn-primary">Add Font</Button>
+            <Button disabled="@(_selectedFont.Id==0)" OnClickAsync="async ()=>await UpsertFont()" class="btn btn-primary">Update Font</Button>
             <Button disabled="@(_selectedFont.Id==0)" OnClick="DeleteFont" class="btn btn-primary">Delete Font</Button>
         </div>
+    </div>
+    <div class="col-md-12 d-flex flex-row-reverse">
+        <Button disabled="@(_selectedCardSet.Id==0 || _selectedGame.Id==0)" class="mt-5 btn btn-success">Select Card Set and Game</Button>
     </div>
 </div>
 
@@ -50,6 +75,7 @@
     private IEnumerable<GameModel> Games { get; set; } = new List<GameModel>();
     private IEnumerable<CardSetModel> CardSets { get; set; } = new List<CardSetModel>();
     private GameModel _selectedGame = new();
+    private CardSetModel _selectedCardSet = new();
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
@@ -61,6 +87,20 @@
         }
         StateHasChanged();
     }
+    public void SelectCardAndGame()
+    {
+    }
+    public void GameSelected(GameModel model)
+    {
+        _selectedGame = model;
+        ReloadCardSets();
+    }
+    private void ReloadCardSets()
+    {
+        CardSets = CardSetService.Execute((s, g) => s.GetCardSets(g.Id), _selectedGame);
+        _selectedCardSet = new() { GameFk = _selectedGame.Id, Name = "" };
+        StateHasChanged();
+    }
     private void ReloadGames()
     {
         Games = GameService.Execute(s => s.GetGames());
@@ -68,7 +108,18 @@
         StateHasChanged();
 
     }
-    public void AddGame()
+    public void DeleteCardSet()
+    {
+        CardSetService.Execute((s, c) => s.DeleteCardSet(c), _selectedCardSet);
+        ReloadCardSets();
+    }
+    public void UpsertCardSet()
+    {
+        CardSetService.Execute((s, c) => s.UpdateCardSet(c), _selectedCardSet);
+        ReloadCardSets();
+    }
+
+    public void UpsertGame()
     {
         GameService.Execute((s, g) => s.UpdateGame(g), _selectedGame);
         ReloadGames();
@@ -93,7 +144,7 @@
         ReloadFonts();
     }
 
-    public async Task AddFont()
+    public async Task UpsertFont()
     {
         FontService.Execute((s, f) => s.UpdateFont(f), _selectedFont);
         await JsInterop.LoadFont(_selectedFont.Name, _selectedFont.Base64Data);

@@ -1,0 +1,23 @@
+<div class="form-floating">
+    <input type="number" value="@_currentValue" @onchange="OnInputChanged" class="form-control" id="@Guid" placeholder="@Label">
+    <label for="@Guid">@Label</label>
+</div>
+@code {
+    Guid Guid = Guid.NewGuid();
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public Func<decimal>? ValueSelector { get; set; }
+    [Parameter] public EventCallback<decimal> InputChanged { get; set; }
+    private decimal _currentValue = 0M;
+    public async Task OnInputChanged(ChangeEventArgs args)
+    {
+        _currentValue = decimal.Parse(args.Value?.ToString() ?? "0");
+        await InputChanged.InvokeAsync(_currentValue);
+    }
+    protected override void OnParametersSet()
+    {
+        var value = ValueSelector?.Invoke() ?? 0M;
+        if (_currentValue == value) return;
+        _currentValue = value;
+        StateHasChanged();
+    }
+}
