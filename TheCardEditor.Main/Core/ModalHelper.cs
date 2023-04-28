@@ -13,12 +13,12 @@ public interface IModalHelper
     Task<TResult?> ShowModal<TModal, TResult>(string title, Dictionary<string, object?> parameter,
             bool moveable = false,
         bool disableBackgroundCancel = false, bool hideCloseButton = false,
-         ModalPosition position = ModalPosition.Center) where TModal : IComponent;
+         ModalPosition position = ModalPosition.Middle) where TModal : IComponent;
 
     Task<object?> ShowModal<TModal>(string title, Dictionary<string, object?> parameter,
             bool movable = false,
             bool disableBackgroundCancel = false, bool hideCloseButton = false,
-            ModalPosition position = ModalPosition.Center) where TModal : IComponent;
+            ModalPosition position = ModalPosition.Middle) where TModal : IComponent;
 }
 
 public class ModalHelper : IModalHelper
@@ -37,7 +37,7 @@ public class ModalHelper : IModalHelper
     public async Task<object?> ShowModal<TModal>(string title, Dictionary<string, object?> parameter,
         bool movable = false,
         bool disableBackgroundCancel = false, bool hideCloseButton = false,
-        ModalPosition position = ModalPosition.Center) where TModal : IComponent
+        ModalPosition position = ModalPosition.Middle) where TModal : IComponent
     {
         if (_modalService == null || _jsRuntime == null || _hotkeys == null) return null;
         using var hotKeyContext = _hotkeys.CreateContext();
@@ -47,6 +47,7 @@ public class ModalHelper : IModalHelper
         {
             DisableBackgroundCancel = disableBackgroundCancel,
             HideCloseButton = hideCloseButton,
+            Size = ModalSize.Automatic,
             Position = position,
             Class = movable ? "blazored-modal-draggable" : "",
             OverlayCustomClass = movable ? "blazored-disable-overlay" : "",
@@ -64,7 +65,7 @@ public class ModalHelper : IModalHelper
     public async Task<TResult?> ShowModal<TModal, TResult>(string title, Dictionary<string, object?> parameter,
         bool moveable = false,
     bool disableBackgroundCancel = false, bool hideCloseButton = false,
-    ModalPosition position = ModalPosition.Center) where TModal : IComponent
+    ModalPosition position = ModalPosition.Middle) where TModal : IComponent
     {
         return (TResult?)await ShowModal<TModal>(title, parameter, moveable, disableBackgroundCancel,
             hideCloseButton, position);
