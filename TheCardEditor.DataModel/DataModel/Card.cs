@@ -10,5 +10,5 @@ public partial class Card
     public string Name { get; set; } = null!;
     public long CardSetFk { get; set; }
     public string Data { get; set; } = null!;
-    public virtual CardSet? CardSetFkNavigation { get; set; }
+    public virtual CardSet CardSetFkNavigation { get; set; } = null!;
 }

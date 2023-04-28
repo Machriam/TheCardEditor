@@ -17,9 +17,9 @@ public partial class DataContext : DbContext
         {
             entity.ToTable("Card");
 
-            entity.HasIndex(e => e.Name, "IX_Card_Name").IsUnique();
-
-            entity.HasOne(d => d.CardSetFkNavigation).WithMany(p => p.Cards).HasForeignKey(d => d.CardSetFk);
+            entity.HasOne(d => d.CardSetFkNavigation).WithMany(p => p.Cards)
+                .HasForeignKey(d => d.CardSetFk)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<CardSet>(entity =>
