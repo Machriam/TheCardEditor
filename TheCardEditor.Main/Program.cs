@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Blazored.Modal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TheCardEditor.DataModel.DataModel;
@@ -30,7 +31,6 @@ internal static class Program
         var environmentConfiguration = new EnvironmentConfiguration(configuration);
         var services = new ServiceCollection();
         services.AddWindowsFormsBlazorWebView();
-        services.AddHotKeys2();
         services.AddEntityFrameworkSqlite();
         services.AddDbContext<DataContext>(opt =>
                     opt.UseSqlite($"Data Source={environmentConfiguration.DatabasePath}", a =>
@@ -41,6 +41,7 @@ internal static class Program
         services.AddBlazorWebViewDeveloperTools();
 #endif
         services.AddSingleton<MainForm>();
+        services.AddSingleton<IModalHelper, ModalHelper>();
         services.AddTransient<IErrorLogger, JsInterop>();
         services.AddTransient<IJsInterop, JsInterop>();
         services.AddTransient<ILocalStorageInterop, LocalStorageInterop>();
@@ -51,6 +52,9 @@ internal static class Program
         services.AddTransient(s => new ServiceAccessor<CardSetService>(s));
         services.AddTransient(s => new ServiceAccessor<CardService>(s));
         services.AddTransient<ICanvasInteropFactory, CanvasInteropFactory>();
+        services.AddTransient<IShortcutRegistrator, ShortcutRegistrator>();
+        services.AddBlazoredModal();
+        services.AddHotKeys2();
         var mainForm = services.BuildServiceProvider().GetService<MainForm>();
         Application.Run(mainForm);
     }

@@ -24,6 +24,7 @@ namespace TheCardEditor.Main.Pages.Components
         [Inject] private IGridViewFactory GridViewFactory { get; set; } = default!;
         [Inject] private ServiceAccessor<CardService> CardService { get; set; } = default!;
         [Inject] private ApplicationStorage ApplicationStorage { get; set; } = default!;
+        [Inject] private IModalHelper ModalHelper { get; set; } = default!;
         private IGridView _gridView = default!;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -45,6 +46,11 @@ namespace TheCardEditor.Main.Pages.Components
 
         private void OnCardsSelected(long[] id)
         {
+        }
+
+        public async Task EditCard()
+        {
+            await ModalHelper.ShowModal<CardModal>("name", new());
         }
 
         public void Dispose()

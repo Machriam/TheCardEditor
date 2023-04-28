@@ -1,0 +1,12 @@
+@using Blazored.Modal;
+<div style="height:80vh;width:80vw" class="col-md-12 row">
+<h1>Fettes Modal</h1>
+</div>
+
+@code {
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; } = default!;
+    public async Task Close()
+    {
+        await ModalInstance.CloseAsync();
+    }
+}
