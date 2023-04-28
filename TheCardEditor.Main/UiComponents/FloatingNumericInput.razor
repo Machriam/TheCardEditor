@@ -1,4 +1,5 @@
-<div class="form-floating">
+<div @attributes="@(Attributes.Where(a=>a.Key!="class"))"
+     class="form-floating @(string.Join(' ', Attributes.Where(a=>a.Key=="class").Select(a=>a.Value)))">
     <input type="number" value="@_currentValue" @onchange="OnInputChanged" class="form-control" id="@Guid" placeholder="@Label">
     <label for="@Guid">@Label</label>
 </div>
@@ -7,6 +8,8 @@
     [Parameter] public string Label { get; set; } = "";
     [Parameter] public Func<decimal>? ValueSelector { get; set; }
     [Parameter] public EventCallback<decimal> InputChanged { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; } = new();
     private decimal _currentValue = 0M;
     public async Task OnInputChanged(ChangeEventArgs args)
     {

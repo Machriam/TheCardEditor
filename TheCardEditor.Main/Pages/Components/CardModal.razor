@@ -2,18 +2,18 @@
 @using System.Text.Json.Nodes;
 @using System.Text.Json;
 @using TheCardEditor.DataModel.DTO;
-<div style="height:80vh;width:80vw;overflow:scroll" class="col-md-12 row">
+<div style="height:80vh;width:90vw;overflow:scroll" class="col-md-12 row">
     <canvas style="border:1px solid #000000" id="@CanvasId" width="@Width" height="@Height"></canvas>
-    <div class="col-md-2">
-        <FloatingInput Label="Cardname" ValueSelector="@(()=>_currentCard.Name)" InputChanged="@(n=>_currentCard.Name=n)"></FloatingInput>
-        <div class="col-md-12 row">
-            <FloatingInput Label="New Text" ValueSelector="@(()=>AddNewText)" InputChanged="@(n=>AddNewText=n)"></FloatingInput>
-            <FloatingInput Label="Tag" ValueSelector="@(()=>AddTag)" InputChanged="@(n=>AddTag=n)"></FloatingInput>
-            <FloatingNumericInput Label="X" ValueSelector="@( ()=>AddObjectX)" InputChanged="@(x=>AddObjectX=(int)x)"></FloatingNumericInput>
-            <FloatingNumericInput Label="Y" ValueSelector="@( ()=>AddObjectY)" InputChanged="@(y=>AddObjectY=(int)y)"></FloatingNumericInput>
-            <Button class="btn btn-primary" OnClick="@(async ()=>await AddText())">AddText</Button>
+    <div style="width: calc(85vw - @(Width)px)">
+        <div class="col-md-12 row mt-2">
+            <FloatingInput class="col-md-3" Label="New Text" ValueSelector="@(()=>AddNewText)" InputChanged="@(n=>AddNewText=n)"></FloatingInput>
+            <FloatingInput class="col-md-3" Label="Tag" ValueSelector="@(()=>AddTag)" InputChanged="@(n=>AddTag=n)"></FloatingInput>
+            <FloatingInput Label="Cardname" ValueSelector="@(()=>_currentCard.Name)" InputChanged="@(n=>_currentCard.Name=n)"></FloatingInput>
+            <FloatingNumericInput class="col-md-2" Label="X" ValueSelector="@( ()=>AddObjectX)" InputChanged="@(x=>AddObjectX=(int)x)"></FloatingNumericInput>
+            <FloatingNumericInput class="col-md-2" Label="Y" ValueSelector="@( ()=>AddObjectY)" InputChanged="@(y=>AddObjectY=(int)y)"></FloatingNumericInput>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await AddText())">+</Button>
         </div>
-        <Button OnClickAsync="@(async()=>await SaveCard())" class="btn btn-primary">Save</Button>
+        <Button OnClickAsync="@(async()=>await SaveCard())" class="btn btn-primary mt-2">Save</Button>
     </div>
 </div>
 
