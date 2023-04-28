@@ -4,8 +4,17 @@
 @using TheCardEditor.DataModel.DTO;
 <div style="height:80vh;width:80vw;overflow:scroll" class="col-md-12 row">
     <canvas style="border:1px solid #000000" id="@CanvasId" width="@Width" height="@Height"></canvas>
-    <FloatingInput ValueSelector="@(()=>_currentCard.Name)" InputChanged="@(n=>_currentCard.Name=n)"></FloatingInput>
-    <Button OnClickAsync="@(async()=>await SaveCard())" class="btn btn-primary">Save</Button>
+    <div class="col-md-2">
+        <FloatingInput Label="Cardname" ValueSelector="@(()=>_currentCard.Name)" InputChanged="@(n=>_currentCard.Name=n)"></FloatingInput>
+        <div class="col-md-12 row">
+            <FloatingInput Label="New Text" ValueSelector="@(()=>AddNewText)" InputChanged="@(n=>AddNewText=n)"></FloatingInput>
+            <FloatingInput Label="Tag" ValueSelector="@(()=>AddTag)" InputChanged="@(n=>AddTag=n)"></FloatingInput>
+            <FloatingNumericInput Label="X" ValueSelector="@( ()=>AddObjectX)" InputChanged="@(x=>AddObjectX=(int)x)"></FloatingNumericInput>
+            <FloatingNumericInput Label="Y" ValueSelector="@( ()=>AddObjectY)" InputChanged="@(y=>AddObjectY=(int)y)"></FloatingNumericInput>
+            <Button class="btn btn-primary" OnClick="@(async ()=>await AddText())">AddText</Button>
+        </div>
+        <Button OnClickAsync="@(async()=>await SaveCard())" class="btn btn-primary">Save</Button>
+    </div>
 </div>
 
 @code {
@@ -17,6 +26,10 @@
     private int Height { get; set; }
     private int Width { get; set; }
     private CardModel _currentCard = new();
+    private string AddNewText { get; set; } = "";
+    private string AddTag { get; set; } = "";
+    private int AddObjectX { get; set; }
+    private int AddObjectY { get; set; }
     private ICanvasInterop _canvasInterop = default!;
     private const string CanvasId = "CardCanvasId";
     protected override void OnInitialized()
@@ -34,6 +47,11 @@
         await _canvasInterop.ImportJson(jsonObject ?? new JsonObject());
 
     }
+    public async Task AddText()
+    {
+        await _canvasInterop.DrawText(AddObjectX, AddObjectY, AddNewText, AddTag);
+    }
+
     public async Task SaveCard()
     {
         if (ApplicationStorage.SelectedCardSet == null) return;
