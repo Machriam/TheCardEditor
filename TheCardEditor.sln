@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheCardEditor.Main", "TheCa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheCardEditor.DataModel", "TheCardEditor.DataModel\TheCardEditor.DataModel.csproj", "{C00B4538-2349-4110-B388-CFCE0B424289}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheCardEditor.Services", "TheCardEditor.Services\TheCardEditor.Services.csproj", "{979CC100-08BD-4D44-9C65-DDC20D69DB9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheCardEditor.Services", "TheCardEditor.Services\TheCardEditor.Services.csproj", "{979CC100-08BD-4D44-9C65-DDC20D69DB9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheCardEditor.Shared", "TheCardEditor.Shared\TheCardEditor.Shared.csproj", "{2CDB3012-911A-454E-B367-236208F10747}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheCardEditor.Shared", "TheCardEditor.Shared\TheCardEditor.Shared.csproj", "{2CDB3012-911A-454E-B367-236208F10747}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

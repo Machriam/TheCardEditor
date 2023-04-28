@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.Main.Core;
+using TheCardEditor.Main.Core.Grid;
 using TheCardEditor.Services;
 using TheCardEditor.Shared;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
@@ -43,6 +44,7 @@ internal static class Program
         services.AddTransient<IErrorLogger, JsInterop>();
         services.AddTransient<IJsInterop, JsInterop>();
         services.AddTransient<ILocalStorageInterop, LocalStorageInterop>();
+        services.AddTransient<IGridViewFactory, GridViewFactory>();
         services.AddSingleton<ApplicationStorage>();
         services.AddTransient(s => new ServiceAccessor<FontService>(s));
         services.AddTransient(s => new ServiceAccessor<GameService>(s));
