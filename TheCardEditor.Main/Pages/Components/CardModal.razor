@@ -5,10 +5,10 @@
 <div style="height:80vh;width:90vw;overflow:scroll" class="col-md-12 row">
     <canvas style="border:1px solid #000000" id="@CanvasId" width="@Width" height="@Height"></canvas>
     <div style="width: calc(85vw - @(Width)px)">
+        <FloatingInput Label="Cardname" ValueSelector="@(()=>_currentCard.Name)" InputChanged="@(n=>_currentCard.Name=n)"></FloatingInput>
         <div class="col-md-12 row mt-2">
             <FloatingInput class="col-md-3" Label="New Text" ValueSelector="@(()=>AddNewText)" InputChanged="@(n=>AddNewText=n)"></FloatingInput>
             <FloatingInput class="col-md-3" Label="Tag" ValueSelector="@(()=>AddTag)" InputChanged="@(n=>AddTag=n)"></FloatingInput>
-            <FloatingInput Label="Cardname" ValueSelector="@(()=>_currentCard.Name)" InputChanged="@(n=>_currentCard.Name=n)"></FloatingInput>
             <FloatingNumericInput class="col-md-2" Label="X" ValueSelector="@( ()=>AddObjectX)" InputChanged="@(x=>AddObjectX=(int)x)"></FloatingNumericInput>
             <FloatingNumericInput class="col-md-2" Label="Y" ValueSelector="@( ()=>AddObjectY)" InputChanged="@(y=>AddObjectY=(int)y)"></FloatingNumericInput>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await AddText())">+</Button>
