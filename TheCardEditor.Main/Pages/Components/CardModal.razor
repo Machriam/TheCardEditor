@@ -1,10 +1,47 @@
 @using Blazored.Modal;
-<div style="height:80vh;width:80vw" class="col-md-12 row">
-<h1>Fettes Modal</h1>
+@using System.Text.Json.Nodes;
+@using System.Text.Json;
+@using TheCardEditor.DataModel.DTO;
+<div style="height:80vh;width:80vw;overflow:scroll" class="col-md-12 row">
+    <canvas style="border:1px solid #000000" id="@CanvasId" width="@Width" height="@Height"></canvas>
+    <FloatingInput ValueSelector="@(()=>_currentCard.Name)" InputChanged="@(n=>_currentCard.Name=n)"></FloatingInput>
+    <Button OnClickAsync="@(async()=>await SaveCard())" class="btn btn-primary">Save</Button>
 </div>
 
 @code {
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; } = default!;
+    [Inject] ServiceAccessor<CardService> CardService { get; set; } = default!;
+    [Inject] ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
+    [Inject] ApplicationStorage ApplicationStorage { get; set; } = default!;
+    [Parameter] public long? CardId { get; set; }
+    private int Height { get; set; }
+    private int Width { get; set; }
+    private CardModel _currentCard = new();
+    private ICanvasInterop _canvasInterop = default!;
+    private const string CanvasId = "CardCanvasId";
+    protected override void OnInitialized()
+    {
+        _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
+        if (ApplicationStorage.SelectedCardSet == null) return;
+        Height = (int)ApplicationStorage.SelectedCardSet.Height;
+        Width = (int)ApplicationStorage.SelectedCardSet.Width;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId);
+        var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
+        await _canvasInterop.ImportJson(jsonObject ?? new JsonObject());
+
+    }
+    public async Task SaveCard()
+    {
+        if (ApplicationStorage.SelectedCardSet == null) return;
+        var json = await _canvasInterop.ExportJson();
+        _currentCard.Data = JsonSerializer.Serialize(json);
+        _currentCard.CardSetFk = ApplicationStorage.SelectedCardSet.Id;
+        CardService.Execute<CardModel>((s, c) => s.UpdateCard(c), _currentCard);
+    }
     public async Task Close()
     {
         await ModalInstance.CloseAsync();

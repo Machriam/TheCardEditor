@@ -31,9 +31,9 @@ public class CardModel
     public long Id { get; set; }
 
     [MinLength(3)]
-    public string Name { get; set; } = null!;
+    public string Name { get; set; } = "";
 
-    public string Data { get; set; } = "";
+    public string Data { get; set; } = "{}";
 
     [Range(1, long.MaxValue)]
     public long CardSetFk { get; set; }
