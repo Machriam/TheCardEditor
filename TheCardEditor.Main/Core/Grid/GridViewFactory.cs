@@ -2,10 +2,6 @@
 
 namespace TheCardEditor.Main.Core.Grid;
 
-public delegate void ChartSeriesPointSelectionHandler(decimal series, decimal datapoint, string seriesName);
-
-public delegate void ChartClickHandler(float xValue, Dictionary<int, float> yValueByAxis);
-
 public delegate void SelectedRowHandler(long id);
 
 public delegate void SelectedRowsHandler(long[] id);

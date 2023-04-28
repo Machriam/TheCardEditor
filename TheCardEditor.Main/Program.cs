@@ -49,6 +49,7 @@ internal static class Program
         services.AddTransient(s => new ServiceAccessor<FontService>(s));
         services.AddTransient(s => new ServiceAccessor<GameService>(s));
         services.AddTransient(s => new ServiceAccessor<CardSetService>(s));
+        services.AddTransient(s => new ServiceAccessor<CardService>(s));
         services.AddTransient<ICanvasInteropFactory, CanvasInteropFactory>();
         var mainForm = services.BuildServiceProvider().GetService<MainForm>();
         Application.Run(mainForm);
