@@ -11,7 +11,11 @@ namespace TheCardEditor.Main.Pages.Components
         {
         }
 
+        [GridMetaData(HeaderName = "Name")]
         public string Name { get; set; } = "";
+
+        [GridMetaData(HeaderName = "Data")]
+        public string Data { get; set; } = "";
     }
 
     public partial class CardEditor : IDisposable
@@ -31,7 +35,8 @@ namespace TheCardEditor.Main.Pages.Components
                 var cards = CardService.Execute(cs => cs.GetCards(ApplicationStorage.SelectedCardSet.Id))
                     .Select(c => new CardGridModel(c.Id)
                     {
-                        Name = c.Name
+                        Name = c.Name,
+                        Data = c.Data
                     });
                 await _gridView.UpdateGrid(new DisplayGridModel<CardGridModel>(cards));
             }
