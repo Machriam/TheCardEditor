@@ -39,8 +39,10 @@ namespace TheCardEditor.Main.Pages.Components
             foreach (var font in Fonts)
             {
                 await JsInterop.LoadFont(font.Name, font.Base64Data);
+                ApplicationStorage.AvailableFonts.Add(font.Name);
             }
-
+            var existingFonts = await JsInterop.GetAvailableFonts();
+            ApplicationStorage.AvailableFonts.AddRange(existingFonts);
             StateHasChanged();
         }
 

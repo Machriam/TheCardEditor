@@ -8,6 +8,7 @@ public class ApplicationStorage
 
     public GameModel? SelectedGame { get; set; }
     public CardSetModel? SelectedCardSet { get; set; }
+    public List<string> AvailableFonts { get; set; } = new();
 
     public async Task OnCardSelectionChanged()
     {

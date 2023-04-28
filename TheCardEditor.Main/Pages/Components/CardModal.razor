@@ -1,4 +1,6 @@
+@implements IDisposable
 @using Blazored.Modal;
+@using Toolbelt.Blazor.HotKeys2;
 @using System.Text.Json.Nodes;
 @using System.Text.Json;
 @using TheCardEditor.DataModel.DTO;
@@ -12,8 +14,29 @@
             <FloatingNumericInput class="col-md-2" Label="X" ValueSelector="@( ()=>AddObjectX)" InputChanged="@(x=>AddObjectX=(int)x)"></FloatingNumericInput>
             <FloatingNumericInput class="col-md-2" Label="Y" ValueSelector="@( ()=>AddObjectY)" InputChanged="@(y=>AddObjectY=(int)y)"></FloatingNumericInput>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await AddText())">+</Button>
+            <div class="col-md-12 mt-2"></div>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.FontWeight,"bold"))">Bold</Button>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.FontStyle,"italic"))">Italic</Button>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Underline,true))">Underline</Button>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Overline,true))">Overline</Button>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Linethrough,true))">Linethrough</Button>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Stroke,"red"))">Stroke</Button>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Clear,true))">Clear</Button>
+            <FloatingNumericInput class="col-md-2" Label="Size" ValueSelector="@( ()=>FontSize)"
+                                  InputChanged="@(async y=>{FontSize=(int)y;await ApplyFont(CanvasFontStyle.FontSize,FontSize);})"></FloatingNumericInput>
+            <div class="col-md-12 mt-2"></div>
+            <div class="col-md-3">
+                <select @onchange="@(arg=>selectedFont=arg.Value?.ToString()??"")" class="form-control col-md-3">
+                    @foreach (var option in ApplicationStorage.AvailableFonts)
+                    {
+                        <option value="@option">@option</option>
+                    }
+                </select>
+            </div>
+            <Button class="btn btn-primary col-md-1" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.FontFamily,selectedFont))">Apply Font</Button>
         </div>
         <Button OnClickAsync="@(async()=>await SaveCard())" class="btn btn-primary mt-2">Save</Button>
+        <Button OnClickAsync="@(async()=>await Reset())" class="btn btn-danger mt-2">Reset</Button>
     </div>
 </div>
 
@@ -21,6 +44,7 @@
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; } = default!;
     [Inject] ServiceAccessor<CardService> CardService { get; set; } = default!;
     [Inject] ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
+    [Inject] IShortcutRegistrator ShortcutRegistrator { get; set; } = default!;
     [Inject] ApplicationStorage ApplicationStorage { get; set; } = default!;
     [Parameter] public long? CardId { get; set; }
     private int Height { get; set; }
@@ -30,12 +54,16 @@
     private string AddTag { get; set; } = "";
     private int AddObjectX { get; set; }
     private int AddObjectY { get; set; }
+    private string selectedFont = "";
+    private int FontSize { get; set; } = 12;
     private ICanvasInterop _canvasInterop = default!;
     private const string CanvasId = "CardCanvasId";
     protected override void OnInitialized()
     {
+        ShortcutRegistrator.AddHotKey(ModCode.Ctrl, Code.B, () => ApplyFont(CanvasFontStyle.FontWeight, "bold"), "Bold");
         _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
         if (ApplicationStorage.SelectedCardSet == null) return;
+        selectedFont = ApplicationStorage.AvailableFonts.FirstOrDefault() ?? "Arial";
         Height = (int)ApplicationStorage.SelectedCardSet.Height;
         Width = (int)ApplicationStorage.SelectedCardSet.Width;
     }
@@ -45,7 +73,13 @@
         _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId);
         var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
         await _canvasInterop.ImportJson(jsonObject ?? new JsonObject());
-
+        StateHasChanged();
+    }
+    private async Task Reset()
+    {
+        _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
+        var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
+        await _canvasInterop.ImportJson(jsonObject ?? new JsonObject());
     }
     public async Task AddText()
     {
@@ -60,8 +94,18 @@
         _currentCard.CardSetFk = ApplicationStorage.SelectedCardSet.Id;
         CardService.Execute<CardModel>((s, c) => s.UpdateCard(c), _currentCard);
     }
+    private async ValueTask ApplyFont(CanvasFontStyle style, object value)
+    {
+        await _canvasInterop.ApplyFont(style, value);
+    }
+    public void Dispose()
+    {
+        ShortcutRegistrator.Dispose();
+    }
+
     public async Task Close()
     {
+        Dispose();
         await ModalInstance.CloseAsync();
     }
 }

@@ -35,16 +35,20 @@ namespace TheCardEditor.Main.Pages.Components
             if (firstRender)
             {
                 _gridView = GridViewFactory.CreateGrid(this, GridId, OnCardsSelected);
-                if (ApplicationStorage.SelectedCardSet == null) return;
-                _cardById = CardService.Execute(cs => cs.GetCards(ApplicationStorage.SelectedCardSet.Id))
-                     .Select(c => new CardGridModel(c.Id)
-                     {
-                         Name = c.Name,
-                         Data = c.Data
-                     }).ToDictionary(c => c.Id);
-                await _gridView.UpdateGrid(new DisplayGridModel<CardGridModel>(_cardById.Values));
+                await UpdateGrid();
             }
             base.OnAfterRender(firstRender);
+        }
+        public async Task UpdateGrid()
+        {
+            if (ApplicationStorage.SelectedCardSet == null) return;
+            _cardById = CardService.Execute(cs => cs.GetCards(ApplicationStorage.SelectedCardSet.Id))
+                 .Select(c => new CardGridModel(c.Id)
+                 {
+                     Name = c.Name,
+                     Data = c.Data
+                 }).ToDictionary(c => c.Id);
+            await _gridView.UpdateGrid(new DisplayGridModel<CardGridModel>(_cardById.Values));
         }
 
         [JSInvokable]
@@ -57,13 +61,17 @@ namespace TheCardEditor.Main.Pages.Components
         public async Task NewCard()
         {
             await ModalHelper.ShowModal<CardModal>("Create new Card", new() {
-                { nameof(CardModal.CardId), null }});
+                { nameof(CardModal.CardId), null }}, disableBackgroundCancel: true);
+            await UpdateGrid();
         }
 
         public async Task EditCards()
         {
             if (_selectedCards.Length == 0) return;
-            await ModalHelper.ShowModal<CardModal>(_cardById[_selectedCards[0]].Name, new() { { nameof(CardModal.CardId), _selectedCards[0] } });
+            await ModalHelper.ShowModal<CardModal>(
+                _cardById[_selectedCards[0]].Name, new() { { nameof(CardModal.CardId), _selectedCards[0] } },
+                disableBackgroundCancel: true);
+            await UpdateGrid();
         }
 
         public void Dispose()
