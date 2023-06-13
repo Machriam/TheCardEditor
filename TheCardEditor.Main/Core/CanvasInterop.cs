@@ -12,6 +12,8 @@ public enum CanvasFontStyle
 {
     [Description("stroke")]
     Stroke,
+    [Description("fill")]
+    Fill,
 
     [Description("fontFamily")]
     FontFamily,

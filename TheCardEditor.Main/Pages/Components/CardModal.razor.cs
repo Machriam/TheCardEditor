@@ -165,6 +165,10 @@ namespace TheCardEditor.Main.Pages.Components
 
         private async ValueTask ApplyFont(CanvasFontStyle style, object value)
         {
+            if (style == CanvasFontStyle.Fill)
+            {
+                value = await JsInterop.Prompt("Enter colorcode:");
+            }
             await _canvasInterop.ApplyFont(style, value);
         }
 
