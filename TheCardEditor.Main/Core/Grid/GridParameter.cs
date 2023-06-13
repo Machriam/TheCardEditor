@@ -2,7 +2,6 @@
 
 public class GridParameter
 {
-    public Dictionary<string, List<string>>? DynamicColumns { get; set; } = null;
     public bool MultipleRowSelect { get; set; }
     public bool UseUserIds { get; set; }
     public bool SuppressFilterButton { get; set; }

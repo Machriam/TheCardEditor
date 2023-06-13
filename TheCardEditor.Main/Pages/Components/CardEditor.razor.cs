@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Main.Core.Grid;
@@ -16,11 +17,12 @@ namespace TheCardEditor.Main.Pages.Components
         [GridMetaData(HeaderName = "Name")]
         public string Name { get; set; } = "";
 
-        [GridMetaData(Resizable = true)]
-        public List<string> TagTexts { get; set; } = new();
-
         [GridMetaData(HeaderName = "Data", Resizable = true)]
         public string Data { get; set; } = "";
+
+        [GridMetaData(Resizable = true, Hide = true)]
+        [JsonExtensionData]
+        public Dictionary<string, object> TagTexts { get; set; } = new();
     }
 
     public partial class CardEditor : IDisposable
@@ -57,7 +59,7 @@ namespace TheCardEditor.Main.Pages.Components
                 {
                     Name = c.Name,
                     Data = c.Data,
-                    TagTexts = Tags.ConvertAll(t => tagTextsByTag.TryGetValue(t, out var tag) ? tag : "")
+                    TagTexts = Tags.ToDictionary(t => t, t => (object)(tagTextsByTag.TryGetValue(t, out var tag) ? tag : "")),
                 };
             }).ToDictionary(c => c.Id);
             await _gridView.UpdateGrid(new DisplayGridModel<CardGridModel>(_cardById.Values,

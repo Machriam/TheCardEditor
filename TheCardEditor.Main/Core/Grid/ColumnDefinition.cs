@@ -11,6 +11,10 @@ public class AgGridFilterParams
 
 public class ColumnDefinition
 {
+    public ColumnDefinition Clone()
+    {
+        return (ColumnDefinition)MemberwiseClone();
+    }
     public ColumnDefinition(string? headerName, string field, int width, FilterParams filterParams,
         bool hide, bool editable, bool filter, bool resizable, bool autoHeight, bool sortable,
         bool wrapText, CellRenderer cellRenderer, string tooltip)

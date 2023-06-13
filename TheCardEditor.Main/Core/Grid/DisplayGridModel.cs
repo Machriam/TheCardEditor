@@ -14,8 +14,20 @@ public class DisplayGridModel<TData> where TData : AbstractGridModel
             ShowFilter = showFilter,
             UseUserIds = useUserIds,
             EnumParameter = enumParameter,
-            DynamicColumns = dynamicColumns
         };
+        foreach (var column in dynamicColumns ?? new())
+        {
+            var template = Parameter.ColumnDefinitions
+                .First(cd => cd.Field.Equals(column.Key, StringComparison.InvariantCultureIgnoreCase));
+            foreach (var field in column.Value)
+            {
+                var templateCopy = template.Clone();
+                templateCopy.Field = field;
+                templateCopy.HeaderName = field;
+                templateCopy.Hide = false;
+                Parameter.ColumnDefinitions = Parameter.ColumnDefinitions.Append(templateCopy);
+            }
+        }
         Data = data;
     }
 
