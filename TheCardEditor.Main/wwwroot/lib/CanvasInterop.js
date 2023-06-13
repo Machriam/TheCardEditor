@@ -16,6 +16,13 @@
         const instance = CanvasInterop.getInstance(id);
         instance.parameter.dotnetReference.invokeMethodAsync(instance.parameter.objectDeselectionHandler);
     }
+    onElementMoved(evt) {
+        if (evt.target.hasOwnProperty("_objects") && evt.target._objects.length > 1) return;
+        const id = evt.target.canvas.lowerCanvasEl.id;
+        const instance = CanvasInterop.getInstance(id);
+        instance.parameter.dotnetReference.invokeMethodAsync(
+            instance.parameter.objectSelectionHandler, evt.target.left, evt.target.top);
+    }
     onElementSelected(evt) {
         const id = evt.selected[0].canvas.lowerCanvasEl.id;
         const instance = CanvasInterop.getInstance(id);
@@ -39,6 +46,7 @@ window.canvasInteropFunctions = {
         instance.canvas = new fabric.Canvas(divId);
         instance.canvas.on("selection:created", instance.onElementSelected);
         instance.canvas.on("selection:updated", instance.onElementSelected);
+        instance.canvas.on("object:moving", instance.onElementMoved);
         instance.canvas.on("selection:cleared", instance.onSelectionCleared);
         instance.divId = divId;
     },
