@@ -84,7 +84,7 @@
     {
         if (!firstRender) return;
         AvailableFonts.AddRange(await JsInterop.GetAvailableFonts());
-        _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, ObjectSelected, ObjectDeselected);
+        _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, ObjectSelected, ObjectDeselected, MultiObjectSelected);
         StateHasChanged();
     }
     private async Task LoadFont()
@@ -149,6 +149,10 @@
     }
     [JSInvokable]
     public async void ObjectDeselected()
+    {
+    }
+    [JSInvokable]
+    public async void MultiObjectSelected()
     {
     }
 

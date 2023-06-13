@@ -1,12 +1,13 @@
 <div @attributes="@(Attributes.Where(a=>a.Key!="class"))"
      class="form-floating @(string.Join(' ', Attributes.Where(a=>a.Key=="class").Select(a=>a.Value)))">
-    <input value="@_currentValue" @onchange="OnInputChanged" class="form-control" id="@Guid" placeholder="@Label">
+    <input disabled="@DisabledSelector.Invoke()" value="@_currentValue" @onchange="OnInputChanged" class="form-control" id="@Guid" placeholder="@Label">
     <label for="@Guid">@Label</label>
 </div>
 @code {
     Guid Guid = Guid.NewGuid();
     [Parameter] public string Label { get; set; } = "";
     [Parameter] public Func<string>? ValueSelector { get; set; }
+    [Parameter] public Func<bool> DisabledSelector { get; set; } = () => false;
     [Parameter] public EventCallback<string> InputChanged { get; set; }
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> Attributes { get; set; } = new();

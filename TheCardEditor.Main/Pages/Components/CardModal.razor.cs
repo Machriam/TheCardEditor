@@ -40,6 +40,7 @@ namespace TheCardEditor.Main.Pages.Components
         private int AddObjectX { get; set; }
 
         private int AddObjectY { get; set; }
+        private bool _multipleObjectsAreSelected;
 
         private string _selectedFont = "";
         private int FontSize { get; set; } = 12;
@@ -68,7 +69,7 @@ namespace TheCardEditor.Main.Pages.Components
         {
             if (!firstRender)
                 return;
-            _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, OnObjectSelected, OnObjectDeselected);
+            _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, OnObjectSelected, OnObjectDeselected, OnMultiObjectIsSelected);
             var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
             await _canvasInterop.ImportJson(jsonObject ?? new JsonObject());
             StateHasChanged();
@@ -77,14 +78,23 @@ namespace TheCardEditor.Main.Pages.Components
         [JSInvokable]
         public void OnObjectDeselected()
         {
+            _multipleObjectsAreSelected = false;
             AddObjectX = 0;
             AddObjectY = 0;
             StateHasChanged();
         }
 
         [JSInvokable]
+        public void OnMultiObjectIsSelected()
+        {
+            _multipleObjectsAreSelected = true;
+            StateHasChanged();
+        }
+
+        [JSInvokable]
         public void OnObjectSelected(float left, float top)
         {
+            _multipleObjectsAreSelected = false;
             AddObjectX = (int)left;
             AddObjectY = (int)top;
             StateHasChanged();
