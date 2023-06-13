@@ -31,7 +31,7 @@
         }
         else {
             instance.parameter.dotnetReference.invokeMethodAsync(
-                instance.parameter.objectSelectionHandler, evt.selected[0].left, evt.selected[0].top, evt.selected[0].tag??evt.selected[0].toObject().tag);
+                instance.parameter.objectSelectionHandler, evt.selected[0].left, evt.selected[0].top, evt.selected[0].tag ?? evt.selected[0].toObject().tag);
         }
     }
     getElement() {
@@ -74,6 +74,11 @@ window.canvasInteropFunctions = {
         const instance = CanvasInterop.getInstance(divId);
         const object = instance.canvas.getActiveObject();
         if (object?.type != "textbox") return;
+        if (styleName == "textAlign") {
+            object.textAlign = value;
+            instance.canvas.renderAll();
+            return;
+        }
         let line = 0;
         let index = 0;
         for (let i = 0; i < object.text.length; i++) {

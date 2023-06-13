@@ -21,6 +21,8 @@ public enum CanvasFontStyle
 
     [Description("fontWeight")]
     FontWeight,
+    [Description("textAlign")]
+    TextAlign,
 
     [Description("fontStyle")]
     FontStyle,
