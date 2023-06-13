@@ -16,6 +16,9 @@ namespace TheCardEditor.Main.Pages.Components
         [GridMetaData(HeaderName = "Name")]
         public string Name { get; set; } = "";
 
+        [GridMetaData(Resizable = true)]
+        public List<string> TagTexts { get; set; } = new();
+
         [GridMetaData(HeaderName = "Data", Resizable = true)]
         public string Data { get; set; } = "";
     }
@@ -27,7 +30,7 @@ namespace TheCardEditor.Main.Pages.Components
         [Inject] private ServiceAccessor<CardService> CardService { get; set; } = default!;
         [Inject] private ApplicationStorage ApplicationStorage { get; set; } = default!;
         [Inject] private IModalHelper ModalHelper { get; set; } = default!;
-        private long[] _selectedCards = new long[0];
+        private long[] _selectedCards = Array.Empty<long>();
         private Dictionary<long, CardGridModel> _cardById = new();
         private List<string> Tags { get; set; } = new();
         private IGridView _gridView = default!;
@@ -46,13 +49,19 @@ namespace TheCardEditor.Main.Pages.Components
         {
             if (ApplicationStorage.SelectedCardSet == null) return;
             var cards = CardService.Execute(cs => cs.GetCards(ApplicationStorage.SelectedCardSet.Id));
-            _cardById = cards.Select(c => new CardGridModel(c.Id)
+            Tags = cards.SelectMany(c => c.SerializedData().GetTags().Select(t => t.Tag)).Distinct().OrderBy(t => t).ToList();
+            _cardById = cards.Select(c =>
             {
-                Name = c.Name,
-                Data = c.Data
+                var tagTextsByTag = c.SerializedData().GetTags().ToDictionary(t => t.Tag, t => t.Text);
+                return new CardGridModel(c.Id)
+                {
+                    Name = c.Name,
+                    Data = c.Data,
+                    TagTexts = Tags.ConvertAll(t => tagTextsByTag.TryGetValue(t, out var tag) ? tag : "")
+                };
             }).ToDictionary(c => c.Id);
-            Tags = cards.SelectMany(c => c.SerializedData().GetTags()).Distinct().ToList();
-            await _gridView.UpdateGrid(new DisplayGridModel<CardGridModel>(_cardById.Values));
+            await _gridView.UpdateGrid(new DisplayGridModel<CardGridModel>(_cardById.Values,
+                dynamicColumns: new() { { nameof(CardGridModel.TagTexts), Tags } }));
         }
 
         [JSInvokable]

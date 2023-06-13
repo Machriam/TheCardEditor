@@ -62,9 +62,9 @@ public enum FilterParams
 
     [Description("contains")]
     Contains,
+
     [Description("greaterThan")]
     GreaterThan
-
 }
 
 public class GridMetaData : Attribute

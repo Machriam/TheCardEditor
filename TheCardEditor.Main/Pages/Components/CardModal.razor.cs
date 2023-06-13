@@ -140,7 +140,7 @@ namespace TheCardEditor.Main.Pages.Components
         public async Task AddText()
         {
             var json = await _canvasInterop.ExportJson();
-            if (json.GetTags().Contains(AddTag))
+            if (json.GetTags().Select(t => t.Tag).Contains(AddTag))
             {
                 await JsInterop.LogError("Tag already exists");
                 return;

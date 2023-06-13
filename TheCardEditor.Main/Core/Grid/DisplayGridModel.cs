@@ -3,7 +3,8 @@
 public class DisplayGridModel<TData> where TData : AbstractGridModel
 {
     public DisplayGridModel(IEnumerable<TData> data, bool suppressFilterButton = false, int rowsize = 20,
-        bool showFilter = true, Dictionary<string, IEnumerable<string>>? enumParameter = null, bool useUserIds = false)
+        bool showFilter = true, Dictionary<string, IEnumerable<string>>? enumParameter = null, bool useUserIds = false,
+        Dictionary<string, List<string>>? dynamicColumns = null)
     {
         Parameter = new GridParameter()
         {
@@ -12,7 +13,8 @@ public class DisplayGridModel<TData> where TData : AbstractGridModel
             RowSize = rowsize,
             ShowFilter = showFilter,
             UseUserIds = useUserIds,
-            EnumParameter = enumParameter
+            EnumParameter = enumParameter,
+            DynamicColumns = dynamicColumns
         };
         Data = data;
     }
