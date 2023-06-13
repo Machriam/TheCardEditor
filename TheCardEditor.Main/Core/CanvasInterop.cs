@@ -6,6 +6,10 @@ using Toolbelt.Blazor.HotKeys2;
 
 namespace TheCardEditor.Main.Core;
 
+public delegate void SelectCanvasObjectHandler(float left, float top);
+
+public delegate void DeselectCanvasObjectHandler();
+
 public enum CanvasFontStyle
 {
     [Description("stroke")]
@@ -38,7 +42,15 @@ public enum CanvasFontStyle
 
 public interface ICanvasInteropFactory
 {
-    ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId) where TView : class;
+    ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId,
+            SelectCanvasObjectHandler objectSelectionHandler, DeselectCanvasObjectHandler objectDeselectionHandler) where TView : class;
+}
+
+public class CanvasParameter
+{
+    public string ObjectSelectionHandler { get; set; } = "";
+    public string ObjectDeselectionHandler { get; set; } = "";
+    public object DotnetReference { get; set; } = new();
 }
 
 public class CanvasInteropFactory : ICanvasInteropFactory
@@ -52,9 +64,10 @@ public class CanvasInteropFactory : ICanvasInteropFactory
         _hotKeys = hotKeys;
     }
 
-    public ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId) where TView : class
+    public ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId,
+        SelectCanvasObjectHandler objectSelectionHandler, DeselectCanvasObjectHandler objectDeselectionHandler) where TView : class
     {
-        return new CanvasInterop<TView>(_jsRuntime, divId, objectReference, _hotKeys);
+        return new CanvasInterop<TView>(_jsRuntime, divId, objectReference, _hotKeys, objectSelectionHandler.Method.Name, objectDeselectionHandler.Method.Name);
     }
 }
 
@@ -83,8 +96,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
 {
     private readonly IJSRuntime _jsRuntime;
     private readonly string _divId;
-    private readonly TView _objectReference;
+    private readonly DotNetObjectReference<TView> _objectReference;
     private readonly HotKeys _hotKeys;
+    private readonly string _selectionHandlerName;
+    private readonly string _deselectionHandlerName;
     private HotKeysContext? _hotKeysContext;
     private bool _initialized;
 
@@ -102,12 +117,14 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string OnKeyDown => Namespace + ".onKeyDown";
     private static string JsDispose => Namespace + ".dispose";
 
-    public CanvasInterop(IJSRuntime jsruntime, string divId, TView objectReference, HotKeys hotKeys)
+    public CanvasInterop(IJSRuntime jsruntime, string divId, TView objectReference, HotKeys hotKeys, string selectionHandlerName, string deselectionHandlerName)
     {
         _jsRuntime = jsruntime;
         _divId = divId;
-        _objectReference = objectReference;
+        _objectReference = DotNetObjectReference.Create(objectReference);
         _hotKeys = hotKeys;
+        _selectionHandlerName = selectionHandlerName;
+        _deselectionHandlerName = deselectionHandlerName;
     }
 
     private async ValueTask Initialize()
@@ -115,7 +132,12 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         if (_initialized) return;
         _hotKeys.KeyDown += HotKeys_KeyDown;
         _hotKeysContext = _hotKeys.CreateContext();
-        await _jsRuntime.HandledInvokeVoid(JsInitialize, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsInitialize, _divId, new CanvasParameter()
+        {
+            ObjectDeselectionHandler = _deselectionHandlerName,
+            ObjectSelectionHandler = _selectionHandlerName,
+            DotnetReference = _objectReference
+        });
         _initialized = true;
     }
 

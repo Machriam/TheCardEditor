@@ -1,6 +1,7 @@
 @implements IDisposable
 @using System.Text.Json;
 @using System.Text.Json.Nodes;
+@using Microsoft.JSInterop;
 @using TheCardEditor.DataModel.DataModel;
 @using TheCardEditor.Main.Core;
 @using TheCardEditor.Shared;
@@ -83,7 +84,7 @@
     {
         if (!firstRender) return;
         AvailableFonts.AddRange(await JsInterop.GetAvailableFonts());
-        _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId);
+        _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, ObjectSelected, ObjectDeselected);
         StateHasChanged();
     }
     private async Task LoadFont()
@@ -146,6 +147,16 @@
     {
         _canvasInterop?.Dispose();
     }
+    [JSInvokable]
+    public async void ObjectDeselected()
+    {
+    }
+
+    [JSInvokable]
+    public async void ObjectSelected(float left, float top)
+    {
+    }
+
 }
 <style>
     .hovery:hover {

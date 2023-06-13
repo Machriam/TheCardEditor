@@ -1,0 +1,124 @@
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+using Blazored.Modal;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using TheCardEditor.DataModel.DTO;
+using TheCardEditor.Main.Core;
+using TheCardEditor.Services;
+using Toolbelt.Blazor.HotKeys2;
+
+namespace TheCardEditor.Main.Pages.Components
+{
+    public partial class CardModal
+    {
+        [CascadingParameter]
+        private BlazoredModalInstance ModalInstance { get; set; } = default!;
+
+        [Inject]
+        private ServiceAccessor<CardService> CardService { get; set; } = default!;
+
+        [Inject]
+        private ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
+
+        [Inject]
+        private IShortcutRegistrator ShortcutRegistrator { get; set; } = default!;
+
+        [Inject]
+        private ApplicationStorage ApplicationStorage { get; set; } = default!;
+
+        [Parameter]
+        public long? CardId { get; set; }
+
+        private int Height { get; set; }
+
+        private int Width { get; set; }
+
+        private CardModel _currentCard = new();
+        private string AddNewText { get; set; } = "";
+        private string AddTag { get; set; } = "";
+        private int AddObjectX { get; set; }
+
+        private int AddObjectY { get; set; }
+
+        private string selectedFont = "";
+        private int FontSize { get; set; } = 12;
+        private ICanvasInterop _canvasInterop = default!;
+        private const string CanvasId = "CardCanvasId";
+
+        protected override void OnInitialized()
+        {
+            ShortcutRegistrator.AddHotKey(ModCode.Ctrl, Code.B, () => ApplyFont(CanvasFontStyle.FontWeight, "bold"), "Bold");
+            _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
+            if (ApplicationStorage.SelectedCardSet == null)
+                return;
+            selectedFont = ApplicationStorage.AvailableFonts.FirstOrDefault() ?? "Arial";
+            Height = (int)ApplicationStorage.SelectedCardSet.Height;
+            Width = (int)ApplicationStorage.SelectedCardSet.Width;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (!firstRender)
+                return;
+            _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, OnObjectSelected, OnObjectDeselected);
+            var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
+            await _canvasInterop.ImportJson(jsonObject ?? new JsonObject());
+            StateHasChanged();
+        }
+
+        [JSInvokable]
+        public async void OnObjectDeselected()
+        {
+            AddObjectX = 0;
+            AddObjectY = 0;
+            StateHasChanged();
+        }
+
+        [JSInvokable]
+        public async void OnObjectSelected(float left, float top)
+        {
+            AddObjectX = (int)left;
+            AddObjectY = (int)top;
+            StateHasChanged();
+        }
+
+        private async Task Reset()
+        {
+            _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
+            var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
+            await _canvasInterop.ImportJson(jsonObject ?? new JsonObject());
+        }
+
+        public async Task AddText()
+        {
+            await _canvasInterop.DrawText(AddObjectX, AddObjectY, AddNewText, AddTag);
+        }
+
+        public async Task SaveCard()
+        {
+            if (ApplicationStorage.SelectedCardSet == null)
+                return;
+            var json = await _canvasInterop.ExportJson();
+            _currentCard.Data = JsonSerializer.Serialize(json);
+            _currentCard.CardSetFk = ApplicationStorage.SelectedCardSet.Id;
+            CardService.Execute<CardModel>((s, c) => s.UpdateCard(c), _currentCard);
+        }
+
+        private async ValueTask ApplyFont(CanvasFontStyle style, object value)
+        {
+            await _canvasInterop.ApplyFont(style, value);
+        }
+
+        public void Dispose()
+        {
+            ShortcutRegistrator.Dispose();
+        }
+
+        public async Task Close()
+        {
+            Dispose();
+            await ModalInstance.CloseAsync();
+        }
+    }
+}
