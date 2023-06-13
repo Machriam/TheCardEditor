@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using TheCardEditor.DataModel.DTO;
 using TheCardEditor.Main.Core;
+using TheCardEditor.Main.UiComponents;
 using TheCardEditor.Services;
 using TheCardEditor.Shared;
 using Toolbelt.Blazor.HotKeys2;
@@ -53,6 +54,7 @@ namespace TheCardEditor.Main.Pages.Components
         private int FontSize { get; set; } = 12;
         private ICanvasInterop _canvasInterop = default!;
         private const string CanvasId = "CardCanvasId";
+        public FileDialogResult Picture { get; set; } = new();
 
         public async Task OnCoordinatesChanged(int? x, int? y)
         {
@@ -106,6 +108,12 @@ namespace TheCardEditor.Main.Pages.Components
             StateHasChanged();
         }
 
+        public void FileSelected(FileDialogResult result)
+        {
+            Picture = result;
+            StateHasChanged();
+        }
+
         private async Task Reset()
         {
             _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
@@ -121,6 +129,11 @@ namespace TheCardEditor.Main.Pages.Components
         public async Task RemoveObject()
         {
             await _canvasInterop.RemoveObject();
+        }
+
+        public async Task InsertPicture()
+        {
+            await _canvasInterop.DrawPicture(AddObjectX, AddObjectY, Random.Shared.NextInt64(), Picture.FilePath, Picture.FileDataBase64);
         }
 
         public async Task AskForNewTag()

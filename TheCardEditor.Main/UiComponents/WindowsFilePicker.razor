@@ -1,24 +1,29 @@
 <Button OnClickAsync="@SelectFile" class="btn btn-primary">Select File</Button>
 @code {
     [Inject] private ILocalStorageInterop LocalStorageInterop { get; set; } = default!;
+    [Parameter] public EventCallback<FileDialogResult> OnFileDialogFinished { get; set; }
     private const string LastPicturePath = nameof(LastPicturePath);
-    public async Task<FileDialogResult> SelectFile()
+    public async Task SelectFile()
     {
         var result = new FileDialogResult();
         var initialDirectory = await LocalStorageInterop.GetItem(LastPicturePath) ?? "";
-        System.Threading.SynchronizationContext.Current.Post((d) =>
+        SynchronizationContext.Current!.Post(async (d) =>
         {
             using var fileDialog = new OpenFileDialog()
-                {
-                    InitialDirectory = initialDirectory
-                };
+            {
+                InitialDirectory = initialDirectory,
+                Filter = "Image Files (PNG) |*.PNG;"
+            };
             var dialogResult = fileDialog.ShowDialog();
             if (dialogResult == DialogResult.OK)
             {
                 result.FilePath = fileDialog.FileName;
             }
+            using var memoryStream = new MemoryStream();
+            fileDialog.OpenFile().CopyTo(memoryStream);
+            result.FileDataBase64 = "data:image/png;base64," + Convert.ToBase64String(memoryStream.ToArray());
+            await OnFileDialogFinished.InvokeAsync(result);
+            await LocalStorageInterop.SetItem(LastPicturePath, Path.GetDirectoryName(result.FilePath) ?? "");
         }, null);
-        await LocalStorageInterop.SetItem(LastPicturePath, Path.GetDirectoryName("") ?? "");
-        return result;
     }
 }
