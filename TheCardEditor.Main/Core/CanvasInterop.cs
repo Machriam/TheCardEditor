@@ -79,6 +79,8 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask ImportJson(JsonObject json);
 
+    ValueTask SetCoordinates(int left, int top);
+
     ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image);
 
     ValueTask DrawText(int xPos, int yPos, string text, string tag);
@@ -111,6 +113,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string JsSelectObject => Namespace + ".selectObject";
     private static string JsApplyFont => Namespace + ".applyFont";
     private static string JsJsonExport => Namespace + ".exportJson";
+    private static string JsSetCoordinates => Namespace + ".setCoordinates";
     private static string JsBringForward => Namespace + ".bringForward";
     private static string JsSendBackwards => Namespace + ".sendBackwards";
     private static string JsJsonImport => Namespace + ".importJson";
@@ -205,5 +208,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     {
         await _jsRuntime.HandledInvokeVoid(JsDispose, _divId);
         _hotKeysContext?.Dispose();
+    }
+
+    public async ValueTask SetCoordinates(int left, int top)
+    {
+        await _jsRuntime.HandledInvokeVoid(JsSetCoordinates, _divId, left, top);
     }
 }

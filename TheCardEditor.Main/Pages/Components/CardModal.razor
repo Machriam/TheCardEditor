@@ -11,8 +11,8 @@
         <div class="col-md-12 row mt-2">
             <FloatingInput class="col-md-3" Label="New Text" ValueSelector="@(()=>AddNewText)" InputChanged="@(n=>AddNewText=n)"></FloatingInput>
             <FloatingInput class="col-md-3" Label="Tag" ValueSelector="@(()=>AddTag)" InputChanged="@(n=>AddTag=n)"></FloatingInput>
-            <FloatingNumericInput class="col-md-2" Label="X" ValueSelector="@( ()=>AddObjectX)" InputChanged="@(x=>AddObjectX=(int)x)"></FloatingNumericInput>
-            <FloatingNumericInput class="col-md-2" Label="Y" ValueSelector="@( ()=>AddObjectY)" InputChanged="@(y=>AddObjectY=(int)y)"></FloatingNumericInput>
+            <FloatingNumericInput class="col-md-2" Label="X" ValueSelector="@( ()=>AddObjectX)" InputChanged="@( async x=>await OnCoordinatesChanged((int)x,null))"></FloatingNumericInput>
+            <FloatingNumericInput class="col-md-2" Label="Y" ValueSelector="@( ()=>AddObjectY)" InputChanged="@(async y=>await OnCoordinatesChanged(null,(int)y))"></FloatingNumericInput>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await AddText())">+</Button>
             <div class="col-md-12 mt-2"></div>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.FontWeight,"bold"))">Bold</Button>
@@ -24,14 +24,14 @@
                                   InputChanged="@(async y=>{FontSize=(int)y;await ApplyFont(CanvasFontStyle.FontSize,FontSize);})"></FloatingNumericInput>
             <div class="col-md-12 mt-2"></div>
             <div class="col-md-3">
-                <select @onchange="@(arg=>selectedFont=arg.Value?.ToString()??"")" class="form-control col-md-3">
+                <select @onchange="@(arg=>_selectedFont=arg.Value?.ToString()??"")" class="form-control col-md-3">
                     @foreach (var option in ApplicationStorage.AvailableFonts)
                     {
                         <option value="@option">@option</option>
                     }
                 </select>
             </div>
-            <Button class="btn btn-primary col-md-1" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.FontFamily,selectedFont))">Apply Font</Button>
+            <Button class="btn btn-primary col-md-1" OnClickAsync="@(async ()=>await ApplyFont(CanvasFontStyle.FontFamily,_selectedFont))">Apply Font</Button>
         </div>
         <Button OnClickAsync="@(async()=>await SaveCard())" class="btn btn-primary mt-2">Save</Button>
         <Button OnClickAsync="@(async()=>await Reset())" class="btn btn-danger mt-2">Reset</Button>

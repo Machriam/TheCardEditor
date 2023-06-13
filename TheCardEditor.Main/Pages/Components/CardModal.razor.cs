@@ -41,10 +41,17 @@ namespace TheCardEditor.Main.Pages.Components
 
         private int AddObjectY { get; set; }
 
-        private string selectedFont = "";
+        private string _selectedFont = "";
         private int FontSize { get; set; } = 12;
         private ICanvasInterop _canvasInterop = default!;
         private const string CanvasId = "CardCanvasId";
+
+        public async Task OnCoordinatesChanged(int? x, int? y)
+        {
+            AddObjectX = x ?? AddObjectX;
+            AddObjectY = y ?? AddObjectY;
+            await _canvasInterop.SetCoordinates(AddObjectX, AddObjectY);
+        }
 
         protected override void OnInitialized()
         {
@@ -52,7 +59,7 @@ namespace TheCardEditor.Main.Pages.Components
             _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
             if (ApplicationStorage.SelectedCardSet == null)
                 return;
-            selectedFont = ApplicationStorage.AvailableFonts.FirstOrDefault() ?? "Arial";
+            _selectedFont = ApplicationStorage.AvailableFonts.FirstOrDefault() ?? "Arial";
             Height = (int)ApplicationStorage.SelectedCardSet.Height;
             Width = (int)ApplicationStorage.SelectedCardSet.Width;
         }
@@ -68,7 +75,7 @@ namespace TheCardEditor.Main.Pages.Components
         }
 
         [JSInvokable]
-        public async void OnObjectDeselected()
+        public void OnObjectDeselected()
         {
             AddObjectX = 0;
             AddObjectY = 0;
@@ -76,7 +83,7 @@ namespace TheCardEditor.Main.Pages.Components
         }
 
         [JSInvokable]
-        public async void OnObjectSelected(float left, float top)
+        public void OnObjectSelected(float left, float top)
         {
             AddObjectX = (int)left;
             AddObjectY = (int)top;

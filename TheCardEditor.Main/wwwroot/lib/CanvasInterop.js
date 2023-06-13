@@ -143,6 +143,12 @@ window.canvasInteropFunctions = {
             instance.canvas.add(img);
         })
     },
+    setCoordinates: function (divId, left, top) {
+        const instance = CanvasInterop.getInstance(divId);
+        instance.canvas.getActiveObject().set({ left: left, top: top });
+        instance.canvas.getActiveObject().setCoords();
+        instance.canvas.renderAll();
+    },
     exportJson: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
         return instance.canvas.toJSON(["tag", "pictureId", "name", "lockScalingY"]);
