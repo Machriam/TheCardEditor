@@ -106,6 +106,10 @@ namespace TheCardEditor.Main.Pages.Components
             var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
             await _canvasInterop.ImportJson(jsonObject ?? new JsonObject());
         }
+        public async Task CenterObjects()
+        {
+            await _canvasInterop.CenterObjects();
+        }
 
         public async Task AddText()
         {

@@ -27,7 +27,7 @@
         const id = evt.selected[0].canvas.lowerCanvasEl.id;
         const instance = CanvasInterop.getInstance(id);
         if (evt.selected.length > 1) {
-            instance.parameter.dotnetReference.invokeMethodAsync( instance.parameter.multiObjectSelectionHandler);
+            instance.parameter.dotnetReference.invokeMethodAsync(instance.parameter.multiObjectSelectionHandler);
         }
         else {
             instance.parameter.dotnetReference.invokeMethodAsync(
@@ -151,6 +151,21 @@ window.canvasInteropFunctions = {
         const instance = CanvasInterop.getInstance(divId);
         instance.canvas.getActiveObject().set({ left: left, top: top });
         instance.canvas.getActiveObject().setCoords();
+        instance.canvas.renderAll();
+    },
+    centerObjects: function (divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        const objects = instance.canvas.getActiveObjects();
+        if (objects.length > 1) {
+            objects[0].group.viewportCenterH();
+            for (var i = 0; i < objects.length; i++) {
+                objects[i].set({ left: - objects[i].width / 2 });
+                objects[i].setCoords();
+            }
+        }
+        else {
+            objects[0].viewportCenterH();
+        }
         instance.canvas.renderAll();
     },
     exportJson: function (divId) {

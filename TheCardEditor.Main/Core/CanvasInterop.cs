@@ -87,6 +87,8 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask SelectObject(int index);
 
+    ValueTask CenterObjects();
+
     ValueTask ApplyFont(CanvasFontStyle style, object value);
 
     ValueTask<int> SendBackwards(int index);
@@ -120,6 +122,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string JsJsonImport => Namespace + ".importJson";
     private static string OnKeyDown => Namespace + ".onKeyDown";
     private static string JsDispose => Namespace + ".dispose";
+    private static string JsCenterObjects => Namespace + ".centerObjects";
 
     public CanvasInterop(IJSRuntime jsruntime, string divId, TView objectReference, HotKeys hotKeys, string selectionHandlerName, string deselectionHandlerName,
                          string multiObjectSelectedHandler)
@@ -217,5 +220,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     public async ValueTask SetCoordinates(int left, int top)
     {
         await _jsRuntime.HandledInvokeVoid(JsSetCoordinates, _divId, left, top);
+    }
+
+    public async ValueTask CenterObjects()
+    {
+        await _jsRuntime.HandledInvokeVoid(JsCenterObjects, _divId);
     }
 }
