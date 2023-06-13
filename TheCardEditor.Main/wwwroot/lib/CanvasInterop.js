@@ -87,7 +87,11 @@ window.canvasInteropFunctions = {
                 if (!lineDefined) object.styles[line] = {};
                 const indexDefined = object.styles[line][index] != undefined;
                 if (!indexDefined) object.styles[line][index] = {};
-                if (styleName == "clear") object.styles[line][index] = {};
+                if (styleName == "clear") {
+                    const fontSize = object.styles[line][index]["fontSize"];
+                    object.styles[line][index] = {};
+                    object.styles[line][index]["fontSize"] = fontSize;
+                }
                 else object.styles[line][index][styleName] = value;
             }
             index++;
