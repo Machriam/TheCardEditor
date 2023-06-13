@@ -42,7 +42,7 @@ public class ModalHelper : IModalHelper
         if (_modalService == null || _jsRuntime == null || _hotkeys == null) return null;
         using var hotKeyContext = _hotkeys.CreateContext();
         var parameters = new ModalParameters();
-        foreach (var param in parameter) parameters.Add(param.Key, param.Value);
+        foreach (var param in parameter) parameters.Add(param.Key, param.Value!);
         var options = new ModalOptions()
         {
             DisableBackgroundCancel = disableBackgroundCancel,

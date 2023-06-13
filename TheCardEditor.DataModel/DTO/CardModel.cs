@@ -35,10 +35,11 @@ public class CardModel
     [MinLength(3)]
     public string Name { get; set; } = "";
 
-    public List<string> GetTags()
+    public JsonObject SerializedData()
     {
-        return JsonSerializer.Deserialize<JsonObject>(Data)?["objects"]?.AsArray().Select(s => s["tag"]?.ToString() ?? "").ToList() ?? new();
+        return JsonSerializer.Deserialize<JsonObject>(Data) ?? new();
     }
+
     public string Data { get; set; } = "{}";
 
     [Range(1, long.MaxValue)]

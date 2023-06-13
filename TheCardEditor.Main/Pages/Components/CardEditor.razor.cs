@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Main.Core.Grid;
 using TheCardEditor.Services;
+using TheCardEditor.Shared;
 
 namespace TheCardEditor.Main.Pages.Components
 {
@@ -50,7 +51,7 @@ namespace TheCardEditor.Main.Pages.Components
                 Name = c.Name,
                 Data = c.Data
             }).ToDictionary(c => c.Id);
-            Tags = cards.SelectMany(c => c.GetTags()).Distinct().ToList();
+            Tags = cards.SelectMany(c => c.SerializedData().GetTags()).Distinct().ToList();
             await _gridView.UpdateGrid(new DisplayGridModel<CardGridModel>(_cardById.Values));
         }
 
@@ -64,7 +65,9 @@ namespace TheCardEditor.Main.Pages.Components
         public async Task NewCard()
         {
             await ModalHelper.ShowModal<CardModal>("Create new Card", new() {
-                { nameof(CardModal.CardId), null }}, disableBackgroundCancel: true);
+                { nameof(CardModal.CardId), null },
+                { nameof(CardModal.Tags), Tags},
+            }, disableBackgroundCancel: true);
             await UpdateGrid();
         }
 

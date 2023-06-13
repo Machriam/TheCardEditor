@@ -6,6 +6,7 @@ using Microsoft.JSInterop;
 using TheCardEditor.DataModel.DTO;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Services;
+using TheCardEditor.Shared;
 using Toolbelt.Blazor.HotKeys2;
 
 namespace TheCardEditor.Main.Pages.Components
@@ -64,8 +65,7 @@ namespace TheCardEditor.Main.Pages.Components
         {
             ShortcutRegistrator.AddHotKey(ModCode.Ctrl, Code.B, () => ApplyFont(CanvasFontStyle.FontWeight, "bold"), "Bold");
             _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
-            if (ApplicationStorage.SelectedCardSet == null)
-                return;
+            if (ApplicationStorage.SelectedCardSet == null) return;
             _selectedFont = ApplicationStorage.AvailableFonts.FirstOrDefault() ?? "Arial";
             Height = (int)ApplicationStorage.SelectedCardSet.Height;
             Width = (int)ApplicationStorage.SelectedCardSet.Width;
@@ -73,8 +73,7 @@ namespace TheCardEditor.Main.Pages.Components
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender)
-                return;
+            if (!firstRender) return;
             _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, OnObjectSelected, OnObjectDeselected, OnMultiObjectIsSelected);
             var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
             await _canvasInterop.ImportJson(jsonObject ?? new JsonObject());
@@ -138,6 +137,12 @@ namespace TheCardEditor.Main.Pages.Components
 
         public async Task AddText()
         {
+            var json = await _canvasInterop.ExportJson();
+            if (json.GetTags().Contains(AddTag))
+            {
+                await JsInterop.LogError("Tag already exists");
+                return;
+            }
             if (string.IsNullOrWhiteSpace(AddTag))
             {
                 await JsInterop.LogError("Each textbox must have a tag");
