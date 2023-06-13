@@ -37,6 +37,7 @@
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Stroke,"red"))">Stroke</Button>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Clear,true))">Clear</Button>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await CenterObjects())">Center</Button>
+            <WindowsFilePicker></WindowsFilePicker>
             <FloatingNumericInput class="col-md-2" Label="Size" ValueSelector="@( ()=>FontSize)"
                                   InputChanged="@(async y=>{FontSize=(int)y;await ApplyFont(CanvasFontStyle.FontSize,FontSize);})"></FloatingNumericInput>
             <div class="col-md-12 mt-2"></div>
