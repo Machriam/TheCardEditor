@@ -6,7 +6,7 @@ using Toolbelt.Blazor.HotKeys2;
 
 namespace TheCardEditor.Main.Core;
 
-public delegate void SelectCanvasObjectHandler(float left, float top);
+public delegate void SelectCanvasObjectHandler(float left, float top, string tag);
 
 public enum CanvasFontStyle
 {

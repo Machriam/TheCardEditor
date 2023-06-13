@@ -11,11 +11,10 @@
         <div class="col-md-12 row mt-2">
             <FloatingInput class="col-md-3" Label="New Text" ValueSelector="@(()=>AddNewText)" InputChanged="@(n=>AddNewText=n)"></FloatingInput>
             <div class="col-md-3">
-                <label>Tag</label>
-                <select @onchange="@(arg=>AddTag=arg.Value?.ToString()??"")" class="form-control col-md-3">
+                <select value="@AddTag" @onchange="@(arg=>AddTag=arg.Value?.ToString()??"")" class="form-control col-md-3">
                     @foreach (var tag in Tags)
                     {
-                        <option selected="@(AddTag==tag)" value="@tag">@tag</option>
+                        <option value="@tag">@tag</option>
                     }
                 </select>
             </div>

@@ -97,11 +97,12 @@ namespace TheCardEditor.Main.Pages.Components
         }
 
         [JSInvokable]
-        public void OnObjectSelected(float left, float top)
+        public void OnObjectSelected(float left, float top, string tag)
         {
             _multipleObjectsAreSelected = false;
             AddObjectX = (int)left;
             AddObjectY = (int)top;
+            AddTag = tag;
             StateHasChanged();
         }
 
