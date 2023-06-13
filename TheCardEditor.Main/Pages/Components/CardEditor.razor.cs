@@ -28,6 +28,7 @@ namespace TheCardEditor.Main.Pages.Components
         [Inject] private IModalHelper ModalHelper { get; set; } = default!;
         private long[] _selectedCards = new long[0];
         private Dictionary<long, CardGridModel> _cardById = new();
+        private List<string> Tags { get; set; } = new();
         private IGridView _gridView = default!;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -39,15 +40,17 @@ namespace TheCardEditor.Main.Pages.Components
             }
             base.OnAfterRender(firstRender);
         }
+
         public async Task UpdateGrid()
         {
             if (ApplicationStorage.SelectedCardSet == null) return;
-            _cardById = CardService.Execute(cs => cs.GetCards(ApplicationStorage.SelectedCardSet.Id))
-                 .Select(c => new CardGridModel(c.Id)
-                 {
-                     Name = c.Name,
-                     Data = c.Data
-                 }).ToDictionary(c => c.Id);
+            var cards = CardService.Execute(cs => cs.GetCards(ApplicationStorage.SelectedCardSet.Id));
+            _cardById = cards.Select(c => new CardGridModel(c.Id)
+            {
+                Name = c.Name,
+                Data = c.Data
+            }).ToDictionary(c => c.Id);
+            Tags = cards.SelectMany(c => c.GetTags()).Distinct().ToList();
             await _gridView.UpdateGrid(new DisplayGridModel<CardGridModel>(_cardById.Values));
         }
 
@@ -69,7 +72,9 @@ namespace TheCardEditor.Main.Pages.Components
         {
             if (_selectedCards.Length == 0) return;
             await ModalHelper.ShowModal<CardModal>(
-                _cardById[_selectedCards[0]].Name, new() { { nameof(CardModal.CardId), _selectedCards[0] } },
+                _cardById[_selectedCards[0]].Name, new() {
+                    { nameof(CardModal.CardId), _selectedCards[0] },
+                    {nameof(CardModal.Tags),Tags } },
                 disableBackgroundCancel: true);
             await UpdateGrid();
         }

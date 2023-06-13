@@ -22,6 +22,9 @@ namespace TheCardEditor.Main.Pages.Components
         private ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
 
         [Inject]
+        private IJsInterop JsInterop { get; set; } = default!;
+
+        [Inject]
         private IShortcutRegistrator ShortcutRegistrator { get; set; } = default!;
 
         [Inject]
@@ -29,6 +32,9 @@ namespace TheCardEditor.Main.Pages.Components
 
         [Parameter]
         public long? CardId { get; set; }
+
+        [Parameter]
+        public List<string> Tags { get; set; } = new();
 
         private int Height { get; set; }
 
@@ -117,8 +123,26 @@ namespace TheCardEditor.Main.Pages.Components
             await _canvasInterop.RemoveObject();
         }
 
+        public async Task AskForNewTag()
+        {
+            var newTag = await JsInterop.Prompt("Name of new Tag?");
+            if (string.IsNullOrWhiteSpace(newTag)) return;
+            if (Tags.Contains(newTag))
+            {
+                await JsInterop.LogError("Tag exists already");
+                return;
+            }
+            Tags.Add(newTag);
+            StateHasChanged();
+        }
+
         public async Task AddText()
         {
+            if (string.IsNullOrWhiteSpace(AddTag))
+            {
+                await JsInterop.LogError("Each textbox must have a tag");
+                return;
+            }
             await _canvasInterop.DrawText(AddObjectX, AddObjectY, AddNewText, AddTag);
         }
 
@@ -129,7 +153,7 @@ namespace TheCardEditor.Main.Pages.Components
             var json = await _canvasInterop.ExportJson();
             _currentCard.Data = JsonSerializer.Serialize(json);
             _currentCard.CardSetFk = ApplicationStorage.SelectedCardSet.Id;
-            CardService.Execute<CardModel>((s, c) => s.UpdateCard(c), _currentCard);
+            CardService.Execute((s, c) => s.UpdateCard(c), _currentCard);
         }
 
         private async ValueTask ApplyFont(CanvasFontStyle style, object value)

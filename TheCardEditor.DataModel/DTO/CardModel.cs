@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using TheCardEditor.DataModel.DataModel;
 
 namespace TheCardEditor.DataModel.DTO;
@@ -33,6 +35,10 @@ public class CardModel
     [MinLength(3)]
     public string Name { get; set; } = "";
 
+    public List<string> GetTags()
+    {
+        return JsonSerializer.Deserialize<JsonObject>(Data)?["objects"]?.AsArray().Select(s => s["tag"]?.ToString() ?? "").ToList() ?? new();
+    }
     public string Data { get; set; } = "{}";
 
     [Range(1, long.MaxValue)]

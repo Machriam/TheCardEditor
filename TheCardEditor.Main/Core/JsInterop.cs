@@ -8,6 +8,7 @@ public interface IJsInterop : IErrorLogger
     Task<IEnumerable<string>> GetAvailableFonts();
 
     Task LoadFont(string fontName, string base64Data);
+    Task<string> Prompt(string message);
 }
 
 public class JsInterop : IJsInterop
@@ -23,6 +24,10 @@ public class JsInterop : IJsInterop
     {
         await _jsRuntime.InvokeVoidAsync("console.log", message + "\n" + stackTrace);
         await _jsRuntime.InvokeVoidAsync("alert", message);
+    }
+    public async Task<string> Prompt(string message)
+    {
+        return await _jsRuntime.InvokeAsync<string>("prompt", message);
     }
 
     public async Task<IEnumerable<string>> GetAvailableFonts()

@@ -10,7 +10,16 @@
         <FloatingInput Label="Cardname" ValueSelector="@(()=>_currentCard.Name)" InputChanged="@(n=>_currentCard.Name=n)"></FloatingInput>
         <div class="col-md-12 row mt-2">
             <FloatingInput class="col-md-3" Label="New Text" ValueSelector="@(()=>AddNewText)" InputChanged="@(n=>AddNewText=n)"></FloatingInput>
-            <FloatingInput class="col-md-3" Label="Tag" ValueSelector="@(()=>AddTag)" InputChanged="@(n=>AddTag=n)"></FloatingInput>
+            <div class="col-md-3">
+                <label>Tag</label>
+                <select @onchange="@(arg=>AddTag=arg.Value?.ToString()??"")" class="form-control col-md-3">
+                    @foreach (var tag in Tags)
+                    {
+                        <option value="@tag">@tag</option>
+                    }
+                </select>
+            </div>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await AskForNewTag())">New Tag</Button>
             <FloatingNumericInput class="col-md-2" Label="X" DisabledSelector="@(()=>_multipleObjectsAreSelected)"
                                   ValueSelector="@( ()=>AddObjectX)" InputChanged="@( async x=>await OnCoordinatesChanged((int)x,null))"></FloatingNumericInput>
             <FloatingNumericInput DisabledSelector="@(()=>_multipleObjectsAreSelected)" class="col-md-2" Label="Y"
