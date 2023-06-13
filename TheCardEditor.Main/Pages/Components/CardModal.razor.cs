@@ -132,6 +132,7 @@ namespace TheCardEditor.Main.Pages.Components
                 return;
             }
             Tags.Add(newTag);
+            AddTag = newTag;
             StateHasChanged();
         }
 
