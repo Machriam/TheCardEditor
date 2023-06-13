@@ -12,7 +12,7 @@
         delete window.canvasInteropFunctions.instance[divId];
     }
     onSelectionCleared(evt) {
-        const id = evt.deselected[0].canvas.lowerCanvasEl.id;
+        const id = evt.hasOwnProperty("target") ? evt.target.canvas.lowerCanvasEl.id: evt.deselected[0].canvas.lowerCanvasEl.id;
         const instance = CanvasInterop.getInstance(id);
         instance.parameter.dotnetReference.invokeMethodAsync(instance.parameter.objectDeselectionHandler);
     }
@@ -152,6 +152,13 @@ window.canvasInteropFunctions = {
         instance.canvas.getActiveObject().set({ left: left, top: top });
         instance.canvas.getActiveObject().setCoords();
         instance.canvas.renderAll();
+    },
+    removeObject: function (divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        const objects = instance.canvas.getActiveObjects();
+        for (let i = 0; i < objects.length; i++) {
+            instance.canvas.remove(objects[i]);
+        }
     },
     centerObjects: function (divId) {
         const instance = CanvasInterop.getInstance(divId);

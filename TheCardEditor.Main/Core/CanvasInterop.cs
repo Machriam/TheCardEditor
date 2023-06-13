@@ -94,6 +94,8 @@ public interface ICanvasInterop : IDisposable
     ValueTask<int> SendBackwards(int index);
 
     ValueTask<int> BringForward(int index);
+
+    ValueTask RemoveObject();
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -111,6 +113,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private const string Namespace = "canvasInteropFunctions";
     private static string JsInitialize => Namespace + ".initialize";
     private static string JsDrawText => Namespace + ".drawText";
+    private static string JsRemoveObject => Namespace + ".removeObject";
     private static string JsDrawPicture => Namespace + ".drawPicture";
     private static string JsExport => Namespace + ".exportCanvas";
     private static string JsSelectObject => Namespace + ".selectObject";
@@ -193,6 +196,12 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await _jsRuntime.HandledInvokeVoid(JsDrawText, xPos, yPos, text, tag, _divId);
     }
 
+    public async ValueTask RemoveObject()
+    {
+        await Initialize();
+        await _jsRuntime.HandledInvokeVoid(JsRemoveObject, _divId);
+    }
+
     public async ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image)
     {
         await Initialize();
@@ -219,11 +228,13 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
 
     public async ValueTask SetCoordinates(int left, int top)
     {
+        await Initialize();
         await _jsRuntime.HandledInvokeVoid(JsSetCoordinates, _divId, left, top);
     }
 
     public async ValueTask CenterObjects()
     {
+        await Initialize();
         await _jsRuntime.HandledInvokeVoid(JsCenterObjects, _divId);
     }
 }
