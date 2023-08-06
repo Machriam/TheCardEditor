@@ -12,6 +12,7 @@ public enum CanvasFontStyle
 {
     [Description("stroke")]
     Stroke,
+
     [Description("fill")]
     Fill,
 
@@ -23,6 +24,7 @@ public enum CanvasFontStyle
 
     [Description("fontWeight")]
     FontWeight,
+
     [Description("textAlign")]
     TextAlign,
 
@@ -81,8 +83,6 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask<JsonObject> ExportJson();
 
-    ValueTask ImportJson(JsonObject json);
-
     ValueTask SetCoordinates(int left, int top);
 
     ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image);
@@ -100,6 +100,8 @@ public interface ICanvasInterop : IDisposable
     ValueTask<int> BringForward(int index);
 
     ValueTask RemoveObject();
+
+    ValueTask ImportJson(JsonObject json, Dictionary<long, string> imageData);
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -212,10 +214,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, id, name, base64Image, _divId);
     }
 
-    public async ValueTask ImportJson(JsonObject json)
+    public async ValueTask ImportJson(JsonObject json, Dictionary<long, string> imageData)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsJsonImport, json, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsJsonImport, json, imageData, _divId);
     }
 
     public async ValueTask<JsonObject> ExportJson()

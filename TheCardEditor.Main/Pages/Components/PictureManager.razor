@@ -1,0 +1,7 @@
+<h1>Picture Manager</h1>
+@foreach (var picture in _pictures)
+{
+    <div>@picture.Name</div>
+}
+
+<WindowsFolderPicker OnFileDialogFinished="OnFolderSelected"></WindowsFolderPicker>

@@ -1,0 +1,26 @@
+<Button OnClickAsync="@SelectFile" class="btn btn-primary">Select Folder</Button>
+@code {
+    [Inject] private ILocalStorageInterop LocalStorageInterop { get; set; } = default!;
+    [Parameter] public EventCallback<FileDialogResult> OnFileDialogFinished { get; set; }
+    private const string LastFolderPath = nameof(LastFolderPath);
+    public async Task SelectFile()
+    {
+        var result = new FileDialogResult();
+        var initialDirectory = await LocalStorageInterop.GetItem(LastFolderPath) ?? "";
+        SynchronizationContext.Current!.Post(async (d) =>
+        {
+            using var fileDialog = new FolderBrowserDialog()
+                {
+                    InitialDirectory = initialDirectory,
+                };
+            var dialogResult = fileDialog.ShowDialog();
+            if (dialogResult == DialogResult.OK)
+            {
+                result.FilePath = fileDialog.SelectedPath;
+            }
+            else return;
+            await OnFileDialogFinished.InvokeAsync(result);
+            await LocalStorageInterop.SetItem(LastFolderPath, Path.GetDirectoryName(result.FilePath) ?? "");
+        }, null);
+    }
+}

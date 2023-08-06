@@ -51,6 +51,7 @@ internal static class Program
         services.AddTransient(s => new ServiceAccessor<GameService>(s));
         services.AddTransient(s => new ServiceAccessor<CardSetService>(s));
         services.AddTransient(s => new ServiceAccessor<CardService>(s));
+        services.AddTransient(s => new ServiceAccessor<PictureService>(s));
         services.AddTransient<ICanvasInteropFactory, CanvasInteropFactory>();
         services.AddTransient<IShortcutRegistrator, ShortcutRegistrator>();
         services.AddBlazoredModal();

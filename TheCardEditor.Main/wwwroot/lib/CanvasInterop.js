@@ -186,9 +186,11 @@ window.canvasInteropFunctions = {
     },
     exportJson: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
-        return instance.canvas.toJSON(["tag", "pictureId", "name", "lockScalingY"]);
+        let result = instance.canvas.toJSON(["tag", "pictureId", "name", "lockScalingY"]);
+        result.objects = result.objects.map(o => { o.src = ""; return o; });
+        return result;
     },
-    importJson: function (json, divId) {
+    importJson: function (json, pictureData, divId) {
         const instance = CanvasInterop.getInstance(divId);
         return instance.canvas.loadFromJSON(json);
     },

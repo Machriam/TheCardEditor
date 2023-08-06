@@ -10,15 +10,16 @@
         SynchronizationContext.Current!.Post(async (d) =>
         {
             using var fileDialog = new OpenFileDialog()
-            {
-                InitialDirectory = initialDirectory,
-                Filter = "Image Files (PNG) |*.PNG;"
-            };
+                {
+                    InitialDirectory = initialDirectory,
+                    Filter = "Image Files (PNG) |*.PNG;"
+                };
             var dialogResult = fileDialog.ShowDialog();
             if (dialogResult == DialogResult.OK)
             {
                 result.FilePath = fileDialog.FileName;
             }
+            else return;
             using var memoryStream = new MemoryStream();
             fileDialog.OpenFile().CopyTo(memoryStream);
             result.FileDataBase64 = "data:image/png;base64," + Convert.ToBase64String(memoryStream.ToArray());

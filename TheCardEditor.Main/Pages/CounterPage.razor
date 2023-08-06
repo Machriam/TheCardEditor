@@ -25,7 +25,7 @@
             @foreach (var item in _canvasObjects)
             {
                 <div style="cursor:pointer;" class="hovery"
-             @onclick="@(async ()=>{SelectIndex=item.Index; await SelectObject();})">
+                @onclick="@(async ()=>{SelectIndex=item.Index; await SelectObject();})">
                     <span>@item.Name</span><span>@item.Tag</span><span>@item.Index</span>
                 </div>
             }
@@ -97,7 +97,7 @@
     private async Task LoadJson()
     {
         if (_json == null) return;
-        await _canvasInterop.ImportJson(_json);
+        await _canvasInterop.ImportJson(_json, new());
     }
     private async Task SelectObject()
     {

@@ -21,6 +21,9 @@ namespace TheCardEditor.Main.Pages.Components
         private ServiceAccessor<CardService> CardService { get; set; } = default!;
 
         [Inject]
+        private ServiceAccessor<PictureService> PictureService { get; set; } = default!;
+
+        [Inject]
         private ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
 
         [Inject]
@@ -55,6 +58,7 @@ namespace TheCardEditor.Main.Pages.Components
         private ICanvasInterop _canvasInterop = default!;
         private const string CanvasId = "CardCanvasId";
         public FileDialogResult Picture { get; set; } = new();
+        private Dictionary<long, string> _pictureData = new();
 
         public async Task OnCoordinatesChanged(int? x, int? y)
         {
@@ -67,6 +71,9 @@ namespace TheCardEditor.Main.Pages.Components
         {
             ShortcutRegistrator.AddHotKey(ModCode.Ctrl, Code.B, () => ApplyFont(CanvasFontStyle.FontWeight, "bold"), "Bold");
             _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
+            _pictureData = _currentCard.SerializedData().GetPictureIds()
+                .Distinct()
+                .ToDictionary(id => id, id => PictureService.Execute(ps => ps.GetBase64Picture(id)));
             if (ApplicationStorage.SelectedCardSet == null) return;
             _selectedFont = ApplicationStorage.AvailableFonts.FirstOrDefault() ?? "Arial";
             Height = (int)ApplicationStorage.SelectedCardSet.Height;
@@ -78,7 +85,7 @@ namespace TheCardEditor.Main.Pages.Components
             if (!firstRender) return;
             _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, OnObjectSelected, OnObjectDeselected, OnMultiObjectIsSelected);
             var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
-            await _canvasInterop.ImportJson(jsonObject ?? new JsonObject());
+            await _canvasInterop.ImportJson(jsonObject ?? new JsonObject(), _pictureData);
             StateHasChanged();
         }
 
@@ -118,7 +125,7 @@ namespace TheCardEditor.Main.Pages.Components
         {
             _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
             var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
-            await _canvasInterop.ImportJson(jsonObject ?? new JsonObject());
+            await _canvasInterop.ImportJson(jsonObject ?? new JsonObject(), _pictureData);
         }
 
         public async Task CenterObjects()
