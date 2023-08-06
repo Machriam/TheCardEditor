@@ -1,4 +1,5 @@
-﻿using TheCardEditor.DataModel.DataModel;
+﻿using System.Text;
+using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.DataModel.DTO;
 
 namespace TheCardEditor.Services;
@@ -46,7 +47,7 @@ public class PictureService
 
     public IEnumerable<PictureModel> GetPictures()
     {
-        var existingNames = new Dictionary<string, List<PictureModel>>();
+        var existingNames = new Dictionary<string, PictureModel>();
         return _dataContext.Pictures.Select(p => new PictureModel()
         {
             Id = p.Id,
@@ -58,10 +59,11 @@ public class PictureService
             if (existingNames.ContainsKey(p.Name))
             {
                 p.DuplicatedName = true;
+                existingNames[p.Name].DuplicatedName = true;
             }
             else
             {
-                existingNames.Add(p.Name, new() { p });
+                existingNames.Add(p.Name, p);
             }
             return p;
         });
@@ -73,6 +75,6 @@ public class PictureService
         if (!Path.Exists(picture?.Path)) return "";
         using var memoryStream = new MemoryStream();
         File.OpenRead(picture.Path).CopyTo(memoryStream);
-        return Convert.ToBase64String(memoryStream.ToArray());
+        return new StringBuilder("data:image/png;base64,").Append(Convert.ToBase64String(memoryStream.ToArray())).ToString();
     }
 }

@@ -142,7 +142,7 @@ namespace TheCardEditor.Main.Pages.Components
         {
             if (_selectedPicture == null) return;
             var base64Text = PictureService.Execute(ps => ps.GetBase64Picture(_selectedPicture.Id)) ?? "";
-            await _canvasInterop.DrawPicture(AddObjectX, AddObjectY, _selectedPicture.Id, _selectedPicture.Path, base64Text);
+            await _canvasInterop.DrawPicture(AddObjectX, AddObjectY, _selectedPicture.Id, base64Text);
         }
 
         public async Task AskForNewTag()
@@ -183,6 +183,9 @@ namespace TheCardEditor.Main.Pages.Components
             _currentCard.Data = JsonSerializer.Serialize(json);
             _currentCard.CardSetFk = ApplicationStorage.SelectedCardSet.Id;
             CardService.Execute((s, c) => s.UpdateCard(c), _currentCard);
+            _pictureData = _currentCard.SerializedData().GetPictureIds()
+                            .Distinct()
+                            .ToDictionary(id => id, id => PictureService.Execute(ps => ps.GetBase64Picture(id)) ?? "");
         }
 
         private async ValueTask ApplyFont(CanvasFontStyle style, object value)

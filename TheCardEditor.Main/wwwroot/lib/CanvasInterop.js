@@ -21,7 +21,7 @@
         const id = evt.target.canvas.lowerCanvasEl.id;
         const instance = CanvasInterop.getInstance(id);
         instance.parameter.dotnetReference.invokeMethodAsync(
-            instance.parameter.objectSelectionHandler, evt.target.left, evt.target.top);
+            instance.parameter.objectSelectionHandler, evt.target.left, evt.target.top, evt.target.tag);
     }
     onElementSelected(evt) {
         const id = evt.selected[0].canvas.lowerCanvasEl.id;
@@ -143,14 +143,14 @@ window.canvasInteropFunctions = {
             canvas.renderAll();
         }
     },
-    drawPicture: function (xPos, yPos, pictureId, name, image, divId) {
+    drawPicture: function (xPos, yPos, pictureId, image, divId) {
         const instance = CanvasInterop.getInstance(divId);
         fabric.Image.fromURL(image, function (img) {
             img.set({ left: xPos, top: yPos });
             img.toObject = (function (toObject) {
                 return function () {
                     return fabric.util.object.extend(toObject.call(this),
-                        { pictureId: pictureId, name: name });
+                        { pictureId: pictureId });
                 };
             })(img.toObject);
             instance.canvas.add(img);
@@ -191,6 +191,7 @@ window.canvasInteropFunctions = {
         return result;
     },
     importJson: function (json, pictureData, divId) {
+        json.objects.map(o => o.src = pictureData.hasOwnProperty(o.pictureId) ? pictureData[o.pictureId] : "");
         const instance = CanvasInterop.getInstance(divId);
         return instance.canvas.loadFromJSON(json);
     },
