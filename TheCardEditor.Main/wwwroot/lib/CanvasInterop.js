@@ -191,6 +191,7 @@ window.canvasInteropFunctions = {
         return result;
     },
     importJson: function (json, pictureData, divId) {
+        if (json==null || Object.keys(json).length == 0) return;
         json.objects.map(o => o.src = pictureData.hasOwnProperty(o.pictureId) ? pictureData[o.pictureId] : "");
         const instance = CanvasInterop.getInstance(divId);
         return instance.canvas.loadFromJSON(json);
