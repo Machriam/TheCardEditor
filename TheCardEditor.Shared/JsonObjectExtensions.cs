@@ -11,6 +11,14 @@ public static class JsonObjectExtensions
                                 .Where(s => !string.IsNullOrEmpty(s.Item1)) ?? Array.Empty<(string, string)>();
     }
 
+    public static IEnumerable<(string Tag, long PictureId, int Index)> GetObjects(this JsonObject json)
+    {
+        return json?["objects"]?.AsArray()
+                                .Select((s, i) => (s?["tag"]?.ToString() ?? "",
+                                long.TryParse(s?["pictureId"]?.ToString(), out var pictureId) ? pictureId : -1, i))?
+                                .ToList() ?? new();
+    }
+
     public static IEnumerable<long> GetPictureIds(this JsonObject json)
     {
         return json?["objects"]?.AsArray()

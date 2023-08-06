@@ -1,5 +1,6 @@
 @implements IDisposable
 @using Blazored.Modal;
+@using TheCardEditor.Shared;
 @using Toolbelt.Blazor.HotKeys2;
 @using System.Text.Json.Nodes;
 @using System.Text.Json;
@@ -38,7 +39,7 @@
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Clear,true))">Clear</Button>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await CenterObjects())">Center</Button>
             <div class="col-md-6">
-                <DataList LabelText="Add Picture" SelectedItemChanged="SelectedPictureChanged" Items="@_pictures"></DataList>
+                <DataList LabelText="Add Picture" SelectedItemChanged="SelectedPictureChanged" Items="@_pictureById.Values"></DataList>
                 @if (_selectedPicture != null)
                 {
                     <Button OnClickAsync="@(async ()=>await InsertPicture())" class="btn btn-primary">Insert @(_selectedPicture.Name)</Button>
@@ -59,6 +60,26 @@
         </div>
         <Button OnClickAsync="@(async()=>await SaveCard())" class="btn btn-primary mt-2">Save</Button>
         <Button OnClickAsync="@(async()=>await Reset())" class="btn btn-danger mt-2">Reset</Button>
+        <div>
+            @foreach (var item in _currentCard.VirtualSerializedData().GetObjects())
+            {
+                <div style="cursor:pointer;" class="hovery row alert p-1 m-0 @(_selectedIndex==item.Index?"alert-info":"")"
+                @onclick="@(async ()=>{_selectedIndex=item.Index; await SelectObject();})">
+                    <div class="col-md-1">
+                        @item.Index
+                    </div>
+                    <div class="col-md-5">
+                        @(_pictureById.TryGetValue(item.PictureId, out var picture) ? picture.Name : item.Tag)
+                    </div>
+                </div>
+
+            }
+        </div>
     </div>
 </div>
+<style>
+    .hovery:hover {
+        background-color: palevioletred;
+    }
+</style>
 

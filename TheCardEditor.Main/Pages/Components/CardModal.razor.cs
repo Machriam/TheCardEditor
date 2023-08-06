@@ -57,8 +57,9 @@ namespace TheCardEditor.Main.Pages.Components
         private ICanvasInterop _canvasInterop = default!;
         private const string CanvasId = "CardCanvasId";
         private Dictionary<long, string> _pictureData = new();
-        private List<PictureModel> _pictures = new();
+        private Dictionary<long, PictureModel> _pictureById = new();
         private PictureModel? _selectedPicture;
+        private int _selectedIndex;
 
         public async Task OnCoordinatesChanged(int? x, int? y)
         {
@@ -72,6 +73,11 @@ namespace TheCardEditor.Main.Pages.Components
             _selectedPicture = picture.GetItem<PictureModel>();
         }
 
+        private async Task SelectObject()
+        {
+            await _canvasInterop.SelectObject(_selectedIndex);
+        }
+
         protected override void OnInitialized()
         {
             ShortcutRegistrator.AddHotKey(ModCode.Ctrl, Code.B, () => ApplyFont(CanvasFontStyle.FontWeight, "bold"), "Bold");
@@ -79,7 +85,7 @@ namespace TheCardEditor.Main.Pages.Components
             _pictureData = _currentCard.SerializedData().GetPictureIds()
                 .Distinct()
                 .ToDictionary(id => id, id => PictureService.Execute(ps => ps.GetBase64Picture(id)) ?? "");
-            _pictures = PictureService.Execute(ps => ps.GetPictures()).ToList();
+            _pictureById = PictureService.Execute(ps => ps.GetPictures()).ToDictionary(p => p.Id);
             if (ApplicationStorage.SelectedCardSet == null) return;
             _selectedFont = ApplicationStorage.AvailableFonts.FirstOrDefault() ?? "Arial";
             Height = (int)ApplicationStorage.SelectedCardSet.Height;
@@ -136,6 +142,7 @@ namespace TheCardEditor.Main.Pages.Components
         public async Task RemoveObject()
         {
             await _canvasInterop.RemoveObject();
+            await UpdateVirtualData();
         }
 
         public async Task InsertPicture()
@@ -143,6 +150,7 @@ namespace TheCardEditor.Main.Pages.Components
             if (_selectedPicture == null) return;
             var base64Text = PictureService.Execute(ps => ps.GetBase64Picture(_selectedPicture.Id)) ?? "";
             await _canvasInterop.DrawPicture(AddObjectX, AddObjectY, _selectedPicture.Id, base64Text);
+            await UpdateVirtualData();
         }
 
         public async Task AskForNewTag()
@@ -173,12 +181,21 @@ namespace TheCardEditor.Main.Pages.Components
                 return;
             }
             await _canvasInterop.DrawText(AddObjectX, AddObjectY, AddNewText, AddTag);
+            await UpdateVirtualData();
+        }
+
+        public async Task UpdateVirtualData()
+        {
+            if (ApplicationStorage.SelectedCardSet == null) return;
+            var json = await _canvasInterop.ExportJson();
+            _selectedIndex = -1;
+            _currentCard.VirtualData = JsonSerializer.Serialize(json);
+            StateHasChanged();
         }
 
         public async Task SaveCard()
         {
-            if (ApplicationStorage.SelectedCardSet == null)
-                return;
+            if (ApplicationStorage.SelectedCardSet == null) return;
             var json = await _canvasInterop.ExportJson();
             _currentCard.Data = JsonSerializer.Serialize(json);
             _currentCard.CardSetFk = ApplicationStorage.SelectedCardSet.Id;

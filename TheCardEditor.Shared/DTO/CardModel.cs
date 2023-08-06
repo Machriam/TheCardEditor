@@ -40,7 +40,23 @@ public class CardModel
         return JsonSerializer.Deserialize<JsonObject>(Data) ?? new();
     }
 
-    public string Data { get; set; } = "{}";
+    public JsonObject VirtualSerializedData()
+    {
+        return JsonSerializer.Deserialize<JsonObject>(VirtualData) ?? new();
+    }
+
+    private string _data = "{}";
+
+    public string Data
+    {
+        get => _data; set
+        {
+            _data = value;
+            VirtualData = _data;
+        }
+    }
+
+    public string VirtualData { get; set; } = "{}";
 
     [Range(1, long.MaxValue)]
     public long CardSetFk { get; set; }
