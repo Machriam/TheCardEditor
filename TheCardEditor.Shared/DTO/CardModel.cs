@@ -58,6 +58,11 @@ public class CardModel
 
     public string VirtualData { get; set; } = "{}";
 
+    public bool IsModified()
+    {
+        return Data != VirtualData;
+    }
+
     [Range(1, long.MaxValue)]
     public long CardSetFk { get; set; }
 }

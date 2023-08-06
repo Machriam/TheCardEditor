@@ -12,9 +12,9 @@ public class CardService
         _dataContext = dataContext;
     }
 
-    public void DeleteCard(CardModel model)
+    public void DeleteCard(long id)
     {
-        _dataContext.Cards.Remove(_dataContext.Cards.First(f => f.Id == model.Id));
+        _dataContext.Cards.Remove(_dataContext.Cards.First(f => f.Id == id));
         _dataContext.SaveChanges();
     }
 

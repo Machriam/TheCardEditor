@@ -29,6 +29,7 @@ namespace TheCardEditor.Main.Pages.Components
     {
         private const string GridId = "CardGrid";
         [Inject] private IGridViewFactory GridViewFactory { get; set; } = default!;
+        [Inject] private IJsInterop JsInterop { get; set; } = default!;
         [Inject] private ServiceAccessor<CardService> CardService { get; set; } = default!;
         [Inject] private ApplicationStorage ApplicationStorage { get; set; } = default!;
         [Inject] private IModalHelper ModalHelper { get; set; } = default!;
@@ -78,7 +79,18 @@ namespace TheCardEditor.Main.Pages.Components
             await ModalHelper.ShowModal<CardModal>("Create new Card", new() {
                 { nameof(CardModal.CardId), null },
                 { nameof(CardModal.Tags), Tags},
-            }, disableBackgroundCancel: true);
+            }, disableBackgroundCancel: true, hideCloseButton: true);
+            await UpdateGrid();
+        }
+
+        public async Task DeleteCards()
+        {
+            if (!await JsInterop.Confirm("Do you really want to delete: " + string.Join(",", _selectedCards.Select(id => _cardById[id].Name))))
+                return;
+            foreach (var id in _selectedCards)
+            {
+                CardService.Execute(cs => cs.DeleteCard(id));
+            }
             await UpdateGrid();
         }
 
