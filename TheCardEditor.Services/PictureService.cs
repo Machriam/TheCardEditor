@@ -12,24 +12,35 @@ public class PictureService
         _dataContext = dataContext;
     }
 
-    public void LoadPicturesFromPath(string path, bool originalCall = true)
+    private IEnumerable<string> RecursivePictureLoad(string path)
     {
+        var result = new List<string>();
         foreach (var file in Directory.GetFiles(path))
         {
             if (file.EndsWith(".png"))
             {
-                _dataContext.Pictures.Add(new Picture()
-                {
-                    Name = Path.GetFileNameWithoutExtension(file),
-                    Path = file
-                });
+                result.Add(file);
             }
         }
         foreach (var dir in Directory.GetDirectories(path))
         {
-            LoadPicturesFromPath(dir, false);
+            result.AddRange(RecursivePictureLoad(dir));
         }
-        if (originalCall) _dataContext.SaveChanges();
+        return result;
+    }
+    public void LoadPicturesFromPath(string path)
+    {
+        var result = RecursivePictureLoad(path);
+        var importedPictures = _dataContext.Pictures.Select(p => p.Path).ToHashSet();
+        foreach (var newPicture in result.Where(r => !importedPictures.Contains(r)))
+        {
+            _dataContext.Pictures.Add(new Picture()
+            {
+                Name = Path.GetFileNameWithoutExtension(newPicture),
+                Path = newPicture
+            });
+        }
+        _dataContext.SaveChanges();
     }
 
     public IEnumerable<PictureModel> GetPictures()

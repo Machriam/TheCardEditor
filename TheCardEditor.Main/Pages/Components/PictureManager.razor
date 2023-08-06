@@ -1,7 +1,17 @@
 <h1>Picture Manager</h1>
-@foreach (var picture in _pictures)
-{
-    <div>@picture.Name</div>
-}
+<div class="col-md-12 row">
+    <div style="height:80vh;overflow-y:scroll" class="col-md-8">
+        @foreach (var picture in _pictures.Where(p=>p.Path.StartsWith(_selectedPath)))
+        {
+            <div>@picture.Name</div>
+        }
+    </div>
+    <div style="height:80vh;overflow-y:scroll" class="col-md-4">
+        @foreach (var path in _relativePaths)
+        {
+            <div @onclick="@(()=>_selectedPath=path)" class="alert p-0 @(_selectedPath==path?"alert-info":"")">@path</div>
+        }
+    </div>
+</div>
 
 <WindowsFolderPicker OnFileDialogFinished="OnFolderSelected"></WindowsFolderPicker>
