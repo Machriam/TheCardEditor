@@ -85,7 +85,7 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask SetCoordinates(int left, int top);
 
-    ValueTask DrawPicture(int xPos, int yPos, long id, string base64Image);
+    ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image);
 
     ValueTask DrawText(int xPos, int yPos, string text, string tag);
 
@@ -208,10 +208,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await _jsRuntime.HandledInvokeVoid(JsRemoveObject, _divId);
     }
 
-    public async ValueTask DrawPicture(int xPos, int yPos, long id, string base64Image)
+    public async ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, id, base64Image, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, id, name, base64Image, _divId);
     }
 
     public async ValueTask ImportJson(JsonObject json, Dictionary<long, string> imageData)

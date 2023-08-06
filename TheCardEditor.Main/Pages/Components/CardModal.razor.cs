@@ -149,7 +149,7 @@ namespace TheCardEditor.Main.Pages.Components
         {
             if (_selectedPicture == null) return;
             var base64Text = PictureService.Execute(ps => ps.GetBase64Picture(_selectedPicture.Id)) ?? "";
-            await _canvasInterop.DrawPicture(AddObjectX, AddObjectY, _selectedPicture.Id, base64Text);
+            await _canvasInterop.DrawPicture(AddObjectX, AddObjectY, _selectedPicture.Id, _selectedPicture.Name, base64Text);
             await UpdateVirtualData();
         }
 
