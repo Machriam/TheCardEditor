@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using TheCardEditor.DataModel.DTO;
 using TheCardEditor.Main.Core;
-using TheCardEditor.Main.UiComponents;
 using TheCardEditor.Services;
 using TheCardEditor.Shared;
 using Toolbelt.Blazor.HotKeys2;
@@ -57,8 +56,9 @@ namespace TheCardEditor.Main.Pages.Components
         private int FontSize { get; set; } = 12;
         private ICanvasInterop _canvasInterop = default!;
         private const string CanvasId = "CardCanvasId";
-        public FileDialogResult Picture { get; set; } = new();
         private Dictionary<long, string> _pictureData = new();
+        private List<PictureModel> _pictures = new();
+        private PictureModel? _selectedPicture;
 
         public async Task OnCoordinatesChanged(int? x, int? y)
         {
@@ -67,13 +67,19 @@ namespace TheCardEditor.Main.Pages.Components
             await _canvasInterop.SetCoordinates(AddObjectX, AddObjectY);
         }
 
+        public void SelectedPictureChanged(IDataListItem picture)
+        {
+            _selectedPicture = picture.GetItem<PictureModel>();
+        }
+
         protected override void OnInitialized()
         {
             ShortcutRegistrator.AddHotKey(ModCode.Ctrl, Code.B, () => ApplyFont(CanvasFontStyle.FontWeight, "bold"), "Bold");
-            _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
+            _currentCard = CardService.Execute(cs => cs.GetCard(CardId)) ?? new();
             _pictureData = _currentCard.SerializedData().GetPictureIds()
                 .Distinct()
-                .ToDictionary(id => id, id => PictureService.Execute(ps => ps.GetBase64Picture(id)));
+                .ToDictionary(id => id, id => PictureService.Execute(ps => ps.GetBase64Picture(id)) ?? "");
+            _pictures = PictureService.Execute(ps => ps.GetPictures()).ToList();
             if (ApplicationStorage.SelectedCardSet == null) return;
             _selectedFont = ApplicationStorage.AvailableFonts.FirstOrDefault() ?? "Arial";
             Height = (int)ApplicationStorage.SelectedCardSet.Height;
@@ -115,15 +121,9 @@ namespace TheCardEditor.Main.Pages.Components
             StateHasChanged();
         }
 
-        public void FileSelected(FileDialogResult result)
-        {
-            Picture = result;
-            StateHasChanged();
-        }
-
         private async Task Reset()
         {
-            _currentCard = CardService.Execute(cs => cs.GetCard(CardId));
+            _currentCard = CardService.Execute(cs => cs.GetCard(CardId)) ?? new();
             var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
             await _canvasInterop.ImportJson(jsonObject ?? new JsonObject(), _pictureData);
         }
@@ -140,7 +140,9 @@ namespace TheCardEditor.Main.Pages.Components
 
         public async Task InsertPicture()
         {
-            await _canvasInterop.DrawPicture(AddObjectX, AddObjectY, Random.Shared.NextInt64(), Picture.FilePath, Picture.FileDataBase64);
+            if (_selectedPicture == null) return;
+            var base64Text = PictureService.Execute(ps => ps.GetBase64Picture(_selectedPicture.Id)) ?? "";
+            await _canvasInterop.DrawPicture(AddObjectX, AddObjectY, _selectedPicture.Id, _selectedPicture.Path, base64Text);
         }
 
         public async Task AskForNewTag()

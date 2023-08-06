@@ -28,6 +28,7 @@ public class PictureService
         }
         return result;
     }
+
     public void LoadPicturesFromPath(string path)
     {
         var result = RecursivePictureLoad(path);
@@ -45,11 +46,24 @@ public class PictureService
 
     public IEnumerable<PictureModel> GetPictures()
     {
+        var existingNames = new Dictionary<string, List<PictureModel>>();
         return _dataContext.Pictures.Select(p => new PictureModel()
         {
             Id = p.Id,
             Name = p.Name,
             Path = p.Path
+        }).ToList()
+        .Select(p =>
+        {
+            if (existingNames.ContainsKey(p.Name))
+            {
+                p.DuplicatedName = true;
+            }
+            else
+            {
+                existingNames.Add(p.Name, new() { p });
+            }
+            return p;
         });
     }
 

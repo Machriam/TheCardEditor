@@ -37,12 +37,9 @@
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Stroke,"red"))">Stroke</Button>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Clear,true))">Clear</Button>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await CenterObjects())">Center</Button>
-            <div class="col-md-4">
-                <WindowsFilePicker OnFileDialogFinished="@(a=>FileSelected(a))"></WindowsFilePicker>
-                @if (!string.IsNullOrEmpty(Picture.FilePath) && !string.IsNullOrEmpty(Picture.FileDataBase64))
-                {
-                    <Button OnClickAsync="@(async ()=>await InsertPicture())" class="btn btn-primary">Insert @(Path.GetFileName(Picture.FilePath))</Button>
-                }
+            <div class="col-md-6">
+                <DataList LabelText="Add Picture"  SelectedItemChanged="SelectedPictureChanged" Items="@_pictures"></DataList>
+                <Button></Button>
             </div>
             <FloatingNumericInput class="col-md-2" Label="Size" ValueSelector="@( ()=>FontSize)"
                                   InputChanged="@(async y=>{FontSize=(int)y;await ApplyFont(CanvasFontStyle.FontSize,FontSize);})"></FloatingNumericInput>
