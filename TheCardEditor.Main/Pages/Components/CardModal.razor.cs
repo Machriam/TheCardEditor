@@ -186,16 +186,19 @@ namespace TheCardEditor.Main.Pages.Components
 
         public async Task UpdateVirtualData(bool resetSelectedIndex = true)
         {
-            if (ApplicationStorage.SelectedCardSet == null) return; var json = await _canvasInterop.ExportJson();
+            if (ApplicationStorage.SelectedCardSet == null) return; 
+            var json = await _canvasInterop.ExportJson();
             if (resetSelectedIndex) _selectedIndex = -1;
             _currentCard.VirtualData = JsonSerializer.Serialize(json);
             StateHasChanged();
         }
+
         private async Task BringForward()
         {
             _selectedIndex = await _canvasInterop.BringForward(_selectedIndex);
             await UpdateVirtualData(false);
         }
+
         private async Task SendBackwards()
         {
             _selectedIndex = await _canvasInterop.SendBackwards(_selectedIndex);
@@ -230,6 +233,9 @@ namespace TheCardEditor.Main.Pages.Components
 
         public async Task Close()
         {
+            await UpdateVirtualData();
+            if (_currentCard.VirtualData != _currentCard.Data && !await JsInterop.Confirm("You have unsaved data. Do you really want to exit?"))
+                return;
             Dispose();
             await ModalInstance.CloseAsync();
         }

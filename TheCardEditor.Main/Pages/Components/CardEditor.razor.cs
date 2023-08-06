@@ -89,7 +89,7 @@ namespace TheCardEditor.Main.Pages.Components
                 _cardById[_selectedCards[0]].Name, new() {
                     { nameof(CardModal.CardId), _selectedCards[0] },
                     {nameof(CardModal.Tags),Tags } },
-                disableBackgroundCancel: true);
+                disableBackgroundCancel: true, hideCloseButton: true);
             await UpdateGrid();
         }
 
