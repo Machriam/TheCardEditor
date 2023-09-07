@@ -12,7 +12,6 @@
     <div style="width: calc(85vw - @(Width)px)">
         <FloatingInput Label="Cardname" ValueSelector="@(()=>_currentCard.Name)" InputChanged="@(n=>_currentCard.Name=n)"></FloatingInput>
         <div class="col-md-12 row mt-2">
-            <FloatingInput class="col-md-3" Label="New Text" ValueSelector="@(()=>AddNewText)" InputChanged="@(n=>AddNewText=n)"></FloatingInput>
             <div class="col-md-3">
                 <select value="@AddTag" @onchange="@(arg=>AddTag=arg.Value?.ToString()??"")" class="form-control col-md-3">
                     @foreach (var tag in Tags)
@@ -71,6 +70,9 @@
                 @onclick="@(async ()=>{_selectedIndex=item.Index; await SelectObject();})">
                     <div class="col-md-1">
                         @item.Index
+                    </div>
+                    <div class="col-md-1">
+                        @(_pictureById.ContainsKey(item.PictureId)?"Picture":"Text")
                     </div>
                     <div class="col-md-5">
                         @(_pictureById.TryGetValue(item.PictureId, out var picture) ? picture.Name : item.Tag)

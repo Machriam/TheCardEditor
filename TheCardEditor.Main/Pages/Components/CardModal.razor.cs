@@ -45,7 +45,7 @@ namespace TheCardEditor.Main.Pages.Components
         private int Width { get; set; }
 
         private CardModel _currentCard = new();
-        private string AddNewText { get; set; } = "";
+        private const string AddNewText = "New Textbox";
         private string AddTag { get; set; } = "";
         private int AddObjectX { get; set; }
 
