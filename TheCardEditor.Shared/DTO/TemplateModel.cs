@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
+using System.Text.Json;
 using TheCardEditor.DataModel.DataModel;
 
 namespace TheCardEditor.DataModel.DTO;
@@ -27,6 +29,10 @@ public class TemplateModel
         };
     }
 
+    public JsonObject SerializedData()
+    {
+        return JsonSerializer.Deserialize<JsonObject>(Data) ?? new();
+    }
     public long Id { get; set; }
 
     [Required]

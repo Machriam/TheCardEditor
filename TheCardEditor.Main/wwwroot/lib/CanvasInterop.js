@@ -190,6 +190,13 @@ window.canvasInteropFunctions = {
         result.objects = result.objects.map(o => { o.src = ""; return o; });
         return result;
     },
+
+    reset: function (divId) {
+        const json = "{\"version\":\"5.3.0\",\"objects\":[]}";
+        const instance = CanvasInterop.getInstance(divId);
+        return instance.canvas.loadFromJSON(json);
+    },
+
     importJson: function (json, pictureData, divId) {
         if (json==null || Object.keys(json).length == 0) return;
         json.objects.map(o => o.src = pictureData.hasOwnProperty(o.pictureId) ? pictureData[o.pictureId] : "");

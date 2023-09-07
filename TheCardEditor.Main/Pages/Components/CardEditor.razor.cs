@@ -76,8 +76,10 @@ namespace TheCardEditor.Main.Pages.Components
 
         public async Task NewCard()
         {
+            var template = await ModalHelper.ShowModal<TemplateModal, string?>("Select Template", new() { }, disableBackgroundCancel: true, hideCloseButton: true);
             await ModalHelper.ShowModal<CardModal>("Create new Card", new() {
                 { nameof(CardModal.CardId), null },
+                { nameof(CardModal.Template), template},
                 { nameof(CardModal.Tags), Tags},
             }, disableBackgroundCancel: true, hideCloseButton: true);
             await UpdateGrid();

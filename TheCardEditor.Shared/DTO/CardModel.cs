@@ -32,7 +32,7 @@ public class CardModel
 
     public long Id { get; set; }
 
-    [MinLength(3)]
+    [MinLength(3, ErrorMessage = "Please give the card a name with a length of atleast 3")]
     public string Name { get; set; } = "";
 
     public JsonObject SerializedData()

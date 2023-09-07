@@ -43,6 +43,9 @@ namespace TheCardEditor.Main.Pages.Components
         [Parameter]
         public List<string> Tags { get; set; } = new();
 
+        [Parameter]
+        public string? Template { get; set; }
+
         private int Height { get; set; }
 
         private int Width { get; set; }
@@ -85,6 +88,7 @@ namespace TheCardEditor.Main.Pages.Components
         {
             ShortcutRegistrator.AddHotKey(ModCode.Ctrl, Code.B, () => ApplyFont(CanvasFontStyle.FontWeight, "bold"), "Bold");
             _currentCard = CardService.Execute(cs => cs.GetCard(CardId)) ?? new();
+            if (!string.IsNullOrEmpty(Template)) _currentCard.Data = Template;
             _pictureData = _currentCard.SerializedData().GetPictureIds()
                 .Distinct()
                 .ToDictionary(id => id, id => PictureService.Execute(ps => ps.GetBase64Picture(id)) ?? "");

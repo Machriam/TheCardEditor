@@ -12,9 +12,9 @@ public class TemplateService
         _dataContext = dataContext;
     }
 
-    public IEnumerable<string> GetTemplateNames(long cardSetId)
+    public IReadOnlyDictionary<long, string> TemplateNamesById(long cardSetId)
     {
-        return _dataContext.Templates.Where(t => t.CardSetFk == cardSetId).Select(t => t.Name ?? "");
+        return _dataContext.Templates.Where(t => t.CardSetFk == cardSetId).ToDictionary(t => t.Id, t => t.Name);
     }
 
     public TemplateModel GetTemplate(long id)

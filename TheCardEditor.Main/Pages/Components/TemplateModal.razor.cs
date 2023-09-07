@@ -1,9 +1,12 @@
-﻿using Blazored.Modal;
+﻿using System.Diagnostics.CodeAnalysis;
+using Blazored.Modal;
+using Blazored.Modal.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using TheCardEditor.DataModel.DTO;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Services;
+using TheCardEditor.Shared;
 
 namespace TheCardEditor.Main.Pages.Components
 {
@@ -33,21 +36,54 @@ namespace TheCardEditor.Main.Pages.Components
 
         private ICanvasInterop _canvasInterop = default!;
         private const string CanvasId = "TemplateCanvasId";
-        private Dictionary<long, string> _pictureData = new();
-        private Dictionary<long, PictureModel> _pictureById = new();
+        private IReadOnlyDictionary<long, string> _templateNamesById = new Dictionary<long, string>();
+        private long? _selectedTemplate;
 
         protected override void OnInitialized()
         {
-            _pictureById = PictureService.Execute(ps => ps.GetPictures()).ToDictionary(p => p.Id);
             if (ApplicationStorage.SelectedCardSet == null) return;
+            _templateNamesById = TemplateService.Execute(ts => ts.TemplateNamesById(ApplicationStorage.SelectedCardSet.Id)) ?? new Dictionary<long, string>();
             Height = (int)ApplicationStorage.SelectedCardSet.Height;
             Width = (int)ApplicationStorage.SelectedCardSet.Width;
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        public async Task RenderCanvas(TemplateModel template)
         {
-            if (!firstRender) return;
+            _canvasInterop?.Dispose();
             _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, OnObjectSelected, OnObjectDeselected, OnMultiObjectIsSelected);
+            var pictureData = template.SerializedData().GetPictureIds()
+                .Distinct()
+                .ToDictionary(id => id, id => PictureService.Execute(ps => ps.GetBase64Picture(id)) ?? "");
+            await _canvasInterop.ImportJson(template.SerializedData(), pictureData);
+        }
+
+        public async Task DeleteTemplate()
+        {
+            if (_selectedTemplate == null) return;
+            var confirmation = await JsInterop.Confirm("Do you really want to delete the template?");
+            if (!confirmation) return;
+            TemplateService.Execute(ts => ts.DeleteTemplate(_selectedTemplate.Value));
+            if (ApplicationStorage.SelectedCardSet == null) return;
+            _selectedTemplate = null;
+            _templateNamesById = TemplateService.Execute(ts => ts.TemplateNamesById(ApplicationStorage.SelectedCardSet.Id)) ?? new Dictionary<long, string>();
+            await _canvasInterop.Reset();
+            StateHasChanged();
+        }
+
+        public async Task UseTemplateForNewCard()
+        {
+            if (_selectedTemplate == null) { await Close(); return; }
+            var template = TemplateService.Execute(ts => ts.GetTemplate(_selectedTemplate.Value));
+            if (template == null) { await Close(); return; }
+            await ModalInstance.CloseAsync(ModalResult.Ok(template.Data));
+        }
+
+        public async Task TemplateSelected(long id)
+        {
+            _selectedTemplate = id;
+            var template = TemplateService.Execute(ts => ts.GetTemplate(id));
+            if (template == null) return;
+            await RenderCanvas(template);
         }
 
         [JSInvokable]

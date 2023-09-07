@@ -102,6 +102,7 @@ public interface ICanvasInterop : IDisposable
     ValueTask RemoveObject();
 
     ValueTask ImportJson(JsonObject json, Dictionary<long, string> imageData);
+    ValueTask Reset();
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -132,6 +133,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string OnKeyDown => Namespace + ".onKeyDown";
     private static string JsDispose => Namespace + ".dispose";
     private static string JsCenterObjects => Namespace + ".centerObjects";
+    private static string JsReset => Namespace + ".reset";
 
     public CanvasInterop(IJSRuntime jsruntime, string divId, TView objectReference, HotKeys hotKeys, string selectionHandlerName, string deselectionHandlerName,
                          string multiObjectSelectedHandler)
@@ -242,5 +244,11 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     {
         await Initialize();
         await _jsRuntime.HandledInvokeVoid(JsCenterObjects, _divId);
+    }
+
+    public async ValueTask Reset()
+    {
+        await Initialize();
+        await _jsRuntime.HandledInvokeVoid(JsReset, _divId);
     }
 }
