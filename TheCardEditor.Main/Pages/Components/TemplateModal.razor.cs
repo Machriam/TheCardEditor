@@ -35,6 +35,7 @@ namespace TheCardEditor.Main.Pages.Components
         private int Width { get; set; }
 
         private ICanvasInterop _canvasInterop = default!;
+        private string _templateSearchValue = "";
         private const string CanvasId = "TemplateCanvasId";
         private IReadOnlyDictionary<long, string> _templateNamesById = new Dictionary<long, string>();
         private long? _selectedTemplate;

@@ -1,6 +1,7 @@
 <div @attributes="@(Attributes.Where(a=>a.Key!="class"))"
      class="form-floating @(string.Join(' ', Attributes.Where(a=>a.Key=="class").Select(a=>a.Value)))">
-    <input disabled="@DisabledSelector.Invoke()" value="@_currentValue" @onchange="OnInputChanged" class="form-control" id="@Guid" placeholder="@Label">
+    <input disabled="@DisabledSelector.Invoke()" value="@_currentValue" @oninput="OnInputJustChanged" 
+           @onchange="OnInputChanged" class="form-control" id="@Guid" placeholder="@Label">
     <label for="@Guid">@Label</label>
 </div>
 @code {
@@ -9,12 +10,17 @@
     [Parameter] public Func<string>? ValueSelector { get; set; }
     [Parameter] public Func<bool> DisabledSelector { get; set; } = () => false;
     [Parameter] public EventCallback<string> InputChanged { get; set; }
+    [Parameter] public EventCallback<string> InputJustChanged { get; set; }
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> Attributes { get; set; } = new();
     private string _currentValue = "";
-    public async Task OnInputChanged(ChangeEventArgs args)
+    public async Task OnInputJustChanged(ChangeEventArgs args)
     {
         _currentValue = args.Value?.ToString() ?? "";
+        await InputJustChanged.InvokeAsync(_currentValue);
+    }
+    public async Task OnInputChanged(ChangeEventArgs args)
+    {
         await InputChanged.InvokeAsync(_currentValue);
     }
     protected override void OnParametersSet()
