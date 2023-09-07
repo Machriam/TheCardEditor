@@ -73,10 +73,11 @@ window.canvasInteropFunctions = {
     getTextSize: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
         const object = instance.canvas.getActiveObject();
-        if (object?.type != "textbox") return;
+        if (object?.type != "textbox") return -1;
         for (let i = 0; i < object.text.length; i++) {
-            return object.styles?.[0]?.[0]?.["fontSize"] ?? object.fontSize;
+            return object.styles?.[0]?.[0]?.["fontSize"] ?? object.fontSize ?? -1;
         }
+        return -1;
     },
     applyFont: function (styleName, value, divId) {
         const instance = CanvasInterop.getInstance(divId);

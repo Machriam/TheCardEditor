@@ -10,7 +10,7 @@
         <canvas style="border:1px solid #000000" id="@CanvasId" width="@(Width)px" height="@(Height)px"></canvas>
     </div>
     <div style="width: calc(85vw - @(Width)px)">
-        <FloatingInput Label="Filter" InputJustChanged="@(v=>{_templateSearchValue=v;})"></FloatingInput>
+        <FloatingInput Label="Filter" InputChanged="@(v=>{_templateSearchValue=v;})"></FloatingInput>
         <div style="height:90%;overflow-y:scroll">
             @foreach (var template in _templateNamesById.Where(t => t.Value.Contains(_templateSearchValue)))
             {

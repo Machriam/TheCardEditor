@@ -102,7 +102,9 @@ public interface ICanvasInterop : IDisposable
     ValueTask RemoveObject();
 
     ValueTask ImportJson(JsonObject json, Dictionary<long, string> imageData);
+
     ValueTask Reset();
+
     ValueTask<int?> GetTextSize();
 }
 
@@ -211,11 +213,15 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await Initialize();
         await _jsRuntime.HandledInvokeVoid(JsRemoveObject, _divId);
     }
+
     public async ValueTask<int?> GetTextSize()
     {
         await Initialize();
-        return await _jsRuntime.HandledInvoke<int>(JsGetTextSize, _divId);
+        var result = await _jsRuntime.HandledInvoke<int>(JsGetTextSize, _divId);
+        if (result < 0) return null;
+        return result;
     }
+
     public async ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image)
     {
         await Initialize();
