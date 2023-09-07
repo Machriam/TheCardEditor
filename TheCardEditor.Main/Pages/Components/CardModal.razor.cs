@@ -23,6 +23,9 @@ namespace TheCardEditor.Main.Pages.Components
         private ServiceAccessor<PictureService> PictureService { get; set; } = default!;
 
         [Inject]
+        private ServiceAccessor<TemplateService> TemplateService { get; set; } = default!;
+
+        [Inject]
         private ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
 
         [Inject]
@@ -143,6 +146,13 @@ namespace TheCardEditor.Main.Pages.Components
         {
             await _canvasInterop.RemoveObject();
             await UpdateVirtualData();
+        }
+
+        public async Task SaveAsTemplate()
+        {
+            await UpdateVirtualData();
+            var name = await JsInterop.Prompt("Enter name for new Template");
+            TemplateService.Execute(ts => ts.StoreTemplate(name, _currentCard));
         }
 
         public async Task InsertPicture()

@@ -13,4 +13,5 @@ public partial class CardSet
     public long GameFk { get; set; }
     public virtual ICollection<Card> Cards { get; init; } = new List<Card>();
     public virtual Game GameFkNavigation { get; set; } = null!;
+    public virtual ICollection<Template> Templates { get; init; } = new List<Template>();
 }

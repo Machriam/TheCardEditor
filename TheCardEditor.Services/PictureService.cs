@@ -3,7 +3,6 @@ using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.DataModel.DTO;
 
 namespace TheCardEditor.Services;
-
 public class PictureService
 {
     private readonly DataContext _dataContext;

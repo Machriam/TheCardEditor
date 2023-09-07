@@ -1,0 +1,20 @@
+@implements IDisposable
+@using Blazored.Modal;
+@using TheCardEditor.Shared;
+@using Toolbelt.Blazor.HotKeys2;
+@using System.Text.Json.Nodes;
+@using System.Text.Json;
+@using TheCardEditor.DataModel.DTO;
+<div @onclick="Close"
+     style="cursor:pointer;position:absolute;font-size:32px;top:5%;left:92%">
+    x
+</div>
+<div style="height:80vh;width:90vw;overflow:scroll" class="col-md-12 row">
+    <canvas style="border:1px solid #000000" id="@CanvasId" width="@Width" height="@Height"></canvas>
+</div>
+<style>
+    .hovery:hover {
+        background-color: palevioletred;
+    }
+</style>
+

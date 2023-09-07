@@ -55,6 +55,10 @@ public partial class DataContext : DbContext
             entity.ToTable("Template");
 
             entity.HasIndex(e => e.Name, "IX_Template_Name").IsUnique();
+
+            entity.HasOne(d => d.CardSetFkNavigation).WithMany(p => p.Templates)
+                .HasForeignKey(d => d.CardSetFk)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         OnModelCreatingPartial(modelBuilder);
