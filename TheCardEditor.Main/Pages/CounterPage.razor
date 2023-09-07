@@ -140,7 +140,7 @@
     private async Task IncrementCount()
     {
         currentCount++;
-        await _canvasInterop.DrawText(10, 20, currentCount.ToString() + "\n" + "asdf", "new Tag");
+        await _canvasInterop.DrawText(10, 20, currentCount.ToString() + "\n" + "asdf", "new Tag", 999);
         var png = await _canvasInterop.ExportPng();
     }
     public void Dispose()

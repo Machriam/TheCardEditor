@@ -70,6 +70,14 @@ window.canvasInteropFunctions = {
         instance.canvas.sendBackwards(instance.canvas.item(index));
         instance.canvas.discardActiveObject().renderAll();
     },
+    getTextSize: function (divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        const object = instance.canvas.getActiveObject();
+        if (object?.type != "textbox") return;
+        for (let i = 0; i < object.text.length; i++) {
+            return object.styles?.[0]?.[0]?.["fontSize"] ?? object.fontSize;
+        }
+    },
     applyFont: function (styleName, value, divId) {
         const instance = CanvasInterop.getInstance(divId);
         const object = instance.canvas.getActiveObject();
@@ -82,7 +90,7 @@ window.canvasInteropFunctions = {
         let line = 0;
         let index = 0;
         for (let i = 0; i < object.text.length; i++) {
-            if (object.selectionStart <= i && object.selectionEnd > i) {
+            if (!object.isEditing || (object.isEditing && object.selectionStart <= i && object.selectionEnd > i)) {
                 const lineDefined = object.styles[line] != undefined;
                 if (!lineDefined) object.styles[line] = {};
                 const indexDefined = object.styles[line][index] != undefined;
@@ -102,10 +110,10 @@ window.canvasInteropFunctions = {
         }
         instance.canvas.renderAll();
     },
-    drawText: function (xPos, yPos, text, tag, divId) {
+    drawText: function (xPos, yPos, text, tag, fontSize, divId) {
         const instance = CanvasInterop.getInstance(divId);
         const canvasText = new fabric.Textbox(text, {
-            fontSize: 30,
+            fontSize: fontSize,
             left: xPos,
             editable: true,
             top: yPos,
@@ -198,7 +206,7 @@ window.canvasInteropFunctions = {
     },
 
     importJson: function (json, pictureData, divId) {
-        if (json==null || Object.keys(json).length == 0) return;
+        if (json == null || Object.keys(json).length == 0) return;
         json.objects.map(o => o.src = pictureData.hasOwnProperty(o.pictureId) ? pictureData[o.pictureId] : "");
         const instance = CanvasInterop.getInstance(divId);
         return instance.canvas.loadFromJSON(json);

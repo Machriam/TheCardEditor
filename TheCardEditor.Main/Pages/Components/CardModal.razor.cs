@@ -59,7 +59,7 @@ namespace TheCardEditor.Main.Pages.Components
         private bool _multipleObjectsAreSelected;
 
         private string _selectedFont = "";
-        private int FontSize { get; set; } = 12;
+        private int FontSize { get; set; } = 32;
         private ICanvasInterop _canvasInterop = default!;
         private const string CanvasId = "CardCanvasId";
         private Dictionary<long, string> _pictureData = new();
@@ -125,11 +125,13 @@ namespace TheCardEditor.Main.Pages.Components
         }
 
         [JSInvokable]
-        public void OnObjectSelected(float left, float top, string tag)
+        public async void OnObjectSelected(float left, float top, string tag)
+
         {
             _multipleObjectsAreSelected = false;
             AddObjectX = (int)left;
             AddObjectY = (int)top;
+            FontSize = (await _canvasInterop.GetTextSize()) ?? FontSize;
             AddTag = tag;
             StateHasChanged();
         }
@@ -194,7 +196,7 @@ namespace TheCardEditor.Main.Pages.Components
                 await JsInterop.LogError("Each textbox must have a tag");
                 return;
             }
-            await _canvasInterop.DrawText(AddObjectX, AddObjectY, AddNewText, AddTag);
+            await _canvasInterop.DrawText(AddObjectX, AddObjectY, AddNewText, AddTag, FontSize);
             await UpdateVirtualData();
         }
 

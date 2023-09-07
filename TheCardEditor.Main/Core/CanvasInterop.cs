@@ -87,7 +87,7 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image);
 
-    ValueTask DrawText(int xPos, int yPos, string text, string tag);
+    ValueTask DrawText(int xPos, int yPos, string text, string tag, int fontSize);
 
     ValueTask SelectObject(int index);
 
@@ -103,6 +103,7 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask ImportJson(JsonObject json, Dictionary<long, string> imageData);
     ValueTask Reset();
+    ValueTask<int?> GetTextSize();
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -134,6 +135,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string JsDispose => Namespace + ".dispose";
     private static string JsCenterObjects => Namespace + ".centerObjects";
     private static string JsReset => Namespace + ".reset";
+    private static string JsGetTextSize => Namespace + ".getTextSize";
 
     public CanvasInterop(IJSRuntime jsruntime, string divId, TView objectReference, HotKeys hotKeys, string selectionHandlerName, string deselectionHandlerName,
                          string multiObjectSelectedHandler)
@@ -198,10 +200,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         return await _jsRuntime.HandledInvoke<string>(JsExport, _divId) ?? "";
     }
 
-    public async ValueTask DrawText(int xPos, int yPos, string text, string tag)
+    public async ValueTask DrawText(int xPos, int yPos, string text, string tag, int fontSize)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsDrawText, xPos, yPos, text, tag, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsDrawText, xPos, yPos, text, tag, fontSize, _divId);
     }
 
     public async ValueTask RemoveObject()
@@ -209,7 +211,11 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await Initialize();
         await _jsRuntime.HandledInvokeVoid(JsRemoveObject, _divId);
     }
-
+    public async ValueTask<int?> GetTextSize()
+    {
+        await Initialize();
+        return await _jsRuntime.HandledInvoke<int>(JsGetTextSize, _divId);
+    }
     public async ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image)
     {
         await Initialize();
