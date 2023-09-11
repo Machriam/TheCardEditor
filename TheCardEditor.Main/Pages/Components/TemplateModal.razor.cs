@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Blazored.Modal;
+﻿using Blazored.Modal;
 using Blazored.Modal.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -98,7 +97,7 @@ namespace TheCardEditor.Main.Pages.Components
         }
 
         [JSInvokable]
-        public void OnObjectSelected(float left, float top, string tag)
+        public void OnObjectSelected(ObjectParameter param)
         {
         }
 

@@ -22,9 +22,11 @@
             </div>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await AskForNewTag())">New Tag</Button>
             <FloatingNumericInput class="col-md-2" Label="X" DisabledSelector="@(()=>_multipleObjectsAreSelected)"
-                                  ValueSelector="@( ()=>AddObjectX)" InputChanged="@( async x=>await OnCoordinatesChanged((int)x,null))"></FloatingNumericInput>
+                                  ValueSelector="@( ()=>AddObjectX)" InputChanged="@( async x=>await OnCoordinatesChanged((int)x,null,null))"></FloatingNumericInput>
             <FloatingNumericInput DisabledSelector="@(()=>_multipleObjectsAreSelected)" class="col-md-2" Label="Y"
-                                  ValueSelector="@( ()=>AddObjectY)" InputChanged="@(async y=>await OnCoordinatesChanged(null,(int)y))"></FloatingNumericInput>
+                                  ValueSelector="@( ()=>AddObjectY)" InputChanged="@(async y=>await OnCoordinatesChanged(null,(int)y,null))"></FloatingNumericInput>
+            <FloatingNumericInput DisabledSelector="@(()=>_multipleObjectsAreSelected)" class="col-md-2" Label="Angle"
+                                  ValueSelector="@( ()=>(decimal)AddObjectAngle)" InputChanged="@(async angle=>await OnCoordinatesChanged(null,null,angle))"></FloatingNumericInput>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await AddText())">+</Button>
             <Button class="btn btn-danger col-md-1" OnClick="@(async ()=>await RemoveObject())">-</Button>
             <div class="col-md-12 mt-2"></div>

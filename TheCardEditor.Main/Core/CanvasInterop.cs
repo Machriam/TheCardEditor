@@ -6,7 +6,19 @@ using Toolbelt.Blazor.HotKeys2;
 
 namespace TheCardEditor.Main.Core;
 
-public delegate void SelectCanvasObjectHandler(float left, float top, string tag);
+public struct ObjectParameter
+{
+    public ObjectParameter()
+    {
+    }
+
+    public float Left { get; set; }
+    public float Top { get; set; }
+    public float Angle { get; set; }
+    public string Tag { get; set; } = "";
+}
+
+public delegate void SelectCanvasObjectHandler(ObjectParameter param);
 
 public enum CanvasFontStyle
 {
@@ -83,7 +95,7 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask<JsonObject> ExportJson();
 
-    ValueTask SetCoordinates(int left, int top);
+    ValueTask SetCoordinates(int left, int top, decimal angle);
 
     ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image);
 
@@ -246,10 +258,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         _hotKeysContext?.Dispose();
     }
 
-    public async ValueTask SetCoordinates(int left, int top)
+    public async ValueTask SetCoordinates(int left, int top, decimal angle)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsSetCoordinates, _divId, left, top);
+        await _jsRuntime.HandledInvokeVoid(JsSetCoordinates, _divId, left, top, angle);
     }
 
     public async ValueTask CenterObjects()
