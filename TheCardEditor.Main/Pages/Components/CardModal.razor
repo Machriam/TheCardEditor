@@ -25,6 +25,8 @@
                                   ValueSelector="@( ()=>AddObjectX)" InputChanged="@( async x=>await OnCoordinatesChanged((int)x,null))"></FloatingNumericInput>
             <FloatingNumericInput DisabledSelector="@(()=>_multipleObjectsAreSelected)" class="col-md-2" Label="Y"
                                   ValueSelector="@( ()=>AddObjectY)" InputChanged="@(async y=>await OnCoordinatesChanged(null,(int)y))"></FloatingNumericInput>
+            <FloatingNumericInput DisabledSelector="@(()=>_multipleObjectsAreSelected)" class="col-md-2" Label="Angle"
+                                  ValueSelector="@( ()=>(decimal)AddObjectAngle)" InputChanged="@(async y=>await OnCoordinatesChanged(null,(int)y))"></FloatingNumericInput>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await AddText())">+</Button>
             <Button class="btn btn-danger col-md-1" OnClick="@(async ()=>await RemoveObject())">-</Button>
             <div class="col-md-12 mt-2"></div>

@@ -56,6 +56,7 @@ namespace TheCardEditor.Main.Pages.Components
         private int AddObjectX { get; set; }
 
         private int AddObjectY { get; set; }
+        private float AddObjectAngle { get; set; }
         private bool _multipleObjectsAreSelected;
 
         private string _selectedFont = "";
@@ -125,14 +126,14 @@ namespace TheCardEditor.Main.Pages.Components
         }
 
         [JSInvokable]
-        public async void OnObjectSelected(float left, float top, string tag)
-
+        public async void OnObjectSelected(ObjectParameter param)
         {
             _multipleObjectsAreSelected = false;
-            AddObjectX = (int)left;
-            AddObjectY = (int)top;
+            AddObjectX = (int)param.Left;
+            AddObjectY = (int)param.Top;
+            AddObjectAngle = float.Round(param.Angle, 1);
             FontSize = (await _canvasInterop.GetTextSize()) ?? FontSize;
-            AddTag = tag;
+            AddTag = param.Tag;
             StateHasChanged();
         }
 

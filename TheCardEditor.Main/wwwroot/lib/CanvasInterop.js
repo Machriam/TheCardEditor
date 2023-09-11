@@ -11,6 +11,9 @@
     static removeInstance(divId) {
         delete window.canvasInteropFunctions.instance[divId];
     }
+    createObjectParameter(left, top, tag, angle) {
+        return { "left": left, "top": top, "tag": tag, "angle": angle };
+    }
     onSelectionCleared(evt) {
         const id = evt.hasOwnProperty("target") ? evt.target.canvas.lowerCanvasEl.id : evt.deselected[0].canvas.lowerCanvasEl.id;
         const instance = CanvasInterop.getInstance(id);
@@ -21,7 +24,7 @@
         const id = evt.target.canvas.lowerCanvasEl.id;
         const instance = CanvasInterop.getInstance(id);
         instance.parameter.dotnetReference.invokeMethodAsync(
-            instance.parameter.objectSelectionHandler, evt.target.left, evt.target.top, evt.target.tag);
+            instance.parameter.objectSelectionHandler, instance.createObjectParameter(evt.target.left, evt.target.top, evt.target.tag, evt.target.angle));
     }
     onElementSelected(evt) {
         const id = evt.selected[0].canvas.lowerCanvasEl.id;
@@ -31,7 +34,8 @@
         }
         else {
             instance.parameter.dotnetReference.invokeMethodAsync(
-                instance.parameter.objectSelectionHandler, evt.selected[0].left, evt.selected[0].top, evt.selected[0].tag ?? evt.selected[0].toObject().tag);
+                instance.parameter.objectSelectionHandler, instance.createObjectParameter(evt.selected[0].left, evt.selected[0].top,
+                    evt.selected[0].tag ?? evt.selected[0].toObject().tag, evt.selected[0].angle));
         }
     }
     getElement() {
