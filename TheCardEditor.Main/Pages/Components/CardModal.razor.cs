@@ -56,7 +56,7 @@ namespace TheCardEditor.Main.Pages.Components
         private int AddObjectX { get; set; }
 
         private int AddObjectY { get; set; }
-        private float AddObjectAngle { get; set; }
+        private decimal AddObjectAngle { get; set; }
         private bool _multipleObjectsAreSelected;
 
         private string _selectedFont = "";
@@ -68,11 +68,12 @@ namespace TheCardEditor.Main.Pages.Components
         private PictureModel? _selectedPicture;
         private int _selectedIndex;
 
-        public async Task OnCoordinatesChanged(int? x, int? y)
+        public async Task OnCoordinatesChanged(int? x, int? y, decimal? angle)
         {
             AddObjectX = x ?? AddObjectX;
             AddObjectY = y ?? AddObjectY;
-            await _canvasInterop.SetCoordinates(AddObjectX, AddObjectY);
+            AddObjectAngle = angle ?? AddObjectAngle;
+            await _canvasInterop.SetCoordinates(AddObjectX, AddObjectY, AddObjectAngle);
         }
 
         public void SelectedPictureChanged(IDataListItem picture)
@@ -115,6 +116,7 @@ namespace TheCardEditor.Main.Pages.Components
             _multipleObjectsAreSelected = false;
             AddObjectX = 0;
             AddObjectY = 0;
+            AddObjectAngle = 0;
             StateHasChanged();
         }
 
@@ -131,7 +133,7 @@ namespace TheCardEditor.Main.Pages.Components
             _multipleObjectsAreSelected = false;
             AddObjectX = (int)param.Left;
             AddObjectY = (int)param.Top;
-            AddObjectAngle = float.Round(param.Angle, 1);
+            AddObjectAngle = (decimal)param.Angle;
             FontSize = (await _canvasInterop.GetTextSize()) ?? FontSize;
             AddTag = param.Tag;
             StateHasChanged();

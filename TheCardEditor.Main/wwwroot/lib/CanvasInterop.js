@@ -169,12 +169,15 @@ window.canvasInteropFunctions = {
             instance.canvas.add(img);
         })
     },
-    setCoordinates: function (divId, left, top) {
+    setCoordinates: function (divId, left, top, angle) {
         const instance = CanvasInterop.getInstance(divId);
-        instance.canvas.getActiveObject().set({ left: left, top: top });
-        instance.canvas.getActiveObject().setCoords();
+        var activeObject = instance.canvas.getActiveObject();
+        if (activeObject == null) return;
+        activeObject.set({ left: left, top: top, angle: angle });
+        activeObject.setCoords();
         instance.canvas.renderAll();
     },
+
     removeObject: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
         const objects = instance.canvas.getActiveObjects();
