@@ -5,5 +5,5 @@
 **/*.lst
 **/temp
 **/*.pubxml.user
-**/*.sqlite3
+**/*.sqlite3*
 appsettings.Development.json

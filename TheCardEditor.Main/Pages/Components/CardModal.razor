@@ -67,7 +67,7 @@
         <Button OnClickAsync="@(async()=>await SendBackwards())" class="btn btn-dark mt-2">^</Button>
         <Button OnClickAsync="@(async()=>await BringForward())" class="btn btn-dark mt-2">v</Button>
         <div>
-            @foreach (var item in _currentCard.VirtualSerializedData().GetObjects())
+            @foreach (var item in _currentCard.VirtualSerializedData().GetObjects().OrderByDescending(i=>i.Index))
             {
                 <div style="cursor:pointer;" class="hovery row alert p-1 m-0 @(_selectedIndex==item.Index?"alert-info":"")"
                 @onclick="@(async ()=>{_selectedIndex=item.Index; await SelectObject();})">
