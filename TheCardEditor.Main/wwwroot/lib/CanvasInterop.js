@@ -23,8 +23,10 @@
         if (evt.target.hasOwnProperty("_objects") && evt.target._objects.length > 1) return;
         const id = evt.target.canvas.lowerCanvasEl.id;
         const instance = CanvasInterop.getInstance(id);
+        const textSize = evt.target.styles?.[0]?.[0]?.["fontSize"] ?? evt.target.fontSize ?? null;
         instance.parameter.dotnetReference.invokeMethodAsync(
-            instance.parameter.objectSelectionHandler, instance.createObjectParameter(evt.target.left, evt.target.top, evt.target.tag, evt.target.angle));
+            instance.parameter.objectSelectionHandler,
+            instance.createObjectParameter(evt.target.left, evt.target.top, evt.target.tag, evt.target.angle, textSize));
     }
     onElementSelected(evt) {
         const id = evt.selected[0].canvas.lowerCanvasEl.id;
@@ -33,7 +35,7 @@
             instance.parameter.dotnetReference.invokeMethodAsync(instance.parameter.multiObjectSelectionHandler);
         }
         else {
-            const textSize = evt.selected[0].styles?.[0]?.[0]?.["fontSize"] ?? evt.selected[0].fontSize ?? -1;
+            const textSize = evt.selected[0].styles?.[0]?.[0]?.["fontSize"] ?? evt.selected[0].fontSize ?? null;
             instance.parameter.dotnetReference.invokeMethodAsync(
                 instance.parameter.objectSelectionHandler,
                 instance.createObjectParameter(evt.selected[0].left, evt.selected[0].top,
@@ -56,6 +58,7 @@ window.canvasInteropFunctions = {
         instance.canvas = new fabric.Canvas(divId);
         instance.canvas.on("selection:created", instance.onElementSelected);
         instance.canvas.on("selection:updated", instance.onElementSelected);
+        instance.canvas.on("object:rotating", instance.onElementMoved);
         instance.canvas.on("object:moving", instance.onElementMoved);
         instance.canvas.on("selection:cleared", instance.onSelectionCleared);
         instance.divId = divId;
