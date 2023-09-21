@@ -96,6 +96,7 @@ window.canvasInteropFunctions = {
             object.scaleX = 1;
             object.scaleY = 1;
             object.angle = 0;
+            instance.canvas.renderAll();
         }
         if (object?.type != "textbox") return;
         if (styleName == "textAlign") {
