@@ -64,8 +64,8 @@
         <Button OnClickAsync="@(async()=>await SaveCard())" class="btn btn-primary mt-2">Save</Button>
         <Button OnClickAsync="@(async()=>await Reset())" class="btn btn-danger mt-2">Reset</Button>
         <Button OnClickAsync="@(async()=>await SaveAsTemplate())" class="btn btn-dark mt-2">Save As Template</Button>
-        <Button OnClickAsync="@(async()=>await SendBackwards())" class="btn btn-dark mt-2">^</Button>
-        <Button OnClickAsync="@(async()=>await BringForward())" class="btn btn-dark mt-2">v</Button>
+        <Button OnClickAsync="@(async()=>await SendBackwards())" class="btn btn-dark mt-2">v</Button>
+        <Button OnClickAsync="@(async()=>await BringForward())" class="btn btn-dark mt-2">^</Button>
         <div>
             @foreach (var item in _currentCard.VirtualSerializedData().GetObjects().OrderByDescending(i=>i.Index))
             {

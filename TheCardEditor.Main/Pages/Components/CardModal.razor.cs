@@ -128,14 +128,14 @@ namespace TheCardEditor.Main.Pages.Components
         }
 
         [JSInvokable]
-        public async void OnObjectSelected(ObjectParameter param)
+        public void OnObjectSelected(ObjectParameter param)
         {
             _multipleObjectsAreSelected = false;
             AddObjectX = (int)param.Left;
             AddObjectY = (int)param.Top;
             AddObjectAngle = (decimal)param.Angle;
-            FontSize = (await _canvasInterop.GetTextSize()) ?? FontSize;
-            AddTag = param.Tag;
+            FontSize = param.TextSize ?? FontSize;
+            AddTag = param.Tag ?? "";
             StateHasChanged();
         }
 
@@ -243,6 +243,7 @@ namespace TheCardEditor.Main.Pages.Components
                 value = await JsInterop.Prompt("Enter colorcode:");
             }
             await _canvasInterop.ApplyFont(style, value);
+            OnObjectSelected(await _canvasInterop.GetObjectParameter());
         }
 
         public void Dispose()

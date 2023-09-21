@@ -11,8 +11,8 @@
     static removeInstance(divId) {
         delete window.canvasInteropFunctions.instance[divId];
     }
-    createObjectParameter(left, top, tag, angle) {
-        return { "left": left, "top": top, "tag": tag, "angle": angle };
+    createObjectParameter(left = 0, top = 0, tag = null, angle = 0, textSize = null) {
+        return { "left": left, "top": top, "tag": tag, "angle": angle, "textSize": textSize };
     }
     onSelectionCleared(evt) {
         const id = evt.hasOwnProperty("target") ? evt.target.canvas.lowerCanvasEl.id : evt.deselected[0].canvas.lowerCanvasEl.id;
@@ -33,9 +33,11 @@
             instance.parameter.dotnetReference.invokeMethodAsync(instance.parameter.multiObjectSelectionHandler);
         }
         else {
+            const textSize = evt.selected[0].styles?.[0]?.[0]?.["fontSize"] ?? evt.selected[0].fontSize ?? -1;
             instance.parameter.dotnetReference.invokeMethodAsync(
-                instance.parameter.objectSelectionHandler, instance.createObjectParameter(evt.selected[0].left, evt.selected[0].top,
-                    evt.selected[0].tag ?? evt.selected[0].toObject().tag, evt.selected[0].angle));
+                instance.parameter.objectSelectionHandler,
+                instance.createObjectParameter(evt.selected[0].left, evt.selected[0].top,
+                    evt.selected[0].tag ?? evt.selected[0].toObject().tag, evt.selected[0].angle, textSize));
         }
     }
     getElement() {
@@ -63,6 +65,16 @@ window.canvasInteropFunctions = {
         instance.canvas.setActiveObject(instance.canvas.item(index));
         instance.canvas.renderAll();
     },
+    getObjectParameter: function (divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        const object = instance.canvas.getActiveObject();
+        let textSize = -1;
+        if (object?.type != "textbox" && object?.type != "image") return instance.createObjectParameter();
+        if (object?.type == "textbox") {
+            textSize = object.styles?.[0]?.[0]?.["fontSize"] ?? object.fontSize ?? null;
+        }
+        return instance.createObjectParameter(object.left, object.top, object.tag, object.angle, textSize);
+    },
     bringForward: function (index, divId) {
         const instance = CanvasInterop.getInstance(divId);
         instance.canvas.bringForward(instance.canvas.item(index));
@@ -74,18 +86,14 @@ window.canvasInteropFunctions = {
         instance.canvas.sendBackwards(instance.canvas.item(index));
         instance.canvas.discardActiveObject().renderAll();
     },
-    getTextSize: function (divId) {
-        const instance = CanvasInterop.getInstance(divId);
-        const object = instance.canvas.getActiveObject();
-        if (object?.type != "textbox") return -1;
-        for (let i = 0; i < object.text.length; i++) {
-            return object.styles?.[0]?.[0]?.["fontSize"] ?? object.fontSize ?? -1;
-        }
-        return -1;
-    },
     applyFont: function (styleName, value, divId) {
         const instance = CanvasInterop.getInstance(divId);
         const object = instance.canvas.getActiveObject();
+        if (object?.type == "image" && styleName == "clear") {
+            object.scaleX = 1;
+            object.scaleY = 1;
+            object.angle = 0;
+        }
         if (object?.type != "textbox") return;
         if (styleName == "textAlign") {
             object.textAlign = value;
