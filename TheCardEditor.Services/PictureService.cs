@@ -3,6 +3,7 @@ using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.DataModel.DTO;
 
 namespace TheCardEditor.Services;
+
 public class PictureService
 {
     private readonly DataContext _dataContext;
@@ -27,6 +28,11 @@ public class PictureService
             result.AddRange(RecursivePictureLoad(dir));
         }
         return result;
+    }
+    public void DeletePicture(long id)
+    {
+        _dataContext.Pictures.Remove(_dataContext.Pictures.First(p => p.Id == id));
+        _dataContext.SaveChanges();
     }
 
     public void LoadPicturesFromPath(string path)
@@ -66,6 +72,20 @@ public class PictureService
             }
             return p;
         });
+    }
+
+    public Dictionary<long, bool> ValidatePictures()
+    {
+        var pictures = GetPictures();
+        return pictures.Select(p => (p.Id, Path.Exists(p.Path)))
+            .ToDictionary(p => p.Id, p => p.Item2);
+    }
+    public void UpdatePath(long pictureId, string newPath)
+    {
+        var picture = _dataContext.Pictures.First(p => p.Id == pictureId);
+        picture.Path = newPath;
+        picture.Name = Path.GetFileNameWithoutExtension(newPath);
+        _dataContext.SaveChanges();
     }
 
     public string GetBase64Picture(long pictureId)
