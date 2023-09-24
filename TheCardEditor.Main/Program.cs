@@ -33,10 +33,8 @@ internal static class Program
         services.AddWindowsFormsBlazorWebView();
         services.AddEntityFrameworkSqlite();
         services.AddDbContext<DataContext>(opt =>
-                    opt.UseSqlite($"Data Source={environmentConfiguration.DatabasePath}", a =>
-        {
-            a.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        }));
+                    opt.UseSqlite($"Data Source={environmentConfiguration.DatabasePath}",
+                    a => a.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 #if DEBUG
         services.AddBlazorWebViewDeveloperTools();
 #endif
