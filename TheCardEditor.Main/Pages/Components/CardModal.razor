@@ -41,6 +41,7 @@
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Stroke,"red"))">Stroke</Button>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Clear,true))">Clear</Button>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await CenterObjects())">Center</Button>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await AddFilter())">Apply Filter</Button>
             <div class="col-md-6">
                 <DataList LabelText="Add Picture" SelectedItemChanged="SelectedPictureChanged" Items="@_pictureById.Values"></DataList>
                 @if (_selectedPicture != null)

@@ -119,6 +119,8 @@ public interface ICanvasInterop : IDisposable
     ValueTask Reset();
 
     ValueTask<ObjectParameter> GetObjectParameter();
+
+    ValueTask AddFilter(int index);
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -151,6 +153,8 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string JsCenterObjects => Namespace + ".centerObjects";
     private static string JsReset => Namespace + ".reset";
     private static string JsGetObjectParameter => Namespace + ".getObjectParameter";
+    private static string JsAddFilter => Namespace + ".addFilter";
+
     public CanvasInterop(IJSRuntime jsruntime, string divId, TView objectReference, HotKeys hotKeys, string selectionHandlerName, string deselectionHandlerName,
                          string multiObjectSelectedHandler)
     {
@@ -194,10 +198,17 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await Initialize();
         await _jsRuntime.HandledInvokeVoid(JsSelectObject, index, _divId);
     }
+
     public async ValueTask<ObjectParameter> GetObjectParameter()
     {
         await Initialize();
         return await _jsRuntime.HandledInvoke<ObjectParameter>(JsGetObjectParameter, _divId);
+    }
+
+    public async ValueTask AddFilter(int index)
+    {
+        await Initialize();
+        await _jsRuntime.HandledInvokeVoid(JsAddFilter, index, _divId);
     }
 
     public async ValueTask<int> SendBackwards(int index)

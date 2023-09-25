@@ -5,6 +5,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ActiveDebugProfile>Debug</ActiveDebugProfile>
+    <DebugType>None</DebugType>
+    <DebugSymbols>False</DebugSymbols>
+    <_LastSelectedProfileId>D:\Repos\TheCardEditor\TheCardEditor.Main\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
     <Compile Update="MainForm.cs">

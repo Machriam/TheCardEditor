@@ -139,6 +139,12 @@ namespace TheCardEditor.Main.Pages.Components
             StateHasChanged();
         }
 
+        private async Task AddFilter()
+        {
+            await _canvasInterop.AddFilter(_selectedIndex);
+            await UpdateVirtualData();
+        }
+
         private async Task Reset()
         {
             _currentCard = CardService.Execute(cs => cs.GetCard(CardId)) ?? new();

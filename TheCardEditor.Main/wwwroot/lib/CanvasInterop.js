@@ -68,6 +68,20 @@ window.canvasInteropFunctions = {
         instance.canvas.setActiveObject(instance.canvas.item(index));
         instance.canvas.renderAll();
     },
+    addFilter: function (index, divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        const applyTo = instance.canvas.getActiveObject();
+        const filterImage = instance.canvas.item(index);
+        filter = new fabric.Image.filters.BlendImage({
+            image: filterImage,
+            mode: 'multiply',
+            alpha: 0.5
+        });
+        applyTo.filters = [];
+        applyTo.filters.push(filter);
+        applyTo.applyFilters();
+        instance.canvas.renderAll();
+    },
     getObjectParameter: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
         const object = instance.canvas.getActiveObject();
