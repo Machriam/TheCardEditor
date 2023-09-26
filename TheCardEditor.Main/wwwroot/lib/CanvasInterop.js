@@ -77,7 +77,7 @@ window.canvasInteropFunctions = {
             mode: 'multiply',
             alpha: 0.5
         });
-        applyTo.filters = [];
+        applyTo.filters.length = 0;
         applyTo.filters.push(filter);
         applyTo.applyFilters();
         instance.canvas.renderAll();
