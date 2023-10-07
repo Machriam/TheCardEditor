@@ -17,19 +17,14 @@ internal static class Program
     private static void Main()
     {
         ApplicationConfiguration.Initialize();
-#if DEBUG
-        const string AppsettingsName = "appsettings.Development.json";
         var directory = Path.GetFullPath(Directory.GetCurrentDirectory());
-#else
-        const string AppsettingsName = "appsettings.json";
-        var directory = Directory.GetCurrentDirectory();
-#endif
         var builder = new ConfigurationBuilder()
                         .SetBasePath(directory)
-                        .AddJsonFile(AppsettingsName, optional: false, reloadOnChange: true);
+                        .AddJsonFile(AppSettings.Name, optional: false, reloadOnChange: true);
         var configuration = builder.Build();
         var environmentConfiguration = new EnvironmentConfiguration(configuration);
         var services = new ServiceCollection();
+        services.AddSingleton<IEnvironmentConfiguration>(environmentConfiguration);
         services.AddWindowsFormsBlazorWebView();
         services.AddEntityFrameworkSqlite();
         services.AddDbContext<DataContext>(opt =>
