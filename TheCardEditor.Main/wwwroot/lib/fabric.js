@@ -21115,6 +21115,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
          */
         applyFilters: function (filters) {
             filters = filters || this.filters || [];
+            debugger;
             filters = filters.filter(function (filter) { return filter && !filter.isNeutralState(); });
             this.set('dirty', true);
 
