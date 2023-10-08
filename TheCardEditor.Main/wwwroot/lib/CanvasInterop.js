@@ -73,8 +73,11 @@ window.canvasInteropFunctions = {
         const applyTo = instance.canvas.getActiveObject();
         const filterImage = instance.canvas.item(index);
         const filter = new ImageFilter();
-        filter.applyFilter(applyTo, filterImage);
-        instance.canvas.renderAll();
+        const newImage=filter._drawRectangle(applyTo);
+        this.removeObject(divId);
+        this.drawPicture(0, 0, "test", "test", newImage, divId);
+        //filter.applyFilter(applyTo, filterImage);
+        //instance.canvas.renderAll();
     },
     getObjectParameter: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
