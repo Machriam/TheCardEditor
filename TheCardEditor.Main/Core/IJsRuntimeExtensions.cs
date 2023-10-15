@@ -6,6 +6,16 @@ namespace TheCardEditor.Main.Core;
 
 public static class IJsRuntimeExtensions
 {
+#if DEBUG
+
+    public static void UpdateLastJsChange()
+    {
+        s_lastJsChange = Guid.NewGuid();
+    }
+
+    private static Guid s_lastJsChange = Guid.NewGuid();
+#endif
+
     private static readonly string s_buildGuid = Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId.ToString();
 
     /// <summary>
@@ -46,7 +56,7 @@ public static class IJsRuntimeExtensions
         if (split.Length == 2) modulePath = "./" + split[^1].Replace(".cs", "") + ".js";
         var buildId = s_buildGuid;
 #if DEBUG
-        buildId = Guid.NewGuid().ToString();
+        buildId = s_lastJsChange.ToString();
 #endif
         return jsRuntime.InvokeAsync<IJSObjectReference>("import", modulePath + "?version=" + buildId);
     }

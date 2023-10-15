@@ -16,6 +16,9 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
+#if DEBUG
+        AddJsDebugFileWatcher();
+#endif
         ApplicationConfiguration.Initialize();
         var directory = Path.GetFullPath(Directory.GetCurrentDirectory());
         var builder = new ConfigurationBuilder()
@@ -52,5 +55,21 @@ internal static class Program
         services.AddHotKeys2();
         var mainForm = services.BuildServiceProvider().GetService<MainForm>();
         Application.Run(mainForm);
+    }
+
+    private static void AddJsDebugFileWatcher()
+    {
+        static void FileWatcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            IJsRuntimeExtensions.UpdateLastJsChange();
+        }
+        var fileWatcher = new FileSystemWatcher
+        {
+            Path = Directory.GetCurrentDirectory() + "/wwwroot/lib",
+            Filter = "*.*",
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.LastAccess
+        };
+        fileWatcher.Changed += FileWatcher_Changed;
+        fileWatcher.EnableRaisingEvents = true;
     }
 }

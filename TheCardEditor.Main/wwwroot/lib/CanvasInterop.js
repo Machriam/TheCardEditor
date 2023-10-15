@@ -67,8 +67,10 @@ export function initialize(divId, params) {
     instance.divId = divId;
 }
 export function selectObject(index, divId) {
+
     const instance = CanvasInterop.getInstance(divId);
     instance.canvas.setActiveObject(instance.canvas.item(index));
+
     instance.canvas.renderAll();
 }
 export function addFilter(index, divId) {
