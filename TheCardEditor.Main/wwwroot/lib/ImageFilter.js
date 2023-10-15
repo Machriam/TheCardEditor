@@ -90,7 +90,7 @@ class ImageFilter {
             gl.bindVertexArray(vao);
             gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
             gl.uniform2f(translationLocation, applyToPosition.left, applyToPosition.top);
-            gl.uniform2fv(rotationLocation, [Math.cos(applyToPosition.angle), Math.sin(applyToPosition.angle)]);
+            gl.uniform2fv(rotationLocation, [Math.sin(applyToPosition.angle), Math.cos(applyToPosition.angle)]);
             gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
             setRectangle(gl, 0, 0, image.width, image.height);
             gl.uniform1i(u_image0Location, 0);
