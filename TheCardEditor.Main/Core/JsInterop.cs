@@ -69,7 +69,7 @@ public class JsInterop : IJsInterop
     {
         var jsFile = await ImportJsFile(path);
         if (jsFile == null) return;
-        await ExecuteVoid(async _ => await jsFile.InvokeVoidAsync(path, functionName, parameter));
+        await ExecuteVoid(async _ => await jsFile.InvokeVoidAsync(functionName, parameter));
         await jsFile.DisposeAsync();
     }
 
@@ -77,7 +77,7 @@ public class JsInterop : IJsInterop
     {
         var jsFile = await ImportJsFile(path);
         if (jsFile == null) return default;
-        var result = await Execute(async _ => await jsFile.InvokeAsync<T>(path, functionName, parameter));
+        var result = await Execute(async _ => await jsFile.InvokeAsync<T>(functionName, parameter));
         await jsFile.DisposeAsync();
         return result;
     }
