@@ -40,5 +40,6 @@ public partial class MainForm : Form
             SizeY = WindowState == FormWindowState.Normal ? Size.Height : RestoreBounds.Size.Height,
             State = WindowState
         });
+        Controls.Remove(blazorWebView1);
     }
 }
