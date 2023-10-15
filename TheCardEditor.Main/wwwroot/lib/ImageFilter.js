@@ -1,12 +1,32 @@
-﻿class ImageFilter {
-    _drawImage(applyTo, filter) {
+﻿/** @typedef {object} ImagePosition
+ * @property {number} left
+ * @property {number} top
+ * @property {number} scaleX
+ * @property {number} scaleY
+ * @property {number} angle
+ */
+class ImageFilter {
+    /**
+     * @param {any} applyTo
+     * @param {any} filter
+     * @param {ImagePosition} applyToPosition
+     * @param {ImagePosition} filterPosition
+     * @returns
+     */
+    _drawImage(applyTo, filter, applyToPosition, filterPosition) {
         var vertexShaderSource = `#version 300 es
         in vec2 a_position;
         in vec2 a_texCoord;
+        uniform vec2 u_rotation;
         uniform vec2 u_resolution;
+        uniform vec2 u_translation;
         out vec2 v_texCoord;
         void main() {
-          vec2 zeroToOne = a_position / u_resolution;
+          vec2 rotatedPosition = vec2(
+             a_position.x * u_rotation.y + a_position.y * u_rotation.x,
+             a_position.y * u_rotation.y - a_position.x * u_rotation.x);
+          vec2 position = rotatedPosition + u_translation;
+          vec2 zeroToOne = position / u_resolution;
           vec2 zeroToTwo = zeroToOne * 2.0;
           vec2 clipSpace = zeroToTwo - 1.0;
           gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
@@ -33,6 +53,8 @@
             var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
             var texCoordAttributeLocation = gl.getAttribLocation(program, "a_texCoord");
             var resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+            var translationLocation = gl.getUniformLocation(program, "u_translation");
+            var rotationLocation = gl.getUniformLocation(program, "u_rotation");
             var vao = gl.createVertexArray();
             gl.bindVertexArray(vao);
             var positionBuffer = gl.createBuffer();
@@ -67,10 +89,12 @@
             gl.useProgram(program);
             gl.bindVertexArray(vao);
             gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+            gl.uniform2f(translationLocation, applyToPosition.left, applyToPosition.top);
+            gl.uniform2fv(rotationLocation, [Math.cos(applyToPosition.angle), Math.sin(applyToPosition.angle)]);
             gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
             setRectangle(gl, 0, 0, image.width, image.height);
-            gl.uniform1i(u_image0Location, 0);  
-            gl.uniform1i(u_image1Location, 1); 
+            gl.uniform1i(u_image0Location, 0);
+            gl.uniform1i(u_image1Location, 1);
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, textures[0]);
             gl.activeTexture(gl.TEXTURE1);
