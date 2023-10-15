@@ -135,25 +135,25 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private HotKeysContext? _hotKeysContext;
     private bool _initialized;
 
-    private const string Namespace = "canvasInteropFunctions";
-    private static string JsInitialize => Namespace + ".initialize";
-    private static string JsDrawText => Namespace + ".drawText";
-    private static string JsRemoveObject => Namespace + ".removeObject";
-    private static string JsDrawPicture => Namespace + ".drawPicture";
-    private static string JsExport => Namespace + ".exportCanvas";
-    private static string JsSelectObject => Namespace + ".selectObject";
-    private static string JsApplyFont => Namespace + ".applyFont";
-    private static string JsJsonExport => Namespace + ".exportJson";
-    private static string JsSetCoordinates => Namespace + ".setCoordinates";
-    private static string JsBringForward => Namespace + ".bringForward";
-    private static string JsSendBackwards => Namespace + ".sendBackwards";
-    private static string JsJsonImport => Namespace + ".importJson";
-    private static string OnKeyDown => Namespace + ".onKeyDown";
-    private static string JsDispose => Namespace + ".dispose";
-    private static string JsCenterObjects => Namespace + ".centerObjects";
-    private static string JsReset => Namespace + ".reset";
-    private static string JsGetObjectParameter => Namespace + ".getObjectParameter";
-    private static string JsAddFilter => Namespace + ".addFilter";
+    private const string Namespace = "/lib/CanvasInterop.js";
+    private static string JsInitialize => "initialize";
+    private static string JsDrawText => "drawText";
+    private static string JsRemoveObject => "removeObject";
+    private static string JsDrawPicture => "drawPicture";
+    private static string JsExport => "exportCanvas";
+    private static string JsSelectObject => "selectObject";
+    private static string JsApplyFont => "applyFont";
+    private static string JsJsonExport => "exportJson";
+    private static string JsSetCoordinates => "setCoordinates";
+    private static string JsBringForward => "bringForward";
+    private static string JsSendBackwards => "sendBackwards";
+    private static string JsJsonImport => "importJson";
+    private static string OnKeyDown => "onKeyDown";
+    private static string JsDispose => "dispose";
+    private static string JsCenterObjects => "centerObjects";
+    private static string JsReset => "reset";
+    private static string JsGetObjectParameter => "getObjectParameter";
+    private static string JsAddFilter => "addFilter";
 
     public CanvasInterop(IJSRuntime jsruntime, string divId, TView objectReference, HotKeys hotKeys, string selectionHandlerName, string deselectionHandlerName,
                          string multiObjectSelectedHandler)
@@ -172,7 +172,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         if (_initialized) return;
         _hotKeys.KeyDown += HotKeys_KeyDown;
         _hotKeysContext = _hotKeys.CreateContext();
-        await _jsRuntime.HandledInvokeVoid(JsInitialize, _divId, new CanvasParameter()
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsInitialize, _divId, new CanvasParameter()
         {
             ObjectDeselectionHandler = _deselectionHandlerName,
             ObjectSelectionHandler = _selectionHandlerName,
@@ -184,103 +184,103 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
 
     private async void HotKeys_KeyDown(object? sender, HotKeyDownEventArgs e)
     {
-        await _jsRuntime.HandledInvokeVoid(OnKeyDown, e.Key, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, OnKeyDown, e.Key, _divId);
     }
 
     public async ValueTask ApplyFont(CanvasFontStyle style, object value)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsApplyFont, style.GetDescription(), value, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsApplyFont, style.GetDescription(), value, _divId);
     }
 
     public async ValueTask SelectObject(int index)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsSelectObject, index, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsSelectObject, index, _divId);
     }
 
     public async ValueTask<ObjectParameter> GetObjectParameter()
     {
         await Initialize();
-        return await _jsRuntime.HandledInvoke<ObjectParameter>(JsGetObjectParameter, _divId);
+        return await _jsRuntime.HandledInvoke<ObjectParameter>(Namespace, JsGetObjectParameter, _divId);
     }
 
     public async ValueTask AddFilter(int index)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsAddFilter, index, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsAddFilter, index, _divId);
     }
 
     public async ValueTask<int> SendBackwards(int index)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsSendBackwards, index, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsSendBackwards, index, _divId);
         return index == 0 ? 0 : index - 1;
     }
 
     public async ValueTask<int> BringForward(int index)
     {
         await Initialize();
-        return await _jsRuntime.HandledInvoke<int>(JsBringForward, index, _divId);
+        return await _jsRuntime.HandledInvoke<int>(Namespace, JsBringForward, index, _divId);
     }
 
     public async ValueTask<string> ExportPng()
     {
         await Initialize();
-        return await _jsRuntime.HandledInvoke<string>(JsExport, _divId) ?? "";
+        return await _jsRuntime.HandledInvoke<string>(Namespace, JsExport, _divId) ?? "";
     }
 
     public async ValueTask DrawText(int xPos, int yPos, string text, string tag, int fontSize)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsDrawText, xPos, yPos, text, tag, fontSize, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsDrawText, xPos, yPos, text, tag, fontSize, _divId);
     }
 
     public async ValueTask RemoveObject()
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsRemoveObject, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsRemoveObject, _divId);
     }
 
     public async ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, id, name, base64Image, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsDrawPicture, xPos, yPos, id, name, base64Image, _divId);
     }
 
     public async ValueTask ImportJson(JsonObject json, Dictionary<long, string> imageData)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsJsonImport, json, imageData, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsJsonImport, json, imageData, _divId);
     }
 
     public async ValueTask<JsonObject> ExportJson()
     {
         await Initialize();
-        return await _jsRuntime.HandledInvoke<JsonObject>(JsJsonExport, _divId) ?? throw new Exception("JsonExport method not found");
+        return await _jsRuntime.HandledInvoke<JsonObject>(Namespace, JsJsonExport, _divId) ?? throw new Exception("JsonExport method not found");
     }
 
     public async void Dispose()
     {
-        await _jsRuntime.HandledInvokeVoid(JsDispose, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsDispose, _divId);
         _hotKeysContext?.Dispose();
     }
 
     public async ValueTask SetCoordinates(int left, int top, decimal angle)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsSetCoordinates, _divId, left, top, angle);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsSetCoordinates, _divId, left, top, angle);
     }
 
     public async ValueTask CenterObjects()
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsCenterObjects, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsCenterObjects, _divId);
     }
 
     public async ValueTask Reset()
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsReset, _divId);
+        await _jsRuntime.HandledInvokeVoid(Namespace, JsReset, _divId);
     }
 }
