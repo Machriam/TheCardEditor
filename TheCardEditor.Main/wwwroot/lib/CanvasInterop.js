@@ -1,8 +1,5 @@
 ﻿import state from "/lib/State.js";
 
-window.canvasInteropFunctions = {
-    instance: {},
-};
 class CanvasInterop {
     parameter;
     divId;
