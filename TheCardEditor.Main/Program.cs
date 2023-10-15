@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Main.Core.Grid;
@@ -16,9 +17,6 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
-#if DEBUG
-        AddJsDebugFileWatcher();
-#endif
         ApplicationConfiguration.Initialize();
         var directory = Path.GetFullPath(Directory.GetCurrentDirectory());
         var builder = new ConfigurationBuilder()
@@ -26,7 +24,12 @@ internal static class Program
                         .AddJsonFile(AppSettings.Name, optional: false, reloadOnChange: true);
         var configuration = builder.Build();
         var environmentConfiguration = new EnvironmentConfiguration(configuration);
-        var services = new ServiceCollection();
+        var host = Host.CreateDefaultBuilder().ConfigureServices(services => AddServices(services, environmentConfiguration));
+        host.Build().RunAsync();
+    }
+
+    private static void AddServices(IServiceCollection services, EnvironmentConfiguration environmentConfiguration)
+    {
         services.AddSingleton<IEnvironmentConfiguration>(environmentConfiguration);
         services.AddWindowsFormsBlazorWebView();
         services.AddEntityFrameworkSqlite();
@@ -35,7 +38,9 @@ internal static class Program
                     a => a.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 #if DEBUG
         services.AddBlazorWebViewDeveloperTools();
+        services.AddHostedService<JsModuleInvalidator>();
 #endif
+        services.AddHostedService<UIService>();
         services.AddSingleton<MainForm>();
         services.AddSingleton<IModalHelper, ModalHelper>();
         services.AddTransient<IErrorLogger, JsInterop>();
@@ -53,23 +58,5 @@ internal static class Program
         services.AddTransient<IShortcutRegistrator, ShortcutRegistrator>();
         services.AddBlazoredModal();
         services.AddHotKeys2();
-        var mainForm = services.BuildServiceProvider().GetService<MainForm>();
-        Application.Run(mainForm);
-    }
-
-    private static void AddJsDebugFileWatcher()
-    {
-        static void FileWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            IJsRuntimeExtensions.UpdateLastJsChange();
-        }
-        var fileWatcher = new FileSystemWatcher
-        {
-            Path = Directory.GetCurrentDirectory() + "/wwwroot/lib",
-            Filter = "*.*",
-            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.LastAccess
-        };
-        fileWatcher.Changed += FileWatcher_Changed;
-        fileWatcher.EnableRaisingEvents = true;
     }
 }

@@ -73,19 +73,19 @@ public class CanvasParameter
 
 public class CanvasInteropFactory : ICanvasInteropFactory
 {
-    private readonly IJSRuntime _jsRuntime;
+    private readonly IJsInterop _jsInterop;
     private readonly HotKeys _hotKeys;
 
-    public CanvasInteropFactory(IJSRuntime jsRuntime, HotKeys hotKeys)
+    public CanvasInteropFactory(IJsInterop jsRuntime, HotKeys hotKeys)
     {
-        _jsRuntime = jsRuntime;
+        _jsInterop = jsRuntime;
         _hotKeys = hotKeys;
     }
 
     public ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId,
         SelectCanvasObjectHandler objectSelectionHandler, Action objectDeselectionHandler, Action multiObjectSelectionHandler) where TView : class
     {
-        return new CanvasInterop<TView>(_jsRuntime, divId, objectReference, _hotKeys, objectSelectionHandler.Method.Name,
+        return new CanvasInterop<TView>(_jsInterop, divId, objectReference, _hotKeys, objectSelectionHandler.Method.Name,
             objectDeselectionHandler.Method.Name, multiObjectSelectionHandler.Method.Name);
     }
 }
@@ -125,7 +125,7 @@ public interface ICanvasInterop : IDisposable
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
 {
-    private readonly IJSRuntime _jsRuntime;
+    private readonly IJsInterop _jsInterop;
     private readonly string _divId;
     private readonly DotNetObjectReference<TView> _objectReference;
     private readonly HotKeys _hotKeys;
@@ -155,10 +155,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string JsGetObjectParameter => "getObjectParameter";
     private static string JsAddFilter => "addFilter";
 
-    public CanvasInterop(IJSRuntime jsruntime, string divId, TView objectReference, HotKeys hotKeys, string selectionHandlerName, string deselectionHandlerName,
+    public CanvasInterop(IJsInterop jsruntime, string divId, TView objectReference, HotKeys hotKeys, string selectionHandlerName, string deselectionHandlerName,
                          string multiObjectSelectedHandler)
     {
-        _jsRuntime = jsruntime;
+        _jsInterop = jsruntime;
         _divId = divId;
         _objectReference = DotNetObjectReference.Create(objectReference);
         _hotKeys = hotKeys;
@@ -172,7 +172,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         if (_initialized) return;
         _hotKeys.KeyDown += HotKeys_KeyDown;
         _hotKeysContext = _hotKeys.CreateContext();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsInitialize, _divId, new CanvasParameter()
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsInitialize, _divId, new CanvasParameter()
         {
             ObjectDeselectionHandler = _deselectionHandlerName,
             ObjectSelectionHandler = _selectionHandlerName,
@@ -184,103 +184,103 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
 
     private async void HotKeys_KeyDown(object? sender, HotKeyDownEventArgs e)
     {
-        await _jsRuntime.HandledInvokeVoid(Namespace, OnKeyDown, e.Key, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, OnKeyDown, e.Key, _divId);
     }
 
     public async ValueTask ApplyFont(CanvasFontStyle style, object value)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsApplyFont, style.GetDescription(), value, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsApplyFont, style.GetDescription(), value, _divId);
     }
 
     public async ValueTask SelectObject(int index)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsSelectObject, index, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsSelectObject, index, _divId);
     }
 
     public async ValueTask<ObjectParameter> GetObjectParameter()
     {
         await Initialize();
-        return await _jsRuntime.HandledInvoke<ObjectParameter>(Namespace, JsGetObjectParameter, _divId);
+        return await _jsInterop.ExecuteModuleFunction<ObjectParameter>(Namespace, JsGetObjectParameter, _divId);
     }
 
     public async ValueTask AddFilter(int index)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsAddFilter, index, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsAddFilter, index, _divId);
     }
 
     public async ValueTask<int> SendBackwards(int index)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsSendBackwards, index, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsSendBackwards, index, _divId);
         return index == 0 ? 0 : index - 1;
     }
 
     public async ValueTask<int> BringForward(int index)
     {
         await Initialize();
-        return await _jsRuntime.HandledInvoke<int>(Namespace, JsBringForward, index, _divId);
+        return await _jsInterop.ExecuteModuleFunction<int>(Namespace, JsBringForward, index, _divId);
     }
 
     public async ValueTask<string> ExportPng()
     {
         await Initialize();
-        return await _jsRuntime.HandledInvoke<string>(Namespace, JsExport, _divId) ?? "";
+        return await _jsInterop.ExecuteModuleFunction<string>(Namespace, JsExport, _divId) ?? "";
     }
 
     public async ValueTask DrawText(int xPos, int yPos, string text, string tag, int fontSize)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsDrawText, xPos, yPos, text, tag, fontSize, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsDrawText, xPos, yPos, text, tag, fontSize, _divId);
     }
 
     public async ValueTask RemoveObject()
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsRemoveObject, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsRemoveObject, _divId);
     }
 
     public async ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsDrawPicture, xPos, yPos, id, name, base64Image, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsDrawPicture, xPos, yPos, id, name, base64Image, _divId);
     }
 
     public async ValueTask ImportJson(JsonObject json, Dictionary<long, string> imageData)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsJsonImport, json, imageData, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsJsonImport, json, imageData, _divId);
     }
 
     public async ValueTask<JsonObject> ExportJson()
     {
         await Initialize();
-        return await _jsRuntime.HandledInvoke<JsonObject>(Namespace, JsJsonExport, _divId) ?? throw new Exception("JsonExport method not found");
+        return await _jsInterop.ExecuteModuleFunction<JsonObject>(Namespace, JsJsonExport, _divId) ?? throw new Exception("JsonExport method not found");
     }
 
     public async void Dispose()
     {
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsDispose, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsDispose, _divId);
         _hotKeysContext?.Dispose();
     }
 
     public async ValueTask SetCoordinates(int left, int top, decimal angle)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsSetCoordinates, _divId, left, top, angle);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsSetCoordinates, _divId, left, top, angle);
     }
 
     public async ValueTask CenterObjects()
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsCenterObjects, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsCenterObjects, _divId);
     }
 
     public async ValueTask Reset()
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(Namespace, JsReset, _divId);
+        await _jsInterop.ExecuteModuleFunction(Namespace, JsReset, _divId);
     }
 }
