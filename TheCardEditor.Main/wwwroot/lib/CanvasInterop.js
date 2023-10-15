@@ -1,4 +1,6 @@
-﻿window.canvasInteropFunctions = {
+﻿import state from "/lib/State.js";
+
+window.canvasInteropFunctions = {
     instance: {},
 };
 class CanvasInterop {
@@ -6,13 +8,13 @@ class CanvasInterop {
     divId;
     canvas;
     static getInstance(divId) {
-        if (!window.canvasInteropFunctions.instance.hasOwnProperty(divId)) {
-            window.canvasInteropFunctions.instance[divId] = new CanvasInterop();
+        if (!state.instances.hasOwnProperty(divId)) {
+            state.instances[divId] = new CanvasInterop();
         }
-        return window.canvasInteropFunctions.instance[divId];
+        return state.instances[divId];
     }
     static removeInstance(divId) {
-        delete window.canvasInteropFunctions.instance[divId];
+        delete state.instances[divId];
     }
     createObjectParameter(left = 0, top = 0, tag = null, angle = 0, textSize = null) {
         return { "left": left, "top": top, "tag": tag, "angle": angle, "textSize": textSize };
@@ -235,7 +237,6 @@ export function reset(divId) {
 }
 
 export function importJson(json, pictureData, divId) {
-    debugger;
     if (json == null || Object.keys(json).length == 0) return;
     json.objects.map(o => o.src = pictureData.hasOwnProperty(o.pictureId) ? pictureData[o.pictureId] : "");
     const instance = CanvasInterop.getInstance(divId);

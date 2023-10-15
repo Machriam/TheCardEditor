@@ -46,7 +46,7 @@ public static class IJsRuntimeExtensions
         if (split.Length == 2) modulePath = "./" + split[^1].Replace(".cs", "") + ".js";
         var buildId = s_buildGuid;
 #if DEBUG
-        //buildId = Guid.NewGuid().ToString();
+        buildId = Guid.NewGuid().ToString();
 #endif
         return jsRuntime.InvokeAsync<IJSObjectReference>("import", modulePath + "?version=" + buildId);
     }
