@@ -6,7 +6,7 @@ public class AppSettings
 #if DEBUG
     public const string Name = "appsettings.Development.json";
 #else
-        public const string AppsettingsName = "appsettings.json";
+    public const string Name = "appsettings.json";
 #endif
     public const string Key = nameof(AppSettings);
     public Dictionary<string, string> ConnectionStrings { get; set; } = new();
