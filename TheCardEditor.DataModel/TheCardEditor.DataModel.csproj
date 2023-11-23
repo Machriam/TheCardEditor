@@ -16,5 +16,23 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="DatabaseMigrations - Copy.Designer.cs">
+      <DependentUpon>DatabaseMigrations.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Migrations\DatabaseMigrations.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DatabaseMigrations.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Migrations\DatabaseMigrations.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>DatabaseMigrations.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 
 </Project>
