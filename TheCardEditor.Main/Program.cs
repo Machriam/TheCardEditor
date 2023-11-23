@@ -57,6 +57,7 @@ internal static class Program
         using (var scope = provider.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+            db.Migrate();
         }
         var mainForm = provider.GetRequiredService<MainForm>();
         Application.Run(mainForm);

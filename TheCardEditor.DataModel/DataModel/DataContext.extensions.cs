@@ -16,10 +16,14 @@ public partial class DataContext
     public void Migrate()
     {
         var version = Database.SqlQueryRaw<string>("select value from Application where Name='Version'");
-        var resourceSet = DatabaseMigrations.ResourceManager.GetResourceSet(CultureInfo.InvariantCulture, false, false) ??
+        var resourceSet = DatabaseMigrations.ResourceManager.GetResourceSet(CultureInfo.InvariantCulture, true, true) ??
             throw new Exception("No Migration Resource found");
         var currentVersion = "0.0.0";
-        if (version != null) currentVersion = version.FirstOrDefault() ?? currentVersion;
+        try
+        {
+            currentVersion = version.FirstOrDefault() ?? currentVersion;
+        }
+        catch (Exception ex) { Console.WriteLine("Application table not found: " + ex.Message); }
         foreach (var sqlToApply in IVersionSort.CreateDefault(currentVersion).GetPatchesToApply(resourceSet))
         {
             Database.ExecuteSqlRaw(sqlToApply.SQL);
