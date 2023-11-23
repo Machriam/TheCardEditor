@@ -22,7 +22,11 @@ public class CardSetService
     {
         var cardSet = _dataContext.CardSets.FirstOrDefault(f => f.Id == model.Id);
         if (cardSet == null) _dataContext.CardSets.Add(model.GetDataModel());
-        else cardSet.Name = model.Name;
+        else
+        {
+            cardSet.Name = model.Name;
+            cardSet.Zoom = model.Zoom;
+        }
         _dataContext.SaveChanges();
     }
 

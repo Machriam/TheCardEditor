@@ -97,8 +97,9 @@ namespace TheCardEditor.Main.Pages.Components
             _pictureById = PictureService.Execute(ps => ps.GetPictures()).ToDictionary(p => p.Id);
             if (ApplicationStorage.SelectedCardSet == null) return;
             _selectedFont = ApplicationStorage.AvailableFonts.FirstOrDefault() ?? "Arial";
-            Height = (int)ApplicationStorage.SelectedCardSet.Height;
-            Width = (int)ApplicationStorage.SelectedCardSet.Width;
+            Console.WriteLine(ApplicationStorage.SelectedCardSet.Zoom);
+            Height = (int)(ApplicationStorage.SelectedCardSet.Height * ApplicationStorage.SelectedCardSet.Zoom / 100f);
+            Width = (int)(ApplicationStorage.SelectedCardSet.Width * ApplicationStorage.SelectedCardSet.Zoom / 100f);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -107,6 +108,7 @@ namespace TheCardEditor.Main.Pages.Components
             _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, OnObjectSelected, OnObjectDeselected, OnMultiObjectIsSelected);
             var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
             await _canvasInterop.ImportJson(jsonObject ?? new JsonObject(), _pictureData);
+            await _canvasInterop.Zoom(ApplicationStorage.SelectedCardSet?.Zoom ?? 100d);
             StateHasChanged();
         }
 

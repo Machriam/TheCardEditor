@@ -16,6 +16,7 @@ public class CardSetModel
         Height = cardSet.Height;
         Width = cardSet.Width;
         GameFk = cardSet.GameFk;
+        Zoom = cardSet.Zoom;
     }
 
     public CardSet GetDataModel()
