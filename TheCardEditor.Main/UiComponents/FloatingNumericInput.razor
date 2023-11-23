@@ -1,6 +1,8 @@
+@using System.Globalization
 <div @attributes="@(Attributes.Where(a=>a.Key!="class"))"
      class="form-floating @(string.Join(' ', Attributes.Where(a=>a.Key=="class").Select(a=>a.Value)))">
-    <input disabled="@DisabledSelector.Invoke()" type="number" value="@_currentValue" @onchange="OnInputChanged" class="form-control" id="@Guid" placeholder="@Label">
+    <input disabled="@DisabledSelector.Invoke()" type="number" @bind="@_currentValue"
+           @bind:after="()=>OnInputChanged()" class="form-control" id="@Guid" placeholder="@Label">
     <label for="@Guid">@Label</label>
 </div>
 @code {
@@ -11,17 +13,21 @@
     [Parameter] public EventCallback<decimal> InputChanged { get; set; }
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> Attributes { get; set; } = new();
-    private decimal _currentValue = 0M;
-    public async Task OnInputChanged(ChangeEventArgs args)
+    private string _currentValue = "";
+    public async Task OnInputChanged()
     {
-        _currentValue = decimal.Parse(args.Value?.ToString() ?? "0");
-        await InputChanged.InvokeAsync(_currentValue);
+        var value = decimal.Parse(_currentValue.Replace(",", ".") ?? "0.0");
+        await InputChanged.InvokeAsync(value);
     }
     protected override void OnParametersSet()
     {
         var value = ValueSelector?.Invoke() ?? 0M;
-        if (_currentValue == value) return;
-        _currentValue = value;
+        if (_currentValue == FormatDecimal(value)) return;
+        _currentValue = FormatDecimal(value);
         StateHasChanged();
+    }
+    private string FormatDecimal(decimal value)
+    {
+        return value.ToString("0.#####", CultureInfo.InvariantCulture);
     }
 }
