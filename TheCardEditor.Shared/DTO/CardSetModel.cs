@@ -29,17 +29,17 @@ public class CardSetModel
         };
     }
 
-    public long Id { get; set; }
+    public int Id { get; set; }
 
     [MinLength(3)]
     public string Name { get; set; } = null!;
 
-    [Range(1, long.MaxValue)]
-    public long Height { get; set; }
+    [Range(1, int.MaxValue)]
+    public int Height { get; set; }
 
-    [Range(1, long.MaxValue)]
-    public long Width { get; set; }
+    [Range(1, int.MaxValue)]
+    public int Width { get; set; }
 
-    [Range(1, long.MaxValue)]
-    public long GameFk { get; set; }
+    [Range(1, int.MaxValue)]
+    public int GameFk { get; set; }
 }

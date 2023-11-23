@@ -30,7 +30,7 @@ public class CardModel
         };
     }
 
-    public long Id { get; set; }
+    public int Id { get; set; }
 
     [MinLength(3, ErrorMessage = "Please give the card a name with a length of atleast 3")]
     public string Name { get; set; } = "";
@@ -63,6 +63,6 @@ public class CardModel
         return Data != VirtualData;
     }
 
-    [Range(1, long.MaxValue)]
-    public long CardSetFk { get; set; }
+    [Range(1, int.MaxValue)]
+    public int CardSetFk { get; set; }
 }

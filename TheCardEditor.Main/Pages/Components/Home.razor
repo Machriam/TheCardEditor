@@ -30,10 +30,10 @@
                     <FloatingInput ValueSelector="()=>_selectedCardSet.Name" Label="Name" InputChanged="a=>_selectedCardSet.Name=a" />
                 </div>
                 <div class="col-md-3">
-                    <FloatingNumericInput ValueSelector="()=>_selectedCardSet.Height" Label="Height" InputChanged="a=>_selectedCardSet.Height=(long)a" />
+                    <FloatingNumericInput ValueSelector="()=>_selectedCardSet.Height" Label="Height" InputChanged="a=>_selectedCardSet.Height=(int)a" />
                 </div>
                 <div class="col-md-3">
-                    <FloatingNumericInput ValueSelector="()=>_selectedCardSet.Width" Label="Width" InputChanged="a=>_selectedCardSet.Width=(long)a" />
+                    <FloatingNumericInput ValueSelector="()=>_selectedCardSet.Width" Label="Width" InputChanged="a=>_selectedCardSet.Width=(int)a" />
                 </div>
             </div>
             <Button class="btn btn-primary" OnClick="()=>{_selectedCardSet.Id=0; UpsertCardSet();}">Add Card Set</Button>
