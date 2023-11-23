@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Blazored.Modal;
 using Microsoft.AspNetCore.Components;
@@ -136,6 +137,7 @@ namespace TheCardEditor.Main.Pages.Components
             AddObjectX = (int)param.Left;
             AddObjectY = (int)param.Top;
             AddObjectAngle = (decimal)param.Angle;
+            JsInterop.ConsoleLog("selected");
             FontSize = param.TextSize ?? FontSize;
             AddTag = param.Tag ?? "";
             StateHasChanged();
@@ -251,7 +253,6 @@ namespace TheCardEditor.Main.Pages.Components
                 value = await JsInterop.Prompt("Enter colorcode:");
             }
             await _canvasInterop.ApplyFont(style, value);
-            OnObjectSelected(await _canvasInterop.GetObjectParameter());
         }
 
         public void Dispose()

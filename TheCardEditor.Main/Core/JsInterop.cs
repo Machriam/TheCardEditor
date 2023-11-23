@@ -12,6 +12,8 @@ public interface IJsInterop : IErrorLogger
     Task<string> Prompt(string message);
 
     Task<bool> Confirm(string message);
+
+    Task ConsoleLog(string message);
 }
 
 public class JsInterop : IJsInterop
@@ -21,6 +23,11 @@ public class JsInterop : IJsInterop
     public JsInterop(IJSRuntime jsRuntime)
     {
         _jsRuntime = jsRuntime;
+    }
+
+    public async Task ConsoleLog(string message)
+    {
+        await _jsRuntime.InvokeVoidAsync("console.log", message);
     }
 
     public async Task LogError(string message, string stackTrace = "")
