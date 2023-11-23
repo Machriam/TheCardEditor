@@ -233,7 +233,11 @@ window.canvasInteropFunctions = {
     exportJson: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
         let result = instance.canvas.toJSON(["tag", "pictureId", "name", "lockScalingY"]);
-        result.objects = result.objects.map(o => { o.src = ""; return o; });
+        result.objects = result.objects.map((o, i) => {
+            if (o.type == "textbox") o.styles = instance.canvas._objects[i].styles;
+            o.src = "";
+            return o;
+        });
         return result;
     },
 
@@ -252,7 +256,6 @@ window.canvasInteropFunctions = {
     exportCanvas: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
         const result = instance.getDataUrl();
-        console.log(result);
         return result;
     },
     dispose: function (divId) {
