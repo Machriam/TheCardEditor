@@ -31,9 +31,7 @@ public partial class DataContext : DbContext
 
             entity.HasIndex(e => e.GameFk, "IX_CardSet_GameFk");
 
-            entity.Property(e => e.Zoom)
-                .HasDefaultValue(1)
-                .HasColumnType("NUMERIC");
+            entity.Property(e => e.Zoom).HasDefaultValue(100.0);
 
             entity.HasOne(d => d.GameFkNavigation).WithMany(p => p.CardSets)
                 .HasForeignKey(d => d.GameFk)

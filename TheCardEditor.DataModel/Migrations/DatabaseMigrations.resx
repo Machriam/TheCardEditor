@@ -125,6 +125,6 @@
 	PRIMARY KEY("Id" AUTOINCREMENT)
 );
 INSERT INTO "main"."ApplicationData"("Id","Name","Value") VALUES (1,'Version','1.2.0');
-ALTER TABLE "main"."CardSet" ADD COLUMN 	"Zoom"	NUMERIC NOT NULL DEFAULT 1;</value>
+ALTER TABLE "main"."CardSet" ADD COLUMN 	"Zoom"	REAL NOT NULL DEFAULT 100.0;</value>
   </data>
 </root>

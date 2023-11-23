@@ -35,6 +35,9 @@
                 <div class="col-md-3">
                     <FloatingNumericInput ValueSelector="()=>_selectedCardSet.Width" Label="Width" InputChanged="a=>_selectedCardSet.Width=(int)a" />
                 </div>
+                <div class="col-md-3">
+                    <FloatingNumericInput ValueSelector="()=>(decimal)_selectedCardSet.Zoom" Label="Zoom" InputChanged="a=>_selectedCardSet.Zoom=(double)a" />
+                </div>
             </div>
             <Button class="btn btn-primary" OnClick="()=>{_selectedCardSet.Id=0; UpsertCardSet();}">Add Card Set</Button>
             <Button class="btn btn-primary" OnClick="()=>UpsertCardSet()">Update Set Name</Button>

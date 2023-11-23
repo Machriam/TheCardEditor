@@ -26,6 +26,7 @@ public class CardSetModel
             Width = Width,
             Height = Height,
             GameFk = GameFk,
+            Zoom = Zoom
         };
     }
 
@@ -42,4 +43,7 @@ public class CardSetModel
 
     [Range(1, int.MaxValue)]
     public int GameFk { get; set; }
+
+    [Range(1d, 500d)]
+    public double Zoom { get; set; }
 }
