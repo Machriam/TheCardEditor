@@ -61,13 +61,13 @@ namespace TheCardEditor.DataModel.Migrations {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CREATE TABLE &quot;Application&quot; (
+        ///   Looks up a localized string similar to CREATE TABLE &quot;ApplicationData&quot; (
         ///	&quot;Id&quot;	INTEGER NOT NULL,
         ///	&quot;Name&quot;	TEXT NOT NULL,
         ///	&quot;Value&quot;	TEXT NOT NULL,
         ///	PRIMARY KEY(&quot;Id&quot; AUTOINCREMENT)
         ///);
-        ///INSERT INTO &quot;main&quot;.&quot;Application&quot;(&quot;Id&quot;,&quot;Name&quot;,&quot;Value&quot;) VALUES (1,&apos;Version&apos;,&apos;1.2.0&apos;);
+        ///INSERT INTO &quot;main&quot;.&quot;ApplicationData&quot;(&quot;Id&quot;,&quot;Name&quot;,&quot;Value&quot;) VALUES (1,&apos;Version&apos;,&apos;1.2.0&apos;);
         ///ALTER TABLE &quot;main&quot;.&quot;CardSet&quot; ADD COLUMN 	&quot;Zoom&quot;	NUMERIC NOT NULL DEFAULT 1;.
         /// </summary>
         public static string _1_2_0 {

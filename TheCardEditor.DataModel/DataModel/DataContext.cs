@@ -4,6 +4,7 @@ namespace TheCardEditor.DataModel.DataModel;
 
 public partial class DataContext : DbContext
 {
+    public virtual DbSet<ApplicationDatum> ApplicationData { get; set; }
     public virtual DbSet<Card> Cards { get; set; }
     public virtual DbSet<CardSet> CardSets { get; set; }
     public virtual DbSet<Font> Fonts { get; set; }

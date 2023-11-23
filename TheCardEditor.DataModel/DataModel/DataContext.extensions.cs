@@ -15,7 +15,7 @@ public partial class DataContext
 
     public void Migrate()
     {
-        var version = Database.SqlQueryRaw<string>("select value from Application where Name='Version'");
+        var version = Database.SqlQueryRaw<string>("select value from ApplicationData where Name='Version'");
         var resourceSet = DatabaseMigrations.ResourceManager.GetResourceSet(CultureInfo.InvariantCulture, true, true) ??
             throw new Exception("No Migration Resource found");
         var currentVersion = "0.0.0";
