@@ -33,12 +33,13 @@ public class TemplateModel
     {
         return JsonSerializer.Deserialize<JsonObject>(Data) ?? new();
     }
-    public long Id { get; set; }
+
+    public int Id { get; set; }
 
     [Required]
     [MinLength(3, ErrorMessage = "Template name must be atleast 3 letters long")]
     public string Name { get; set; } = "";
 
     public string Data { get; set; } = null!;
-    public long CardSetFk { get; set; }
+    public int CardSetFk { get; set; }
 }

@@ -1,7 +1,10 @@
-﻿using Blazored.Modal;
+﻿using System.Collections;
+using System.Globalization;
+using Blazored.Modal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TheCardEditor.DataModel;
 using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Main.Core.Grid;
@@ -50,7 +53,13 @@ internal static class Program
         services.AddTransient<IShortcutRegistrator, ShortcutRegistrator>();
         services.AddBlazoredModal();
         services.AddHotKeys2();
-        var mainForm = services.BuildServiceProvider().GetService<MainForm>();
+        var provider = services.BuildServiceProvider();
+        using (var scope = provider.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+            db.Migrate();
+        }
+        var mainForm = provider.GetRequiredService<MainForm>();
         Application.Run(mainForm);
     }
 }

@@ -6,11 +6,12 @@ public partial class CardSet
     {
     }
 
-    public long Id { get; set; }
-    public long Height { get; set; }
-    public long Width { get; set; }
+    public int Id { get; set; }
+    public int Height { get; set; }
+    public int Width { get; set; }
     public string Name { get; set; } = null!;
-    public long GameFk { get; set; }
+    public int GameFk { get; set; }
+    public double Zoom { get; set; }
     public virtual ICollection<Card> Cards { get; init; } = new List<Card>();
     public virtual Game GameFkNavigation { get; set; } = null!;
     public virtual ICollection<Template> Templates { get; init; } = new List<Template>();

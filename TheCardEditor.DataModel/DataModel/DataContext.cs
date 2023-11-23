@@ -4,6 +4,7 @@ namespace TheCardEditor.DataModel.DataModel;
 
 public partial class DataContext : DbContext
 {
+    public virtual DbSet<ApplicationDatum> ApplicationData { get; set; }
     public virtual DbSet<Card> Cards { get; set; }
     public virtual DbSet<CardSet> CardSets { get; set; }
     public virtual DbSet<Font> Fonts { get; set; }
@@ -17,6 +18,8 @@ public partial class DataContext : DbContext
         {
             entity.ToTable("Card");
 
+            entity.HasIndex(e => e.CardSetFk, "IX_Card_CardSetFk");
+
             entity.HasOne(d => d.CardSetFkNavigation).WithMany(p => p.Cards)
                 .HasForeignKey(d => d.CardSetFk)
                 .OnDelete(DeleteBehavior.ClientSetNull);
@@ -25,6 +28,10 @@ public partial class DataContext : DbContext
         modelBuilder.Entity<CardSet>(entity =>
         {
             entity.ToTable("CardSet");
+
+            entity.HasIndex(e => e.GameFk, "IX_CardSet_GameFk");
+
+            entity.Property(e => e.Zoom).HasDefaultValue(100.0);
 
             entity.HasOne(d => d.GameFkNavigation).WithMany(p => p.CardSets)
                 .HasForeignKey(d => d.GameFk)
@@ -35,7 +42,7 @@ public partial class DataContext : DbContext
         {
             entity.ToTable("Font");
 
-            entity.Property(e => e.Name).HasDefaultValueSql("'Unnamed Font'");
+            entity.Property(e => e.Name).HasDefaultValue("Unnamed Font");
         });
 
         modelBuilder.Entity<Game>(entity =>
@@ -53,6 +60,8 @@ public partial class DataContext : DbContext
         modelBuilder.Entity<Template>(entity =>
         {
             entity.ToTable("Template");
+
+            entity.HasIndex(e => e.CardSetFk, "IX_Template_CardSetFk");
 
             entity.HasIndex(e => e.Name, "IX_Template_Name").IsUnique();
 

@@ -98,6 +98,10 @@ window.canvasInteropFunctions = {
         instance.canvas.discardActiveObject().renderAll();
         return Math.min(instance.canvas._objects.length, index + 1);
     },
+    zoom: function (zoom, divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        instance.canvas.setZoom(zoom / 100.0);
+    },
     sendBackwards: function (index, divId) {
         const instance = CanvasInterop.getInstance(divId);
         instance.canvas.sendBackwards(instance.canvas.item(index));

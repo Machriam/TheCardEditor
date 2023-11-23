@@ -12,12 +12,12 @@ public class TemplateService
         _dataContext = dataContext;
     }
 
-    public IReadOnlyDictionary<long, string> TemplateNamesById(long cardSetId)
+    public IReadOnlyDictionary<int, string> TemplateNamesById(int cardSetId)
     {
         return _dataContext.Templates.Where(t => t.CardSetFk == cardSetId).ToDictionary(t => t.Id, t => t.Name);
     }
 
-    public TemplateModel GetTemplate(long id)
+    public TemplateModel GetTemplate(int id)
     {
         return new TemplateModel(_dataContext.Templates.First(t => t.Id == id));
     }
@@ -33,7 +33,7 @@ public class TemplateService
         _dataContext.SaveChanges();
     }
 
-    public void DeleteTemplate(long id)
+    public void DeleteTemplate(int id)
     {
         _dataContext.Templates.Remove(_dataContext.Templates.First(t => t.Id == id));
         _dataContext.SaveChanges();

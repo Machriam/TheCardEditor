@@ -36,15 +36,15 @@ namespace TheCardEditor.Main.Pages.Components
         private ICanvasInterop _canvasInterop = default!;
         private string _templateSearchValue = "";
         private const string CanvasId = "TemplateCanvasId";
-        private IReadOnlyDictionary<long, string> _templateNamesById = new Dictionary<long, string>();
-        private long? _selectedTemplate;
+        private IReadOnlyDictionary<int, string> _templateNamesById = new Dictionary<int, string>();
+        private int? _selectedTemplate;
 
         protected override void OnInitialized()
         {
             if (ApplicationStorage.SelectedCardSet == null) return;
-            _templateNamesById = TemplateService.Execute(ts => ts.TemplateNamesById(ApplicationStorage.SelectedCardSet.Id)) ?? new Dictionary<long, string>();
-            Height = (int)ApplicationStorage.SelectedCardSet.Height;
-            Width = (int)ApplicationStorage.SelectedCardSet.Width;
+            _templateNamesById = TemplateService.Execute(ts => ts.TemplateNamesById(ApplicationStorage.SelectedCardSet.Id)) ?? new Dictionary<int, string>();
+            Height = ApplicationStorage.SelectedCardSet.Height;
+            Width = ApplicationStorage.SelectedCardSet.Width;
         }
 
         public async Task RenderCanvas(TemplateModel template)
@@ -65,7 +65,7 @@ namespace TheCardEditor.Main.Pages.Components
             TemplateService.Execute(ts => ts.DeleteTemplate(_selectedTemplate.Value));
             if (ApplicationStorage.SelectedCardSet == null) return;
             _selectedTemplate = null;
-            _templateNamesById = TemplateService.Execute(ts => ts.TemplateNamesById(ApplicationStorage.SelectedCardSet.Id)) ?? new Dictionary<long, string>();
+            _templateNamesById = TemplateService.Execute(ts => ts.TemplateNamesById(ApplicationStorage.SelectedCardSet.Id)) ?? new Dictionary<int, string>();
             await _canvasInterop.Reset();
             StateHasChanged();
         }
@@ -80,8 +80,8 @@ namespace TheCardEditor.Main.Pages.Components
 
         public async Task TemplateSelected(long id)
         {
-            _selectedTemplate = id;
-            var template = TemplateService.Execute(ts => ts.GetTemplate(id));
+            _selectedTemplate = (int)id;
+            var template = TemplateService.Execute(ts => ts.GetTemplate((int)id));
             if (template == null) return;
             await RenderCanvas(template);
         }

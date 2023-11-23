@@ -114,6 +114,8 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask RemoveObject();
 
+    ValueTask Zoom(double zoom);
+
     ValueTask ImportJson(JsonObject json, Dictionary<long, string> imageData);
 
     ValueTask Reset();
@@ -150,6 +152,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string JsJsonImport => Namespace + ".importJson";
     private static string OnKeyDown => Namespace + ".onKeyDown";
     private static string JsDispose => Namespace + ".dispose";
+    private static string JsZoom => Namespace + ".zoom";
     private static string JsCenterObjects => Namespace + ".centerObjects";
     private static string JsReset => Namespace + ".reset";
     private static string JsGetObjectParameter => Namespace + ".getObjectParameter";
@@ -282,5 +285,11 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     {
         await Initialize();
         await _jsRuntime.HandledInvokeVoid(JsReset, _divId);
+    }
+
+    public async ValueTask Zoom(double zoom)
+    {
+        await Initialize();
+        await _jsRuntime.HandledInvokeVoid(JsZoom, zoom, _divId);
     }
 }

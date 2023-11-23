@@ -16,6 +16,7 @@ public class CardSetModel
         Height = cardSet.Height;
         Width = cardSet.Width;
         GameFk = cardSet.GameFk;
+        Zoom = cardSet.Zoom;
     }
 
     public CardSet GetDataModel()
@@ -26,20 +27,24 @@ public class CardSetModel
             Width = Width,
             Height = Height,
             GameFk = GameFk,
+            Zoom = Zoom
         };
     }
 
-    public long Id { get; set; }
+    public int Id { get; set; }
 
     [MinLength(3)]
     public string Name { get; set; } = null!;
 
-    [Range(1, long.MaxValue)]
-    public long Height { get; set; }
+    [Range(1, int.MaxValue)]
+    public int Height { get; set; }
 
-    [Range(1, long.MaxValue)]
-    public long Width { get; set; }
+    [Range(1, int.MaxValue)]
+    public int Width { get; set; }
 
-    [Range(1, long.MaxValue)]
-    public long GameFk { get; set; }
+    [Range(1, int.MaxValue)]
+    public int GameFk { get; set; }
+
+    [Range(1d, 500d)]
+    public double Zoom { get; set; }
 }
