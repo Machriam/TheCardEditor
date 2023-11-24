@@ -2,11 +2,11 @@
 
 public class AppSettings
 {
-    public static string GetPath => Path.Combine(Path.GetFullPath(Directory.GetCurrentDirectory()), Name);
+    public static string GetPath => Path.Combine(Path.GetFullPath(Directory.GetCurrentDirectory()), AppsettingsName);
 #if DEBUG
-    public const string Name = "appsettings.Development.json";
+    public const string AppsettingsName = "appsettings.Development.json";
 #else
-        public const string AppsettingsName = "appsettings.json";
+    public const string AppsettingsName = "appsettings.json";
 #endif
     public const string Key = nameof(AppSettings);
     public Dictionary<string, string> ConnectionStrings { get; set; } = new();
