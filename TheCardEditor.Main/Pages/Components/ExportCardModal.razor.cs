@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Nodes;
+﻿using System.Text;
 using Blazored.Modal;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -40,7 +39,6 @@ namespace TheCardEditor.Main.Pages.Components
         private int Width { get; set; }
         private ICanvasInterop _canvasInterop { get; set; } = default!;
         private const string ExportCanvasId = nameof(ExportCanvasId);
-        private readonly Dictionary<long, string> _existingPictures = new();
         private List<PngExportData> _pngs = [];
 
         protected override void OnInitialized()
@@ -54,46 +52,36 @@ namespace TheCardEditor.Main.Pages.Components
         {
             if (!firstRender) return;
             _canvasInterop = CanvasInteropFactory.CreateCanvas(this, ExportCanvasId, OnObjectSelected, OnObjectDeselected, OnMultiObjectIsSelected);
-            var errors = "";
+            await _folderPicker.SelectFile();
+        }
+
+        public async Task FolderPickingFinished(FileDialogResult result)
+        {
+            var errors = new StringBuilder();
             foreach (var card in CardIds)
             {
                 var currentCard = CardService.Execute(cs => cs.GetCard(card));
                 if (currentCard == null)
                 {
-                    errors += "Card with ID: " + card + " was not found\n";
+                    errors.Append("Card with ID: ").Append(card).AppendLine(" was not found");
                     continue;
                 }
-                foreach (var picture in currentCard.SerializedData().GetPictureIds())
+                var pictures = new Dictionary<long, string>();
+                var data = currentCard.SerializedData();
+                foreach (var picture in data.GetPictureIds())
                 {
-                    if (!_existingPictures.ContainsKey(picture))
-                    {
-                        var newPicture = PictureService.Execute(ps => ps.GetBase64Picture(picture)) ?? "";
-                        if (newPicture.IsEmpty()) errors += "Picture: " + picture + " not found";
-                        _existingPictures.Add(picture, newPicture);
-                    }
+                    if (pictures.ContainsKey(picture)) continue;
+                    var newPicture = PictureService.Execute(ps => ps.GetBase64Picture(picture)) ?? "";
+                    if (newPicture.IsEmpty()) errors.Append("Picture: ").Append(picture).AppendLine(" not found");
+                    pictures.Add(picture, newPicture);
                 }
-                var jsonObject = JsonSerializer.Deserialize<JsonObject>(currentCard.Data);
-                await _canvasInterop.ImportJson(jsonObject ?? [], _existingPictures);
+                await _canvasInterop.ImportJson(data, pictures);
                 var png = await _canvasInterop.ExportPng();
-                await JsInterop.ConsoleLog(png);
-                _pngs.Add(new PngExportData()
-                {
-                    PNG = png,
-                    Name = currentCard.Name,
-                });
+                var pngData = new PngExportData() { Name = currentCard.Name, PNG = png };
+                File.WriteAllBytes(result.FilePath + "/" + pngData.Name + ".png", pngData.PNGData);
             }
-            if (!string.IsNullOrEmpty(errors)) await JsInterop.Prompt(errors);
-            await _folderPicker.SelectFile();
+            if (errors.Length != 0) await JsInterop.Prompt(errors.ToString());
             await ModalInstance.CloseAsync();
-        }
-
-        public Task FolderPickingFinished(FileDialogResult result)
-        {
-            foreach (var png in _pngs)
-            {
-                File.WriteAllBytes(result.FilePath + "/" + png.Name + ".png", png.PNGData);
-            }
-            return Task.CompletedTask;
         }
 
         [JSInvokable]
