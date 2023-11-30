@@ -1,9 +1,71 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace TheCardEditor.Shared;
 
 public static class ObjectExtensions
 {
+    public static T? Try<T, V>(this V obj, Func<V, T> function, out string? error)
+    {
+        error = null;
+        try
+        {
+            return function(obj);
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            return default;
+        }
+    }
+
+    public static T? FromJson<T>(this Stream utf8Stream, bool includeFields = true, bool ignoreCycles = true, bool allowNumberReadingFromString = false) where T : class
+    {
+        return JsonSerializer.Deserialize<T>(utf8Stream, new JsonSerializerOptions()
+        {
+            IncludeFields = includeFields,
+            NumberHandling = allowNumberReadingFromString ? JsonNumberHandling.AllowReadingFromString : JsonNumberHandling.Strict,
+            ReferenceHandler = ignoreCycles ? ReferenceHandler.IgnoreCycles : ReferenceHandler.Preserve
+        });
+    }
+
+    public static T? FromJson<T>(this byte[] utf8Json, bool includeFields = true, bool ignoreCycles = true, bool allowNumberReadingFromString = false) where T : class
+    {
+        return JsonSerializer.Deserialize<T>(utf8Json, new JsonSerializerOptions()
+        {
+            IncludeFields = includeFields,
+            NumberHandling = allowNumberReadingFromString ? JsonNumberHandling.AllowReadingFromString : JsonNumberHandling.Strict,
+            ReferenceHandler = ignoreCycles ? ReferenceHandler.IgnoreCycles : ReferenceHandler.Preserve
+        });
+    }
+
+    public static T? FromJson<T>(this string json, bool includeFields = true, bool ignoreCycles = true, bool allowNumberReadingFromString = false) where T : class
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions()
+            {
+                IncludeFields = includeFields,
+                NumberHandling = allowNumberReadingFromString ? JsonNumberHandling.AllowReadingFromString : JsonNumberHandling.Strict,
+                ReferenceHandler = ignoreCycles ? ReferenceHandler.IgnoreCycles : ReferenceHandler.Preserve
+            });
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public static string AsJson<T>(this T obj, bool includeFields = true, bool ignoreCycles = true) where T : class
+    {
+        return JsonSerializer.Serialize(obj, new JsonSerializerOptions()
+        {
+            IncludeFields = includeFields,
+            ReferenceHandler = ignoreCycles ? ReferenceHandler.IgnoreCycles : ReferenceHandler.Preserve
+        });
+    }
+
     public static bool ModelIsValid(this object model, out string errors)
     {
         var validationContext = new ValidationContext(model);

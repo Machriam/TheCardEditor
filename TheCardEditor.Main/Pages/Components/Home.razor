@@ -55,12 +55,12 @@
         }
         <div class="col-md-12">
             <div class="col-md-8">
-                <FloatingInput ValueSelector="()=>_selectedFont.Name" Label="Font Name" InputChanged="a=>_selectedFont.Name=a" />
+                <FloatingInput ValueSelector="()=>_selectedFont!.Name" Label="Font Name" InputChanged="a=>_selectedFont!.Name=a" />
                 <InputFile class="form-control" OnChange="LoadFile"></InputFile>
             </div>
-            <Button OnClickAsync="async ()=>{_selectedFont.Id=0; await UpsertFont();}" class="btn btn-primary">Add Font</Button>
-            <Button disabled="@(_selectedFont.Id==0)" OnClickAsync="async ()=>await UpsertFont()" class="btn btn-primary">Update Font</Button>
-            <Button disabled="@(_selectedFont.Id==0)" OnClick="DeleteFont" class="btn btn-primary">Delete Font</Button>
+            <Button OnClickAsync="async ()=>{_selectedFont!.Id=0; await UpsertFont();}" class="btn btn-primary">Add Font</Button>
+            <Button disabled="@(_selectedFont!.Id==0)" OnClickAsync="async ()=>await UpsertFont()" class="btn btn-primary">Update Font</Button>
+            <Button disabled="@(_selectedFont!.Id==0)" OnClick="DeleteFont" class="btn btn-primary">Delete Font</Button>
         </div>
     </div>
     <div class="col-md-12 d-flex flex-row-reverse">

@@ -85,6 +85,11 @@ namespace TheCardEditor.Main.Pages.Components
             await UpdateGrid();
         }
 
+        public async Task ExportCards()
+        {
+            await ModalHelper.ShowModal<ExportCardModal>("Exporting Cards...", new() { { nameof(ExportCardModal.CardIds), _selectedCards } });
+        }
+
         public async Task DeleteCards()
         {
             if (!await JsInterop.Confirm("Do you really want to delete: " + string.Join(",", _selectedCards.Select(id => _cardById[id].Name))))

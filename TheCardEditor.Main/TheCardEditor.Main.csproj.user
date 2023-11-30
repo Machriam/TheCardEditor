@@ -4,7 +4,7 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup>
-    <ActiveDebugProfile>Watch</ActiveDebugProfile>
+    <ActiveDebugProfile>Debug</ActiveDebugProfile>
     <DebugType>None</DebugType>
     <DebugSymbols>False</DebugSymbols>
     <_LastSelectedProfileId>C:\Users\GruselGusel\Desktop\Repos\TheCardEditor\TheCardEditor.Main\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
