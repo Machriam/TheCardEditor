@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 using TheCardEditor.DataModel.DTO;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Services;
@@ -18,7 +19,7 @@ namespace TheCardEditor.Main.Pages.Components
         private ServiceAccessor<CardSetService> CardSetService { get; set; } = default!;
 
         [Inject]
-        private IJsInterop JsInterop { get; set; } = default!;
+        private IJSRuntime JS { get; set; } = default!;
 
         [Inject]
         private ApplicationStorage ApplicationStorage { get; set; } = default!;
@@ -38,10 +39,10 @@ namespace TheCardEditor.Main.Pages.Components
             Games = GameService.Execute(s => s.GetGames());
             foreach (var font in Fonts)
             {
-                await JsInterop.LoadFont(font.Name, font.Base64Data);
+                await JS.LoadFont(font.Name, font.Base64Data);
                 ApplicationStorage.AvailableFonts.Add(font.Name);
             }
-            var existingFonts = await JsInterop.GetAvailableFonts();
+            var existingFonts = await JS.GetAvailableFonts();
             ApplicationStorage.AvailableFonts.AddRange(existingFonts);
             StateHasChanged();
         }
@@ -118,7 +119,7 @@ namespace TheCardEditor.Main.Pages.Components
         public async Task UpsertFont()
         {
             FontService.Execute((s, f) => s.UpdateFont(f), _selectedFont);
-            await JsInterop.LoadFont(_selectedFont.Name, _selectedFont.Base64Data);
+            await JS.LoadFont(_selectedFont.Name, _selectedFont.Base64Data);
             ReloadFonts();
         }
 

@@ -30,7 +30,7 @@ namespace TheCardEditor.Main.Pages.Components
         private ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
 
         [Inject]
-        private IJsInterop JsInterop { get; set; } = default!;
+        private IJSRuntime JS { get; set; } = default!;
 
         [Inject]
         private IShortcutRegistrator ShortcutRegistrator { get; set; } = default!;
@@ -106,7 +106,8 @@ namespace TheCardEditor.Main.Pages.Components
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (!firstRender) return;
-            _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, OnObjectSelected, OnObjectDeselected, OnMultiObjectIsSelected);
+            _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, OnObjectSelected,
+                OnObjectDeselected, OnMultiObjectIsSelected);
             var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
             await _canvasInterop.ImportJson(jsonObject ?? new JsonObject(), _pictureData);
             await _canvasInterop.Zoom(ApplicationStorage.SelectedCardSet?.Zoom ?? 100d);
@@ -114,30 +115,32 @@ namespace TheCardEditor.Main.Pages.Components
         }
 
         [JSInvokable]
-        public void OnObjectDeselected()
+        public Task OnObjectDeselected()
         {
             _multipleObjectsAreSelected = false;
             AddObjectX = 0;
             AddObjectY = 0;
             AddObjectAngle = 0;
             StateHasChanged();
+            return Task.CompletedTask;
         }
 
         [JSInvokable]
-        public void OnMultiObjectIsSelected()
+        public Task OnMultiObjectIsSelected()
         {
             _multipleObjectsAreSelected = true;
             StateHasChanged();
+            return Task.CompletedTask;
         }
 
         [JSInvokable]
-        public void OnObjectSelected(ObjectParameter param)
+        public async Task OnObjectSelected(ObjectParameter param)
         {
             _multipleObjectsAreSelected = false;
             AddObjectX = (int)param.Left;
             AddObjectY = (int)param.Top;
             AddObjectAngle = (decimal)param.Angle;
-            JsInterop.ConsoleLog("selected");
+            await JS.ConsoleLog("selected");
             FontSize = param.TextSize ?? FontSize;
             AddTag = param.Tag ?? "";
             StateHasChanged();
@@ -170,7 +173,7 @@ namespace TheCardEditor.Main.Pages.Components
         public async Task SaveAsTemplate()
         {
             await UpdateVirtualData();
-            var name = await JsInterop.Prompt("Enter name for new Template");
+            var name = await JS.GetUserString("Enter name for new Template");
             TemplateService.Execute(ts => ts.StoreTemplate(name, _currentCard));
         }
 
@@ -184,11 +187,11 @@ namespace TheCardEditor.Main.Pages.Components
 
         public async Task AskForNewTag()
         {
-            var newTag = await JsInterop.Prompt("Name of new Tag?");
+            var newTag = await JS.GetUserString("Name of new Tag?");
             if (string.IsNullOrWhiteSpace(newTag)) return;
             if (Tags.Contains(newTag))
             {
-                await JsInterop.LogError("Tag exists already");
+                await JS.LogError("Tag exists already");
                 return;
             }
             Tags.Add(newTag);
@@ -201,12 +204,12 @@ namespace TheCardEditor.Main.Pages.Components
             var json = await _canvasInterop.ExportJson();
             if (json.GetTags().Select(t => t.Tag).Contains(AddTag))
             {
-                await JsInterop.LogError("Tag already exists");
+                await JS.LogError("Tag already exists");
                 return;
             }
             if (string.IsNullOrWhiteSpace(AddTag))
             {
-                await JsInterop.LogError("Each textbox must have a tag");
+                await JS.LogError("Each textbox must have a tag");
                 return;
             }
             await _canvasInterop.DrawText(AddObjectX, AddObjectY, AddNewText, AddTag, FontSize);
@@ -250,7 +253,7 @@ namespace TheCardEditor.Main.Pages.Components
         {
             if (style == CanvasFontStyle.Fill)
             {
-                value = await JsInterop.Prompt("Enter colorcode:");
+                value = await JS.GetUserString("Enter colorcode:");
             }
             await _canvasInterop.ApplyFont(style, value);
         }
@@ -263,7 +266,7 @@ namespace TheCardEditor.Main.Pages.Components
         public async Task Close()
         {
             await UpdateVirtualData();
-            if (_currentCard.IsModified() && !await JsInterop.Confirm("You have unsaved data. Do you really want to exit?")) return;
+            if (_currentCard.IsModified() && !await JS.Confirm("You have unsaved data. Do you really want to exit?")) return;
             Dispose();
             await ModalInstance.CloseAsync();
         }

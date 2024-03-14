@@ -29,7 +29,7 @@ namespace TheCardEditor.Main.Pages.Components
     {
         private const string GridId = "CardGrid";
         [Inject] private IGridViewFactory GridViewFactory { get; set; } = default!;
-        [Inject] private IJsInterop JsInterop { get; set; } = default!;
+        [Inject] private IJSRuntime JS { get; set; } = default!;
         [Inject] private ServiceAccessor<CardService> CardService { get; set; } = default!;
         [Inject] private ApplicationStorage ApplicationStorage { get; set; } = default!;
         [Inject] private IModalHelper ModalHelper { get; set; } = default!;
@@ -92,7 +92,7 @@ namespace TheCardEditor.Main.Pages.Components
 
         public async Task DeleteCards()
         {
-            if (!await JsInterop.Confirm("Do you really want to delete: " + string.Join(",", _selectedCards.Select(id => _cardById[id].Name))))
+            if (!await JS.Confirm("Do you really want to delete: " + string.Join(",", _selectedCards.Select(id => _cardById[id].Name))))
                 return;
             foreach (var id in _selectedCards)
             {

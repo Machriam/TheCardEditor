@@ -24,7 +24,7 @@ namespace TheCardEditor.Main.Pages.Components
         private ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
 
         [Inject]
-        private IJsInterop JsInterop { get; set; } = default!;
+        private IJSRuntime JS { get; set; } = default!;
 
         [Inject]
         private ApplicationStorage ApplicationStorage { get; set; } = default!;
@@ -60,7 +60,7 @@ namespace TheCardEditor.Main.Pages.Components
         public async Task DeleteTemplate()
         {
             if (_selectedTemplate == null) return;
-            var confirmation = await JsInterop.Confirm("Do you really want to delete the template?");
+            var confirmation = await JS.Confirm("Do you really want to delete the template?");
             if (!confirmation) return;
             TemplateService.Execute(ts => ts.DeleteTemplate(_selectedTemplate.Value));
             if (ApplicationStorage.SelectedCardSet == null) return;

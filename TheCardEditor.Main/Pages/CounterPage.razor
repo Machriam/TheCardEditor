@@ -25,7 +25,7 @@
             @foreach (var item in _canvasObjects)
             {
                 <div style="cursor:pointer;" class="hovery"
-                @onclick="@(async ()=>{SelectIndex=item.Index; await SelectObject();})">
+                     @onclick="@(async ()=>{SelectIndex=item.Index; await SelectObject();})">
                     <span>@item.Name</span><span>@item.Tag</span><span>@item.Index</span>
                 </div>
             }
@@ -68,7 +68,7 @@
 
 
 @code {
-    [Inject] IJsInterop JsInterop { get; set; } = default!;
+    [Inject] IJSRuntime JS { get; set; } = default!;
     [Inject] ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
     private ICanvasInterop _canvasInterop = default!;
     public const string Location = "Counter";
@@ -83,14 +83,14 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        AvailableFonts.AddRange(await JsInterop.GetAvailableFonts());
+        AvailableFonts.AddRange(await JS.GetAvailableFonts());
         _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, ObjectSelected, ObjectDeselected, MultiObjectSelected);
         StateHasChanged();
     }
     private async Task LoadFont()
     {
         var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ShittyFont.woff2");
-        await JsInterop.LoadFont("Shitty Test Font", Convert.ToBase64String(File.ReadAllBytes(path)));
+        await JS.LoadFont("Shitty Test Font", Convert.ToBase64String(File.ReadAllBytes(path)));
         AvailableFonts.Add("Shitty Test Font");
         StateHasChanged();
     }

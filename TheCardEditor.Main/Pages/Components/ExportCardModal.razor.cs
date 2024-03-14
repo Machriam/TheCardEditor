@@ -28,7 +28,7 @@ namespace TheCardEditor.Main.Pages.Components
         [Inject] private ServiceAccessor<PictureService> PictureService { get; set; } = default!;
 
         [Inject] private ICanvasInteropFactory CanvasInteropFactory { get; set; } = default!;
-        [Inject] private IJsInterop JsInterop { get; set; } = default!;
+        [Inject] private IJSRuntime JS { get; set; } = default!;
 
         [Inject] private ApplicationStorage ApplicationStorage { get; set; } = default!;
 
@@ -80,7 +80,7 @@ namespace TheCardEditor.Main.Pages.Components
                 var pngData = new PngExportData() { Name = currentCard.Name, PNG = png };
                 File.WriteAllBytes(result.FilePath + "/" + pngData.Name + ".png", pngData.PNGData);
             }
-            if (errors.Length != 0) await JsInterop.Prompt(errors.ToString());
+            if (errors.Length != 0) await JS.Prompt(errors.ToString());
             await ModalInstance.CloseAsync();
         }
 

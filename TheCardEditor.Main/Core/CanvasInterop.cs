@@ -21,6 +21,8 @@ public struct ObjectParameter
 
 public delegate void SelectCanvasObjectHandler(ObjectParameter param);
 
+public delegate Task SelectCanvasObjectHandlerAsync(ObjectParameter param);
+
 public enum CanvasFontStyle
 {
     [Description("stroke")]
@@ -60,7 +62,12 @@ public enum CanvasFontStyle
 public interface ICanvasInteropFactory
 {
     ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId,
-            SelectCanvasObjectHandler objectSelectionHandler, Action objectDeselectionHandler, Action multiObjectSelectionHandler) where TView : class;
+        SelectCanvasObjectHandlerAsync objectSelectionHandler, Func<Task> objectDeselectionHandler,
+        Func<Task> multiObjectSelectionHandler) where TView : class;
+
+    ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId,
+    SelectCanvasObjectHandler objectSelectionHandler, Action objectDeselectionHandler,
+    Action multiObjectSelectionHandler) where TView : class;
 }
 
 public class CanvasParameter
@@ -83,7 +90,16 @@ public class CanvasInteropFactory : ICanvasInteropFactory
     }
 
     public ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId,
-        SelectCanvasObjectHandler objectSelectionHandler, Action objectDeselectionHandler, Action multiObjectSelectionHandler) where TView : class
+        SelectCanvasObjectHandlerAsync objectSelectionHandler, Func<Task> objectDeselectionHandler,
+        Func<Task> multiObjectSelectionHandler) where TView : class
+    {
+        return new CanvasInterop<TView>(_jsRuntime, divId, objectReference, _hotKeys, objectSelectionHandler.Method.Name,
+            objectDeselectionHandler.Method.Name, multiObjectSelectionHandler.Method.Name);
+    }
+
+    public ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId,
+    SelectCanvasObjectHandler objectSelectionHandler, Action objectDeselectionHandler,
+    Action multiObjectSelectionHandler) where TView : class
     {
         return new CanvasInterop<TView>(_jsRuntime, divId, objectReference, _hotKeys, objectSelectionHandler.Method.Name,
             objectDeselectionHandler.Method.Name, multiObjectSelectionHandler.Method.Name);
