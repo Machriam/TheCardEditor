@@ -12,6 +12,7 @@ public struct ObjectParameter
     {
     }
 
+    public long PictureId { get; set; }
     public float Left { get; set; }
     public float Top { get; set; }
     public float Angle { get; set; }
@@ -138,7 +139,7 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask<ObjectParameter> GetObjectParameter();
 
-    ValueTask AddFilter(int index);
+    ValueTask UpdateImage(string base64Image);
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -172,7 +173,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string JsCenterObjects => Namespace + ".centerObjects";
     private static string JsReset => Namespace + ".reset";
     private static string JsGetObjectParameter => Namespace + ".getObjectParameter";
-    private static string JsAddFilter => Namespace + ".addFilter";
+    private static string JsUpdateImage => Namespace + ".updateImage";
 
     public CanvasInterop(IJSRuntime jsruntime, string divId, TView objectReference, HotKeys hotKeys, string selectionHandlerName, string deselectionHandlerName,
                          string multiObjectSelectedHandler)
@@ -224,10 +225,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         return await _jsRuntime.HandledInvoke<ObjectParameter>(JsGetObjectParameter, _divId);
     }
 
-    public async ValueTask AddFilter(int index)
+    public async ValueTask UpdateImage(string base64Image)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsAddFilter, index, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsUpdateImage, base64Image, _divId);
     }
 
     public async ValueTask<int> SendBackwards(int index)

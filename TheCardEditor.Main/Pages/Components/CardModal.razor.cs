@@ -67,6 +67,7 @@ namespace TheCardEditor.Main.Pages.Components
         private Dictionary<long, string> _pictureData = new();
         private Dictionary<long, PictureModel> _pictureById = new();
         private PictureModel? _selectedPicture;
+        private ObjectParameter? _selectedObjectParams;
         private int _selectedIndex;
 
         public async Task OnCoordinatesChanged(int? x, int? y, decimal? angle)
@@ -137,6 +138,7 @@ namespace TheCardEditor.Main.Pages.Components
         public async Task OnObjectSelected(ObjectParameter param)
         {
             _multipleObjectsAreSelected = false;
+            _selectedObjectParams = param;
             AddObjectX = (int)param.Left;
             AddObjectY = (int)param.Top;
             AddObjectAngle = (decimal)param.Angle;
@@ -148,7 +150,10 @@ namespace TheCardEditor.Main.Pages.Components
 
         private async Task AddFilter()
         {
-            await _canvasInterop.AddFilter(_selectedIndex);
+            if (_selectedObjectParams == null || _multipleObjectsAreSelected) return;
+            var base64Text = PictureService.Execute(ps => ps.GetBase64Picture(_selectedObjectParams.Value.PictureId)) ?? "";
+            var cannyImage = await JS.ExecuteModuleFunction<string>("Canny", new[] { base64Text }, "/lib/OpenCvInterop.js");
+            await _canvasInterop.UpdateImage(cannyImage);
             await UpdateVirtualData();
         }
 
@@ -156,7 +161,7 @@ namespace TheCardEditor.Main.Pages.Components
         {
             _currentCard = CardService.Execute(cs => cs.GetCard(CardId)) ?? new();
             var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
-            await _canvasInterop.ImportJson(jsonObject ?? new JsonObject(), _pictureData);
+            await _canvasInterop.ImportJson(jsonObject ?? [], _pictureData);
         }
 
         public async Task CenterObjects()
@@ -175,12 +180,6 @@ namespace TheCardEditor.Main.Pages.Components
             await UpdateVirtualData();
             var name = await JS.GetUserString("Enter name for new Template");
             TemplateService.Execute(ts => ts.StoreTemplate(name, _currentCard));
-        }
-
-        public async Task ApplyFilter()
-        {
-            var imageData = "";
-            var cannyImage = await JS.ExecuteModuleFunction<string>("Canny", new[] { imageData }, "/lib/OpenCvInterop.js");
         }
 
         public async Task InsertPicture()

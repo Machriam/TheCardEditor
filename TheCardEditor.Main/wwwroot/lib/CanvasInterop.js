@@ -11,8 +11,8 @@
     static removeInstance(divId) {
         delete window.canvasInteropFunctions.instance[divId];
     }
-    createObjectParameter(left = 0, top = 0, tag = null, angle = 0, textSize = null) {
-        return { "left": left, "top": top, "tag": tag, "angle": angle, "textSize": textSize };
+    createObjectParameter(left = 0, top = 0, tag = null, angle = 0, textSize = null, pictureId = -1) {
+        return { "left": left, "top": top, "tag": tag, "angle": angle, "textSize": textSize, "pictureId": pictureId };
     }
     onSelectionCleared(evt) {
         const id = evt.hasOwnProperty("target") ? evt.target.canvas.lowerCanvasEl.id : evt.deselected[0].canvas.lowerCanvasEl.id;
@@ -26,7 +26,7 @@
         const textSize = evt.target.styles?.[0]?.[0]?.["fontSize"] ?? evt.target.fontSize ?? null;
         instance.parameter.dotnetReference.invokeMethodAsync(
             instance.parameter.objectSelectionHandler,
-            instance.createObjectParameter(evt.target.left, evt.target.top, evt.target.tag, evt.target.angle, textSize));
+            instance.createObjectParameter(evt.target.left, evt.target.top, evt.target.tag, evt.target.angle, textSize, evt.target.pictureId));
     }
     onElementSelected(evt) {
         const id = evt.selected[0].canvas.lowerCanvasEl.id;
@@ -39,7 +39,7 @@
             instance.parameter.dotnetReference.invokeMethodAsync(
                 instance.parameter.objectSelectionHandler,
                 instance.createObjectParameter(evt.selected[0].left, evt.selected[0].top,
-                    evt.selected[0].tag ?? evt.selected[0].toObject().tag, evt.selected[0].angle, textSize));
+                    evt.selected[0].tag ?? evt.selected[0].toObject().tag, evt.selected[0].angle, textSize, evt.selected[0].pictureId));
         }
     }
     getElement() {
@@ -68,19 +68,12 @@ window.canvasInteropFunctions = {
         instance.canvas.setActiveObject(instance.canvas.item(index));
         instance.canvas.renderAll();
     },
-    addFilter: function (index, divId) {
+    updateImage: function (newImage, divId) {
         const instance = CanvasInterop.getInstance(divId);
         const applyTo = instance.canvas.getActiveObject();
-        const filterImage = instance.canvas.item(index);
-        filter = new fabric.Image.filters.BlendImageNew({
-            image: filterImage,
-            mode: 'multiply',
-            alpha: 0.5
+        applyTo.setSrc(newImage, function () {
+            instance.canvas.renderAll();
         });
-        applyTo.filters.length = 0;
-        applyTo.filters.push(filter);
-        applyTo.applyFilters();
-        instance.canvas.renderAll();
     },
     getObjectParameter: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
