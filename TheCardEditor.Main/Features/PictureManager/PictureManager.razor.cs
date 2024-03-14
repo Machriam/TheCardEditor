@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
-using TheCardEditor.DataModel.DTO;
 using TheCardEditor.Main.UiComponents;
 using TheCardEditor.Services;
+using TheCardEditor.Shared.DTO;
 
-namespace TheCardEditor.Main.Pages.Components
+namespace TheCardEditor.Main.Features.PictureManager
 {
     public partial class PictureManager
     {

@@ -1,5 +1,9 @@
-﻿@using System.Text.Json;
-@using TheCardEditor.DataModel.DTO;
+﻿@using TheCardEditor.Main.Features.BatchTextEditor
+@using TheCardEditor.Main.Features.CardEditor
+@using TheCardEditor.Main.Features.PictureManager
+@using TheCardEditor.Main.Features.Testing
+@using TheCardEditor.Shared.DTO
+@using TheCardEditor.Main.Features.Home
 <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3 fixed-top">
     <div class="container" style="height:30px">
         <button class="navbar-toggler" @onclick="ToggleNavMenu" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -68,7 +72,7 @@
         ApplicationStorage.CardSelectionChanged += OnCardSelectionChanged;
         var gameData = await LocalStorageInterop.GetItem(SelectedGameData);
         if (string.IsNullOrEmpty(gameData)) return;
-        var gameObject = JsonSerializer.Deserialize<SelectedGameObject>(gameData);
+        var gameObject = gameData.FromJson<SelectedGameObject>();
         if (gameObject == null || gameObject.Game.Id == 0 || gameObject.CardSet.Id == 0) return;
         var cardSets = CardSetService.Execute((s, g) => s.GetCardSets(g.Id), gameObject.Game);
         var games = GameService.Execute(s => s.GetGames());
@@ -90,11 +94,11 @@
     private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
     async Task OnCardSelectionChanged()
     {
-        await LocalStorageInterop.SetItem(SelectedGameData, JsonSerializer.Serialize(new SelectedGameObject()
+        await LocalStorageInterop.SetItem(SelectedGameData, new SelectedGameObject()
             {
                 CardSet = ApplicationStorage.SelectedCardSet ?? new(),
                 Game = ApplicationStorage.SelectedGame ?? new()
-            }));
+            }.AsJson());
         StateHasChanged();
     }
 

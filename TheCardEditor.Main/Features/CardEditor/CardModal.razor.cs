@@ -4,13 +4,13 @@ using System.Text.Json.Nodes;
 using Blazored.Modal;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using TheCardEditor.DataModel.DTO;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Services;
 using TheCardEditor.Shared;
+using TheCardEditor.Shared.DTO;
 using Toolbelt.Blazor.HotKeys2;
 
-namespace TheCardEditor.Main.Pages.Components
+namespace TheCardEditor.Main.Features.CardEditor
 {
     public partial class CardModal
     {

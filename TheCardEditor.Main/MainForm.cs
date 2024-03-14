@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.WebView.WindowsForms;
 using Microsoft.Extensions.DependencyInjection;
-using TheCardEditor.Main.AppLayout;
 using TheCardEditor.Main.Core;
+using TheCardEditor.Main.Features.AppLayout;
 
 namespace TheCardEditor;
 

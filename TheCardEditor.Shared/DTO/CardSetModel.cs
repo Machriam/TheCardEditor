@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using TheCardEditor.DataModel.DataModel;
 
-namespace TheCardEditor.DataModel.DTO;
+namespace TheCardEditor.Shared.DTO;
 
 public class CardSetModel
 {

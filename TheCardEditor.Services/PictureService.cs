@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using TheCardEditor.DataModel.DataModel;
-using TheCardEditor.DataModel.DTO;
+using TheCardEditor.Shared.DTO;
 
 namespace TheCardEditor.Services;
 

@@ -6,7 +6,7 @@ using TheCardEditor.Main.Core.Grid;
 using TheCardEditor.Services;
 using TheCardEditor.Shared;
 
-namespace TheCardEditor.Main.Pages.Components
+namespace TheCardEditor.Main.Features.CardEditor
 {
     public class CardGridModel : AbstractGridModel
     {

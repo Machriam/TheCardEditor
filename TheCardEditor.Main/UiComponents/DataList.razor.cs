@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using TheCardEditor.Shared;
 
-namespace TheCardEditor.Main.Pages.Components;
+namespace TheCardEditor.Main.UiComponents;
 
 public class DataListEntry
 {

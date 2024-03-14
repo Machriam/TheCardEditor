@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using TheCardEditor.DataModel.DataModel;
 
-namespace TheCardEditor.DataModel.DTO;
+namespace TheCardEditor.Shared.DTO;
 
 public class CardModel
 {

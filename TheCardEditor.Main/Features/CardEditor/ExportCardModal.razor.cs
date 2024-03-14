@@ -7,7 +7,7 @@ using TheCardEditor.Main.UiComponents;
 using TheCardEditor.Services;
 using TheCardEditor.Shared;
 
-namespace TheCardEditor.Main.Pages.Components
+namespace TheCardEditor.Main.Features.CardEditor
 {
     public partial class ExportCardModal
     {

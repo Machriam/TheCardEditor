@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using TheCardEditor.DataModel.DTO;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Services;
+using TheCardEditor.Shared.DTO;
 
-namespace TheCardEditor.Main.Pages.Components
+namespace TheCardEditor.Main.Features.Home
 {
     public partial class Home
     {
