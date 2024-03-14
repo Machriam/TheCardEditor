@@ -9,7 +9,7 @@ export function DrawSourceImage(guid, data) {
     };
 }
 export async function ApplyFilterPipeline(base64Url, pipeline) {
-    const filterFunctions = [Canny, MedianBlur];
+    const filterFunctions = [Canny, MedianBlur, TransparentFilter];
     const filterByName = Object.assign({}, ...filterFunctions.map((x) => ({ [x.name]: x })));
     const source = document.createElement("img");
     source.src = base64Url;
@@ -21,6 +21,33 @@ export async function ApplyFilterPipeline(base64Url, pipeline) {
             filterByName[pipeline.filters[i].name](dest, dest, pipeline.filters[i].parameters.map(p => p.parsedValue))
         }
     });
+}
+async function TransparentFilter(src, dest) {
+    let rgbPlanes = new cv.MatVector();
+    let mergedPlanes = new cv.MatVector();
+    cv.cvtColor(src, src, cv.COLOR_RGB2RGBA);
+    cv.split(src, rgbPlanes);
+    let R = rgbPlanes.get(0);
+    let G = rgbPlanes.get(1);
+    let B = rgbPlanes.get(2);
+    const clipProtection = 1 / 3;
+    const ones = new cv.Mat(R.rows, R.cols, cv.CV_8UC1, new cv.Scalar(1));
+    const A = new cv.Mat(R.rows, R.cols, cv.CV_8UC1, new cv.Scalar(255));
+    let clipR = R.mul(ones, clipProtection);
+    let clipG = G.mul(ones, clipProtection);
+    let clipB = B.mul(ones, clipProtection);
+    cv.subtract(A, clipR, A);
+    cv.subtract(A, clipG, A);
+    cv.subtract(A, clipB, A);
+    mergedPlanes.push_back(R);
+    mergedPlanes.push_back(G);
+    mergedPlanes.push_back(B);
+    mergedPlanes.push_back(A);
+    cv.merge(mergedPlanes, dest);
+    rgbPlanes.delete();
+    mergedPlanes.delete();
+    ones.delete();
+    A.delete();
 }
 async function Canny(src, dest, params) {
     cv.Canny(src, dest, params[0], params[1], params[2], params[3]);

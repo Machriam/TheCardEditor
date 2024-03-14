@@ -142,7 +142,6 @@ namespace TheCardEditor.Main.Features.CardEditor
             AddObjectX = (int)param.Left;
             AddObjectY = (int)param.Top;
             AddObjectAngle = (decimal)param.Angle;
-            await JS.ConsoleLog(param.AsJson());
             FontSize = param.TextSize ?? FontSize;
             AddTag = param.Tag ?? "";
             StateHasChanged();
@@ -154,7 +153,8 @@ namespace TheCardEditor.Main.Features.CardEditor
             var base64Text = PictureService.Execute(ps => ps.GetBase64Picture(_selectedObjectParams.Value.PictureId)) ?? "";
             var pipeline = new ImageFilterPipeline()
             {
-                Filters = [ new ImageFilterModel() { Name = "Canny", Parameters = [
+                Filters = [
+                    new ImageFilterModel() { Name = "TransparentFilter", Parameters = [
                     new FilterParameter() { Name="Threshold 1",Type=FilterParameterType.Double,Value="100" },
                     new FilterParameter() { Name="Threshold 2",Type=FilterParameterType.Double,Value="300" },
                     new FilterParameter() { Name="Aperture Size",Type=FilterParameterType.Int,Value="3" },
