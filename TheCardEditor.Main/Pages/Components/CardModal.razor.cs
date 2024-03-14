@@ -99,7 +99,6 @@ namespace TheCardEditor.Main.Pages.Components
             _pictureById = PictureService.Execute(ps => ps.GetPictures()).ToDictionary(p => p.Id);
             if (ApplicationStorage.SelectedCardSet == null) return;
             _selectedFont = ApplicationStorage.AvailableFonts.FirstOrDefault() ?? "Arial";
-            Console.WriteLine(ApplicationStorage.SelectedCardSet.Zoom);
             Height = (int)(ApplicationStorage.SelectedCardSet.Height * ApplicationStorage.SelectedCardSet.Zoom / 100f);
             Width = (int)(ApplicationStorage.SelectedCardSet.Width * ApplicationStorage.SelectedCardSet.Zoom / 100f);
         }
