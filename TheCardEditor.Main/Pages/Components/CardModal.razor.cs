@@ -140,7 +140,7 @@ namespace TheCardEditor.Main.Pages.Components
             AddObjectX = (int)param.Left;
             AddObjectY = (int)param.Top;
             AddObjectAngle = (decimal)param.Angle;
-            await JS.ConsoleLog("selected");
+            await JS.ConsoleLog(param.AsJson());
             FontSize = param.TextSize ?? FontSize;
             AddTag = param.Tag ?? "";
             StateHasChanged();
@@ -175,6 +175,12 @@ namespace TheCardEditor.Main.Pages.Components
             await UpdateVirtualData();
             var name = await JS.GetUserString("Enter name for new Template");
             TemplateService.Execute(ts => ts.StoreTemplate(name, _currentCard));
+        }
+
+        public async Task ApplyFilter()
+        {
+            var imageData = "";
+            var cannyImage = await JS.ExecuteModuleFunction<string>("Canny", new[] { imageData }, "/lib/OpenCvInterop.js");
         }
 
         public async Task InsertPicture()

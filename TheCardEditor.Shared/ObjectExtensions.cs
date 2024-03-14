@@ -57,7 +57,7 @@ public static class ObjectExtensions
         }
     }
 
-    public static string AsJson<T>(this T obj, bool includeFields = true, bool ignoreCycles = true) where T : class
+    public static string AsJson<T>(this T obj, bool includeFields = true, bool ignoreCycles = true)
     {
         return JsonSerializer.Serialize(obj, new JsonSerializerOptions()
         {
