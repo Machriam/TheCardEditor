@@ -1,6 +1,6 @@
 ﻿using TheCardEditor.DataModel.DataModel;
 
-namespace TheCardEditor.DataModel.DTO;
+namespace TheCardEditor.Shared.DTO;
 
 public class GameModel
 {

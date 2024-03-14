@@ -1,6 +1,6 @@
 ﻿using TheCardEditor.Shared;
 
-namespace TheCardEditor.DataModel.DTO;
+namespace TheCardEditor.Shared.DTO;
 
 public class PictureModel : IDataListItem
 {

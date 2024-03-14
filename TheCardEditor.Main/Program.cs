@@ -38,8 +38,7 @@ internal static class Program
 #endif
         services.AddSingleton<MainForm>();
         services.AddSingleton<IModalHelper, ModalHelper>();
-        services.AddTransient<IErrorLogger, JsInterop>();
-        services.AddTransient<IJsInterop, JsInterop>();
+        services.AddTransient<IErrorLogger, ErrorLogger>();
         services.AddTransient<ILocalStorageInterop, LocalStorageInterop>();
         services.AddTransient<IGridViewFactory, GridViewFactory>();
         services.AddSingleton<ApplicationStorage>();

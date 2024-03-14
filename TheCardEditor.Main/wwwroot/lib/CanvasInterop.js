@@ -1,7 +1,12 @@
 ﻿class CanvasInterop {
     parameter;
     divId;
+    static opencv;
     canvas;
+    async getOpenCv() {
+        if (this.opencv == undefined) this.opencv = await import("/lib/OpenCvInterop.js");
+        return this.opencv;
+    }
     static getInstance(divId) {
         if (!window.canvasInteropFunctions.instance.hasOwnProperty(divId)) {
             window.canvasInteropFunctions.instance[divId] = new CanvasInterop();
@@ -11,8 +16,8 @@
     static removeInstance(divId) {
         delete window.canvasInteropFunctions.instance[divId];
     }
-    createObjectParameter(left = 0, top = 0, tag = null, angle = 0, textSize = null) {
-        return { "left": left, "top": top, "tag": tag, "angle": angle, "textSize": textSize };
+    createObjectParameter(left = 0, top = 0, tag = null, angle = 0, textSize = null, pictureId = -1) {
+        return { "left": left, "top": top, "tag": tag, "angle": angle, "textSize": textSize, "pictureId": pictureId };
     }
     onSelectionCleared(evt) {
         const id = evt.hasOwnProperty("target") ? evt.target.canvas.lowerCanvasEl.id : evt.deselected[0].canvas.lowerCanvasEl.id;
@@ -26,7 +31,7 @@
         const textSize = evt.target.styles?.[0]?.[0]?.["fontSize"] ?? evt.target.fontSize ?? null;
         instance.parameter.dotnetReference.invokeMethodAsync(
             instance.parameter.objectSelectionHandler,
-            instance.createObjectParameter(evt.target.left, evt.target.top, evt.target.tag, evt.target.angle, textSize));
+            instance.createObjectParameter(evt.target.left, evt.target.top, evt.target.tag, evt.target.angle, textSize, evt.target.pictureId));
     }
     onElementSelected(evt) {
         const id = evt.selected[0].canvas.lowerCanvasEl.id;
@@ -39,7 +44,7 @@
             instance.parameter.dotnetReference.invokeMethodAsync(
                 instance.parameter.objectSelectionHandler,
                 instance.createObjectParameter(evt.selected[0].left, evt.selected[0].top,
-                    evt.selected[0].tag ?? evt.selected[0].toObject().tag, evt.selected[0].angle, textSize));
+                    evt.selected[0].tag ?? evt.selected[0].toObject().tag, evt.selected[0].angle, textSize, evt.selected[0].pictureId));
         }
     }
     getElement() {
@@ -68,19 +73,13 @@ window.canvasInteropFunctions = {
         instance.canvas.setActiveObject(instance.canvas.item(index));
         instance.canvas.renderAll();
     },
-    addFilter: function (index, divId) {
+    updateImage: function (newImage, filterPipeline, divId) {
         const instance = CanvasInterop.getInstance(divId);
         const applyTo = instance.canvas.getActiveObject();
-        const filterImage = instance.canvas.item(index);
-        filter = new fabric.Image.filters.BlendImageNew({
-            image: filterImage,
-            mode: 'multiply',
-            alpha: 0.5
+        applyTo.setSrc(newImage, function () {
+            instance.canvas.renderAll();
         });
-        applyTo.filters.length = 0;
-        applyTo.filters.push(filter);
-        applyTo.applyFilters();
-        instance.canvas.renderAll();
+        applyTo.pictureFilter = JSON.stringify(filterPipeline);
     },
     getObjectParameter: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
@@ -186,14 +185,13 @@ window.canvasInteropFunctions = {
             canvas.renderAll();
         }
     },
-    drawPicture: function (xPos, yPos, pictureId, name, image, divId) {
+    drawPicture: function (xPos, yPos, pictureId, name, image, pictureFilter, divId) {
         const instance = CanvasInterop.getInstance(divId);
         fabric.Image.fromURL(image, function (img) {
             img.set({ left: xPos, top: yPos });
             img.toObject = (function (toObject) {
                 return function () {
-                    return fabric.util.object.extend(toObject.call(this),
-                        { pictureId: pictureId, name: name });
+                    return fabric.util.object.extend(toObject.call(this), { pictureId: pictureId, pictureFilter: pictureFilter, name: name });
                 };
             })(img.toObject);
             instance.canvas.add(img);
@@ -232,7 +230,7 @@ window.canvasInteropFunctions = {
     },
     exportJson: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
-        let result = instance.canvas.toJSON(["tag", "pictureId", "name", "lockScalingY"]);
+        let result = instance.canvas.toJSON(["tag", "pictureFilter", "pictureId", "name", "lockScalingY"]);
         result.objects = result.objects.map((o, i) => {
             if (o.type == "textbox") o.styles = instance.canvas._objects[i].styles;
             o.src = "";
@@ -247,10 +245,17 @@ window.canvasInteropFunctions = {
         return instance.canvas.loadFromJSON(json);
     },
 
-    importJson: function (json, pictureData, divId) {
-        if (json == null || Object.keys(json).length == 0) return;
-        json.objects.map(o => o.src = pictureData.hasOwnProperty(o.pictureId) ? pictureData[o.pictureId] : "");
+    importJson: async function (json, pictureData, divId) {
         const instance = CanvasInterop.getInstance(divId);
+        const opencv = await instance.getOpenCv();
+        if (json == null || Object.keys(json).length == 0) return;
+        for (let i = 0; i < json.objects.length; i++) {
+            const object = json.objects[i];
+            if (!pictureData.hasOwnProperty(object.pictureId)) continue;
+            const filter = JSON.parse(object.pictureFilter ?? "{}");
+            if (filter?.filters?.length > 0) object.src = await opencv.ApplyFilterPipeline(pictureData[object.pictureId], filter);
+            else object.src = pictureData[object.pictureId];
+        }
         return instance.canvas.loadFromJSON(json);
     },
     exportCanvas: function (divId) {

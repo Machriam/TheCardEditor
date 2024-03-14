@@ -1,4 +1,4 @@
-﻿using TheCardEditor.DataModel.DTO;
+﻿using TheCardEditor.Shared.DTO;
 
 namespace TheCardEditor.Main.Core;
 

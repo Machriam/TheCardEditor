@@ -2,6 +2,7 @@
 using System.Text.Json.Nodes;
 using Microsoft.JSInterop;
 using TheCardEditor.Shared;
+using TheCardEditor.Shared.Features.CardEditor;
 using Toolbelt.Blazor.HotKeys2;
 
 namespace TheCardEditor.Main.Core;
@@ -12,6 +13,7 @@ public struct ObjectParameter
     {
     }
 
+    public long PictureId { get; set; }
     public float Left { get; set; }
     public float Top { get; set; }
     public float Angle { get; set; }
@@ -20,6 +22,8 @@ public struct ObjectParameter
 }
 
 public delegate void SelectCanvasObjectHandler(ObjectParameter param);
+
+public delegate Task SelectCanvasObjectHandlerAsync(ObjectParameter param);
 
 public enum CanvasFontStyle
 {
@@ -60,7 +64,12 @@ public enum CanvasFontStyle
 public interface ICanvasInteropFactory
 {
     ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId,
-            SelectCanvasObjectHandler objectSelectionHandler, Action objectDeselectionHandler, Action multiObjectSelectionHandler) where TView : class;
+        SelectCanvasObjectHandlerAsync objectSelectionHandler, Func<Task> objectDeselectionHandler,
+        Func<Task> multiObjectSelectionHandler) where TView : class;
+
+    ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId,
+    SelectCanvasObjectHandler objectSelectionHandler, Action objectDeselectionHandler,
+    Action multiObjectSelectionHandler) where TView : class;
 }
 
 public class CanvasParameter
@@ -83,7 +92,16 @@ public class CanvasInteropFactory : ICanvasInteropFactory
     }
 
     public ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId,
-        SelectCanvasObjectHandler objectSelectionHandler, Action objectDeselectionHandler, Action multiObjectSelectionHandler) where TView : class
+        SelectCanvasObjectHandlerAsync objectSelectionHandler, Func<Task> objectDeselectionHandler,
+        Func<Task> multiObjectSelectionHandler) where TView : class
+    {
+        return new CanvasInterop<TView>(_jsRuntime, divId, objectReference, _hotKeys, objectSelectionHandler.Method.Name,
+            objectDeselectionHandler.Method.Name, multiObjectSelectionHandler.Method.Name);
+    }
+
+    public ICanvasInterop CreateCanvas<TView>(TView objectReference, string divId,
+    SelectCanvasObjectHandler objectSelectionHandler, Action objectDeselectionHandler,
+    Action multiObjectSelectionHandler) where TView : class
     {
         return new CanvasInterop<TView>(_jsRuntime, divId, objectReference, _hotKeys, objectSelectionHandler.Method.Name,
             objectDeselectionHandler.Method.Name, multiObjectSelectionHandler.Method.Name);
@@ -122,7 +140,7 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask<ObjectParameter> GetObjectParameter();
 
-    ValueTask AddFilter(int index);
+    ValueTask UpdateImage(string base64Image, ImageFilterPipeline filterPipeline);
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -156,7 +174,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string JsCenterObjects => Namespace + ".centerObjects";
     private static string JsReset => Namespace + ".reset";
     private static string JsGetObjectParameter => Namespace + ".getObjectParameter";
-    private static string JsAddFilter => Namespace + ".addFilter";
+    private static string JsUpdateImage => Namespace + ".updateImage";
 
     public CanvasInterop(IJSRuntime jsruntime, string divId, TView objectReference, HotKeys hotKeys, string selectionHandlerName, string deselectionHandlerName,
                          string multiObjectSelectedHandler)
@@ -208,10 +226,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         return await _jsRuntime.HandledInvoke<ObjectParameter>(JsGetObjectParameter, _divId);
     }
 
-    public async ValueTask AddFilter(int index)
+    public async ValueTask UpdateImage(string base64Image, ImageFilterPipeline filterPipeline)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsAddFilter, index, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsUpdateImage, base64Image, filterPipeline, _divId);
     }
 
     public async ValueTask<int> SendBackwards(int index)

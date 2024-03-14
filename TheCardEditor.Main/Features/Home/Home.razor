@@ -1,0 +1,69 @@
+@using System.Security.Cryptography;
+@using Microsoft.AspNetCore.Components.Forms
+<div class="col-md-12 row">
+    <div class="col-md-4">
+        <h2>Games</h2>
+        @foreach (var game in Games)
+        {
+            <div @onclick="()=>GameSelected(game)" style="background-color:@(_selectedGame.Id==game.Id?"lightblue":"")">
+                <label class="col-form-label-lg">@game.Name</label>
+            </div>
+        }
+        <FloatingInput ValueSelector="()=>_selectedGame.Name" Label="Game Name" InputChanged="a=>_selectedGame.Name=a" />
+        <Button class="btn btn-primary" OnClick="()=>{_selectedGame.Id=0; UpsertGame();}">Add Game</Button>
+        <Button disabled="@(_selectedGame.Id==0)" class="btn btn-primary" OnClick="UpsertGame">Update Game</Button>
+        <Button disabled="@(_selectedGame.Id==0)" class="btn btn-primary" OnClick="DeleteGame">Delete Game</Button>
+    </div>
+    <div class="col-md-4">
+        <h2>Card Set</h2>
+        @if (_selectedGame.Id != 0)
+        {
+            @foreach (var cardSet in CardSets)
+            {
+                <div @onclick="@(()=>_selectedCardSet=cardSet)" style="background-color:@(_selectedCardSet.Id==cardSet.Id?"lightblue":"")">
+                    <label class="col-form-label-lg">@cardSet.Name</label>
+                </div>
+            }
+            <div class="col-md-12 row">
+                <div class="col-md-6">
+                    <FloatingInput ValueSelector="()=>_selectedCardSet.Name" Label="Name" InputChanged="a=>_selectedCardSet.Name=a" />
+                </div>
+                <div class="col-md-3">
+                    <FloatingNumericInput ValueSelector="()=>_selectedCardSet.Height" Label="Height" InputChanged="a=>_selectedCardSet.Height=(int)a" />
+                </div>
+                <div class="col-md-3">
+                    <FloatingNumericInput ValueSelector="()=>_selectedCardSet.Width" Label="Width" InputChanged="a=>_selectedCardSet.Width=(int)a" />
+                </div>
+                <div class="col-md-3">
+                    <FloatingNumericInput ValueSelector="()=>(decimal)_selectedCardSet.Zoom" Label="Zoom" InputChanged="a=>_selectedCardSet.Zoom=(double)a" />
+                </div>
+            </div>
+            <Button class="btn btn-primary" OnClick="()=>{_selectedCardSet.Id=0; UpsertCardSet();}">Add Card Set</Button>
+            <Button class="btn btn-primary" OnClick="()=>UpsertCardSet()">Update Set Name</Button>
+            <Button disabled="@(_selectedCardSet.Id==0)" class="btn btn-primary" OnClick="DeleteCardSet">Delete Card Set</Button>
+        }
+    </div>
+    <div class="col-md-4">
+        <h2>Fonts</h2>
+        @foreach (var font in Fonts)
+        {
+            <div class="col-md-12 row" style="background-color:@(_selectedFont?.Id==font.Id?"lightblue":"")" @onclick="@(()=>_selectedFont=font)">
+                <label style="font-family:@font.Name" class="col-form-label-lg col-md-6">@font.Name</label>
+                <label class="col-form-label col-md-6">@(Convert.ToBase64String(MD5.HashData(Convert.FromBase64String(font.Base64Data)))[..12])</label>
+            </div>
+        }
+        <div class="col-md-12">
+            <div class="col-md-8">
+                <FloatingInput ValueSelector="()=>_selectedFont!.Name" Label="Font Name" InputChanged="a=>_selectedFont!.Name=a" />
+                <InputFile class="form-control" OnChange="LoadFile"></InputFile>
+            </div>
+            <Button OnClickAsync="async ()=>{_selectedFont!.Id=0; await UpsertFont();}" class="btn btn-primary">Add Font</Button>
+            <Button disabled="@(_selectedFont!.Id==0)" OnClickAsync="async ()=>await UpsertFont()" class="btn btn-primary">Update Font</Button>
+            <Button disabled="@(_selectedFont!.Id==0)" OnClick="DeleteFont" class="btn btn-primary">Delete Font</Button>
+        </div>
+    </div>
+    <div class="col-md-12 d-flex flex-row-reverse">
+        <Button OnClickAsync="async ()=>await SelectCardAndGame()" disabled="@(_selectedCardSet.Id==0 || _selectedGame.Id==0)" class="mt-5 btn btn-success">Select Card Set and Game</Button>
+    </div>
+</div>
+
