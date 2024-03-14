@@ -25,6 +25,7 @@ public static class ObjectExtensions
         return JsonSerializer.Deserialize<T>(utf8Stream, new JsonSerializerOptions()
         {
             IncludeFields = includeFields,
+            PropertyNameCaseInsensitive = true,
             NumberHandling = allowNumberReadingFromString ? JsonNumberHandling.AllowReadingFromString : JsonNumberHandling.Strict,
             ReferenceHandler = ignoreCycles ? ReferenceHandler.IgnoreCycles : ReferenceHandler.Preserve
         });
@@ -35,6 +36,7 @@ public static class ObjectExtensions
         return JsonSerializer.Deserialize<T>(utf8Json, new JsonSerializerOptions()
         {
             IncludeFields = includeFields,
+            PropertyNameCaseInsensitive = true,
             NumberHandling = allowNumberReadingFromString ? JsonNumberHandling.AllowReadingFromString : JsonNumberHandling.Strict,
             ReferenceHandler = ignoreCycles ? ReferenceHandler.IgnoreCycles : ReferenceHandler.Preserve
         });
@@ -47,6 +49,7 @@ public static class ObjectExtensions
             return JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions()
             {
                 IncludeFields = includeFields,
+                PropertyNameCaseInsensitive = true,
                 NumberHandling = allowNumberReadingFromString ? JsonNumberHandling.AllowReadingFromString : JsonNumberHandling.Strict,
                 ReferenceHandler = ignoreCycles ? ReferenceHandler.IgnoreCycles : ReferenceHandler.Preserve
             });

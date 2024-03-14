@@ -1,7 +1,12 @@
 ﻿class CanvasInterop {
     parameter;
     divId;
+    static opencv;
     canvas;
+    async getOpenCv() {
+        if (this.opencv == undefined) this.opencv = await import("/lib/OpenCvInterop.js");
+        return this.opencv;
+    }
     static getInstance(divId) {
         if (!window.canvasInteropFunctions.instance.hasOwnProperty(divId)) {
             window.canvasInteropFunctions.instance[divId] = new CanvasInterop();
@@ -68,12 +73,13 @@ window.canvasInteropFunctions = {
         instance.canvas.setActiveObject(instance.canvas.item(index));
         instance.canvas.renderAll();
     },
-    updateImage: function (newImage, divId) {
+    updateImage: function (newImage, filterPipeline, divId) {
         const instance = CanvasInterop.getInstance(divId);
         const applyTo = instance.canvas.getActiveObject();
         applyTo.setSrc(newImage, function () {
             instance.canvas.renderAll();
         });
+        applyTo.pictureFilter = JSON.stringify(filterPipeline);
     },
     getObjectParameter: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
@@ -179,14 +185,13 @@ window.canvasInteropFunctions = {
             canvas.renderAll();
         }
     },
-    drawPicture: function (xPos, yPos, pictureId, name, image, divId) {
+    drawPicture: function (xPos, yPos, pictureId, name, image, pictureFilter, divId) {
         const instance = CanvasInterop.getInstance(divId);
         fabric.Image.fromURL(image, function (img) {
             img.set({ left: xPos, top: yPos });
             img.toObject = (function (toObject) {
                 return function () {
-                    return fabric.util.object.extend(toObject.call(this),
-                        { pictureId: pictureId, name: name });
+                    return fabric.util.object.extend(toObject.call(this), { pictureId: pictureId, pictureFilter: pictureFilter, name: name });
                 };
             })(img.toObject);
             instance.canvas.add(img);
@@ -225,7 +230,7 @@ window.canvasInteropFunctions = {
     },
     exportJson: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
-        let result = instance.canvas.toJSON(["tag", "pictureId", "name", "lockScalingY"]);
+        let result = instance.canvas.toJSON(["tag", "pictureFilter", "pictureId", "name", "lockScalingY"]);
         result.objects = result.objects.map((o, i) => {
             if (o.type == "textbox") o.styles = instance.canvas._objects[i].styles;
             o.src = "";
@@ -240,10 +245,17 @@ window.canvasInteropFunctions = {
         return instance.canvas.loadFromJSON(json);
     },
 
-    importJson: function (json, pictureData, divId) {
-        if (json == null || Object.keys(json).length == 0) return;
-        json.objects.map(o => o.src = pictureData.hasOwnProperty(o.pictureId) ? pictureData[o.pictureId] : "");
+    importJson: async function (json, pictureData, divId) {
         const instance = CanvasInterop.getInstance(divId);
+        const opencv = await instance.getOpenCv();
+        if (json == null || Object.keys(json).length == 0) return;
+        for (let i = 0; i < json.objects.length; i++) {
+            const object = json.objects[i];
+            if (!pictureData.hasOwnProperty(object.pictureId)) continue;
+            const filter = JSON.parse(object.pictureFilter ?? "{}");
+            if (filter?.filters?.length > 0) object.src = await opencv.ApplyFilterPipeline(pictureData[object.pictureId], filter);
+            else object.src = pictureData[object.pictureId];
+        }
         return instance.canvas.loadFromJSON(json);
     },
     exportCanvas: function (divId) {

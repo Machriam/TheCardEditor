@@ -2,6 +2,7 @@
 using System.Text.Json.Nodes;
 using Microsoft.JSInterop;
 using TheCardEditor.Shared;
+using TheCardEditor.Shared.Features.CardEditor;
 using Toolbelt.Blazor.HotKeys2;
 
 namespace TheCardEditor.Main.Core;
@@ -139,7 +140,7 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask<ObjectParameter> GetObjectParameter();
 
-    ValueTask UpdateImage(string base64Image);
+    ValueTask UpdateImage(string base64Image, ImageFilterPipeline filterPipeline);
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -225,10 +226,10 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         return await _jsRuntime.HandledInvoke<ObjectParameter>(JsGetObjectParameter, _divId);
     }
 
-    public async ValueTask UpdateImage(string base64Image)
+    public async ValueTask UpdateImage(string base64Image, ImageFilterPipeline filterPipeline)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsUpdateImage, base64Image, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsUpdateImage, base64Image, filterPipeline, _divId);
     }
 
     public async ValueTask<int> SendBackwards(int index)

@@ -8,6 +8,7 @@ using TheCardEditor.Main.Core;
 using TheCardEditor.Services;
 using TheCardEditor.Shared;
 using TheCardEditor.Shared.DTO;
+using TheCardEditor.Shared.Features.CardEditor;
 using Toolbelt.Blazor.HotKeys2;
 
 namespace TheCardEditor.Main.Features.CardEditor
@@ -109,7 +110,7 @@ namespace TheCardEditor.Main.Features.CardEditor
             _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, OnObjectSelected,
                 OnObjectDeselected, OnMultiObjectIsSelected);
             var jsonObject = JsonSerializer.Deserialize<JsonObject>(_currentCard.Data);
-            await _canvasInterop.ImportJson(jsonObject ?? new JsonObject(), _pictureData);
+            await _canvasInterop.ImportJson(jsonObject ?? [], _pictureData);
             await _canvasInterop.Zoom(ApplicationStorage.SelectedCardSet?.Zoom ?? 100d);
             StateHasChanged();
         }
@@ -151,8 +152,18 @@ namespace TheCardEditor.Main.Features.CardEditor
         {
             if (_selectedObjectParams == null || _multipleObjectsAreSelected) return;
             var base64Text = PictureService.Execute(ps => ps.GetBase64Picture(_selectedObjectParams.Value.PictureId)) ?? "";
-            var cannyImage = await JS.ExecuteModuleFunction<string>("Canny", new[] { base64Text }, "/lib/OpenCvInterop.js");
-            await _canvasInterop.UpdateImage(cannyImage);
+            var pipeline = new ImageFilterPipeline()
+            {
+                Filters = [ new ImageFilterModel() { Name = "Canny", Parameters = [
+                    new FilterParameter() { Name="Threshold 1",Type=FilterParameterType.Double,Value="100" },
+                    new FilterParameter() { Name="Threshold 2",Type=FilterParameterType.Double,Value="300" },
+                    new FilterParameter() { Name="Aperture Size",Type=FilterParameterType.Int,Value="3" },
+                    new FilterParameter() { Name="L2 Gradient",Type=FilterParameterType.Bool,Value="false" },
+                ] } ]
+            };
+            var cannyImage = await JS.ExecuteModuleFunction<string>("ApplyFilterPipeline",
+                [base64Text, pipeline], "/lib/OpenCvInterop.js");
+            await _canvasInterop.UpdateImage(cannyImage, pipeline);
             await UpdateVirtualData();
         }
 

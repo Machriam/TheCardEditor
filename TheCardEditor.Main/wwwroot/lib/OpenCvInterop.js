@@ -8,14 +8,22 @@ export function DrawSourceImage(guid, data) {
         cv.imshow(canvas, data);
     };
 }
-export async function Canny(base64Url, params) {
+export async function ApplyFilterPipeline(base64Url, pipeline) {
+    const filterFunctions = [Canny, MedianBlur];
+    const filterByName = Object.assign({}, ...filterFunctions.map((x) => ({ [x.name]: x })));
     const source = document.createElement("img");
     source.src = base64Url;
     await source.decode();
-    const resultImage = InvokeStep(source, (src, dest) => {
-        cv.Canny(src, dest, 100, 300, 3, false);
+    return InvokeStep(source, (src, dest) => {
+        if (pipeline.filters.length == 0) return;
+        filterByName[pipeline.filters[0].name](src, dest, pipeline.filters[0].parameters.map(p => p.parsedValue))
+        for (let i = 1; i < pipeline.filters.length; i++) {
+            filterByName[pipeline.filters[i].name](dest, dest, pipeline.filters[i].parameters.map(p => p.parsedValue))
+        }
     });
-    return resultImage;
+}
+async function Canny(src, dest, params) {
+    cv.Canny(src, dest, params[0], params[1], params[2], params[3]);
 }
 
 export function MedianBlur(sourceGuid, destGuid, params) {
