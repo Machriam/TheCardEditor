@@ -188,7 +188,7 @@ window.canvasInteropFunctions = {
     drawPicture: function (xPos, yPos, pictureId, name, image, pictureFilter, divId) {
         const instance = CanvasInterop.getInstance(divId);
         fabric.Image.fromURL(image, function (img) {
-            img.set({ left: xPos, top: yPos });
+            img.set({ left: xPos, top: yPos, pictureId: pictureId });
             img.toObject = (function (toObject) {
                 return function () {
                     return fabric.util.object.extend(toObject.call(this), { pictureId: pictureId, pictureFilter: pictureFilter, name: name });

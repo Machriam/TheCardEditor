@@ -266,7 +266,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     public async ValueTask DrawPicture(int xPos, int yPos, long id, string name, string base64Image)
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, id, name, base64Image, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsDrawPicture, xPos, yPos, id, name, base64Image, new(), _divId);
     }
 
     public async ValueTask ImportJson(JsonObject json, Dictionary<long, string> imageData)
