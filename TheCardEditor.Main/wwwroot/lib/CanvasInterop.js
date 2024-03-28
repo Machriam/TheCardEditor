@@ -252,7 +252,7 @@ window.canvasInteropFunctions = {
         for (let i = 0; i < json.objects.length; i++) {
             const object = json.objects[i];
             if (!pictureData.hasOwnProperty(object.pictureId)) continue;
-            const filter = JSON.parse(object.pictureFilter ?? "{}");
+            const filter = JSON.parse(Object.getOwnPropertyNames(object.pictureFilter ?? {}).length == 0 ? "{}" : object.pictureFilter);
             if (filter?.filters?.length > 0) object.src = await opencv.ApplyFilterPipeline(pictureData[object.pictureId], filter);
             else object.src = pictureData[object.pictureId];
         }
