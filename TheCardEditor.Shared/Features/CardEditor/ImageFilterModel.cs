@@ -46,12 +46,14 @@ public class ImageFilterSelector(ImageFilterModel model)
     {
         model.Name = name;
         model.Parameters = parameter;
-        return model;
+        var method = GetType()?.GetMethod(name);
+        var defaultValues = method?.GetParameters().Select(p => p.DefaultValue).ToArray() ?? [];
+        return (ImageFilterModel?)method?.Invoke(this, defaultValues) ?? new();
     }
 
-    public ImageFilterModel FormFree()
+    public ImageFilterModel FreeForm()
     {
-        model.Name = nameof(ImageFilterType.TransparentFilter);
+        model.Name = nameof(ImageFilterType.FreeForm);
         model.Parameters = [];
         return model;
     }
@@ -90,7 +92,7 @@ public enum ImageFilterType
     InvertColors,
 
     [Description("Free Form")]
-    TransparentFilter,
+    FreeForm,
 
     [Description("Canny")]
     Canny

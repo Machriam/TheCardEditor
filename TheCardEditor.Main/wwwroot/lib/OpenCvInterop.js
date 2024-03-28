@@ -9,7 +9,7 @@ export function DrawSourceImage(guid, data) {
     };
 }
 export async function ApplyFilterPipeline(base64Url, pipeline) {
-    const filterFunctions = [Canny, MedianBlur, TransparentFilter, InvertColors];
+    const filterFunctions = [Canny, MedianBlur, FreeForm, InvertColors];
     const filterByName = Object.assign({}, ...filterFunctions.map((x) => ({ [x.name]: x })));
     const source = document.createElement("img");
     source.src = base64Url;
@@ -45,7 +45,7 @@ async function InvertColors(src, dest) {
     mergedPlanes.delete();
     invertA.delete();
 }
-async function TransparentFilter(src, dest) {
+async function FreeForm(src, dest) {
     let rgbPlanes = new cv.MatVector();
     let grayPlanes = new cv.MatVector();
     let mergedPlanes = new cv.MatVector();
