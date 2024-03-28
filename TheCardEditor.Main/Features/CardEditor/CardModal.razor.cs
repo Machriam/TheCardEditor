@@ -135,26 +135,27 @@ namespace TheCardEditor.Main.Features.CardEditor
         }
 
         [JSInvokable]
-        public async Task OnObjectSelected(ObjectParameter param)
+        public Task OnObjectSelected(ObjectParameter param)
         {
             _multipleObjectsAreSelected = false;
             _selectedObjectParams = param;
             AddObjectX = (int)param.Left;
             AddObjectY = (int)param.Top;
             AddObjectAngle = (decimal)param.Angle;
-            await JS.ConsoleLog(param.AsJson());
             FontSize = param.TextSize ?? FontSize;
             AddTag = param.Tag ?? "";
             StateHasChanged();
+            return Task.CompletedTask;
         }
 
-        private async Task AddFilter()
+        private async Task FreeForm()
         {
             if (_selectedObjectParams == null || _multipleObjectsAreSelected) return;
             var base64Text = PictureService.Execute(ps => ps.GetBase64Picture(_selectedObjectParams.Value.PictureId)) ?? "";
             var pipeline = new ImageFilterPipeline()
             {
-                Filters = [ new ImageFilterModel() { Name = "Canny", Parameters = [
+                Filters = [
+                    new ImageFilterModel() { Name = "TransparentFilter", Parameters = [
                     new FilterParameter() { Name="Threshold 1",Type=FilterParameterType.Double,Value="100" },
                     new FilterParameter() { Name="Threshold 2",Type=FilterParameterType.Double,Value="300" },
                     new FilterParameter() { Name="Aperture Size",Type=FilterParameterType.Int,Value="3" },

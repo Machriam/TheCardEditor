@@ -185,13 +185,13 @@ window.canvasInteropFunctions = {
             canvas.renderAll();
         }
     },
-    drawPicture: function (xPos, yPos, pictureId, name, image, pictureFilter, divId) {
+    drawPicture: function (xPos, yPos, pictureId, name, image, divId) {
         const instance = CanvasInterop.getInstance(divId);
         fabric.Image.fromURL(image, function (img) {
-            img.set({ left: xPos, top: yPos });
+            img.set({ left: xPos, top: yPos, pictureId: pictureId });
             img.toObject = (function (toObject) {
                 return function () {
-                    return fabric.util.object.extend(toObject.call(this), { pictureId: pictureId, pictureFilter: pictureFilter, name: name });
+                    return fabric.util.object.extend(toObject.call(this), { pictureId: pictureId, pictureFilter: this.pictureFilter ?? "{}", name: name });
                 };
             })(img.toObject);
             instance.canvas.add(img);
@@ -252,7 +252,7 @@ window.canvasInteropFunctions = {
         for (let i = 0; i < json.objects.length; i++) {
             const object = json.objects[i];
             if (!pictureData.hasOwnProperty(object.pictureId)) continue;
-            const filter = JSON.parse(object.pictureFilter ?? "{}");
+            const filter = JSON.parse(Object.getOwnPropertyNames(object.pictureFilter ?? {}).length == 0 ? "{}" : object.pictureFilter);
             if (filter?.filters?.length > 0) object.src = await opencv.ApplyFilterPipeline(pictureData[object.pictureId], filter);
             else object.src = pictureData[object.pictureId];
         }

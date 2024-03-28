@@ -9,7 +9,7 @@ export function DrawSourceImage(guid, data) {
     };
 }
 export async function ApplyFilterPipeline(base64Url, pipeline) {
-    const filterFunctions = [Canny, MedianBlur];
+    const filterFunctions = [Canny, MedianBlur, TransparentFilter];
     const filterByName = Object.assign({}, ...filterFunctions.map((x) => ({ [x.name]: x })));
     const source = document.createElement("img");
     source.src = base64Url;
@@ -21,6 +21,47 @@ export async function ApplyFilterPipeline(base64Url, pipeline) {
             filterByName[pipeline.filters[i].name](dest, dest, pipeline.filters[i].parameters.map(p => p.parsedValue))
         }
     });
+}
+function ChannelCount(src) {
+    const matType = src.type();
+    if (matType >= 24) return 4;
+    if (matType >= 16) return 3;
+    if (matType >= 8) return 2;
+    return 1;
+}
+async function TransparentFilter(src, dest) {
+    let rgbPlanes = new cv.MatVector();
+    let grayPlanes = new cv.MatVector();
+    let mergedPlanes = new cv.MatVector();
+    const grayMat = new cv.Mat();
+    const channelCount = ChannelCount(src);
+    if (channelCount == 1) {
+        grayMat = src.clone();
+        cv.cvtColor(src, src, cv.COLOR_GRAY2RGB);
+    }
+    if (channelCount == 3) cv.cvtColor(src, grayMat, cv.COLOR_RGB2GRAY);
+    if (channelCount == 4) cv.cvtColor(src, grayMat, cv.COLOR_RGBA2GRAY);
+    cv.split(src, rgbPlanes);
+    cv.split(grayMat, grayPlanes);
+    let R = rgbPlanes.get(0);
+    let G = rgbPlanes.get(1);
+    let B = rgbPlanes.get(2);
+    let A = grayPlanes.get(0);
+    const invertA = new cv.Mat(R.rows, R.cols, cv.CV_8UC1, new cv.Scalar(255));
+    cv.subtract(invertA, A, A);
+    mergedPlanes.push_back(R);
+    mergedPlanes.push_back(G);
+    mergedPlanes.push_back(B);
+    mergedPlanes.push_back(A);
+    cv.merge(mergedPlanes, dest);
+    rgbPlanes.delete();
+    grayPlanes.delete();
+    mergedPlanes.delete();
+    grayMat.delete();
+    R.delete();
+    G.delete();
+    B.delete();
+    A.delete();
 }
 async function Canny(src, dest, params) {
     cv.Canny(src, dest, params[0], params[1], params[2], params[3]);
