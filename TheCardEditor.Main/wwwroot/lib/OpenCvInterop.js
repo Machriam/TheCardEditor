@@ -30,7 +30,6 @@ function ChannelCount(src) {
     return 1;
 }
 async function TransparentFilter(src, dest) {
-    debugger;
     let rgbPlanes = new cv.MatVector();
     let grayPlanes = new cv.MatVector();
     let mergedPlanes = new cv.MatVector();

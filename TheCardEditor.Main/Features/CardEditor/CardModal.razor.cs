@@ -147,7 +147,7 @@ namespace TheCardEditor.Main.Features.CardEditor
             StateHasChanged();
         }
 
-        private async Task AddFilter()
+        private async Task FreeForm()
         {
             if (_selectedObjectParams == null || _multipleObjectsAreSelected) return;
             var base64Text = PictureService.Execute(ps => ps.GetBase64Picture(_selectedObjectParams.Value.PictureId)) ?? "";
