@@ -1,24 +1,22 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
 using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.Shared.DTO;
 
 namespace TheCardEditor.Services;
 
-public class PictureService
+public class PictureService(DataContext dataContext)
 {
-    private readonly DataContext _dataContext;
-
-    public PictureService(DataContext dataContext)
-    {
-        _dataContext = dataContext;
-    }
+    private readonly DataContext _dataContext = dataContext;
+    private static readonly string[] s_allowedFiles = [".png", ".jpg", ".JPEG"];
 
     private IEnumerable<string> RecursivePictureLoad(string path)
     {
         var result = new List<string>();
         foreach (var file in Directory.GetFiles(path))
         {
-            if (file.EndsWith(".png"))
+            if (s_allowedFiles.Any(af => file.EndsWith(af, StringComparison.InvariantCultureIgnoreCase)))
             {
                 result.Add(file);
             }
@@ -29,6 +27,7 @@ public class PictureService
         }
         return result;
     }
+
     public void DeletePicture(long id)
     {
         _dataContext.Pictures.Remove(_dataContext.Pictures.First(p => p.Id == id));
@@ -43,7 +42,7 @@ public class PictureService
         {
             _dataContext.Pictures.Add(new Picture()
             {
-                Name = Path.GetFileNameWithoutExtension(newPicture),
+                Name = Path.GetFileName(newPicture),
                 Path = newPicture
             });
         }
@@ -80,11 +79,12 @@ public class PictureService
         return pictures.Select(p => (p.Id, Path.Exists(p.Path)))
             .ToDictionary(p => p.Id, p => p.Item2);
     }
+
     public void UpdatePath(long pictureId, string newPath)
     {
         var picture = _dataContext.Pictures.First(p => p.Id == pictureId);
         picture.Path = newPath;
-        picture.Name = Path.GetFileNameWithoutExtension(newPath);
+        picture.Name = Path.GetFileName(newPath);
         _dataContext.SaveChanges();
     }
 
