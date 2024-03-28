@@ -148,6 +148,16 @@ namespace TheCardEditor.Main.Features.CardEditor
             return Task.CompletedTask;
         }
 
+        private async Task ApplyChainFilter(ImageFilterModel[] filter, int index)
+        {
+            if (_selectedIndex != index)
+            {
+                _selectedIndex = index;
+                await _canvasInterop.SelectObject(_selectedIndex);
+            }
+            await ApplyFilter(filter);
+        }
+
         private async Task ApplyFilter(params ImageFilterModel[] filter)
         {
             if (_selectedObjectParams == null || _multipleObjectsAreSelected) return;

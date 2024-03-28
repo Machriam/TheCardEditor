@@ -1,0 +1,13 @@
+﻿@typeparam T
+<div class="@(string.Join(' ', Attributes.Where(a=>a.Key=="class").Select(a=>a.Value)))">
+    @if (!Label.IsEmpty())
+    {
+        <label class="col-form-label">@Label</label>
+    }
+    <select title="@_error" class="form-select @(_error.IsEmpty()?"":"invalid")" @onchange="SelectedEnumChanged">
+        @foreach (var item in FilteredItems)
+        {
+            <option selected="@(item.Equals(SelectedItem))" value="@item">@item.GetDescription()</option>
+        }
+    </select>
+</div>
