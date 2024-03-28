@@ -36,7 +36,7 @@ namespace TheCardEditor.Main.Features.PictureManager
         public void Initialize()
         {
             _selectedPicture = null;
-            _pictures = PictureService.Execute(ps => ps.GetPictures()).ToList();
+            _pictures = [.. PictureService.Execute(ps => ps.GetPictures())];
             _existingPictures = PictureService.Execute(ps => ps.ValidatePictures()) ?? new();
             _relativePaths = _pictures.Select(p => Path.GetDirectoryName(p.Path) ?? "")
                         .Where(p => !string.IsNullOrEmpty(p))

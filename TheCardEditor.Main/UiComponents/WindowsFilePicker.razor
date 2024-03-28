@@ -1,12 +1,13 @@
 <Button @attributes="@Attributes" OnClickAsync="@SelectFile" class="@ButtonClass">
-    Select File
+    @Name
 </Button>
 @code {
     [Inject] private ILocalStorageInterop LocalStorageInterop { get; set; } = default!;
+    [Parameter] public string Name { get; set; } = "";
     [Parameter] public EventCallback<FileDialogResult> OnFileDialogFinished { get; set; }
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> Attributes { get; set; } = new();
-    public string ButtonClass => 
+    public string ButtonClass =>
         string.Join(" ", Attributes.Where(a => a.Key == "class").Select(a => a.Value).Append("btn").Append("btn-primary"));
     private const string LastPicturePath = nameof(LastPicturePath);
     public async Task SelectFile()
@@ -18,7 +19,7 @@
             using var fileDialog = new OpenFileDialog()
                 {
                     InitialDirectory = initialDirectory,
-                    Filter = "Image Files (PNG) |*.PNG;"
+                    Filter = "Image Files (PNG, JPG) |*.png|*.jpg|*.jpeg|*.JPG|*.PNG|*.JPEG;",
                 };
             var dialogResult = fileDialog.ShowDialog();
             if (dialogResult == DialogResult.OK)
