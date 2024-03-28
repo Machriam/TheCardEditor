@@ -22,31 +22,46 @@ export async function ApplyFilterPipeline(base64Url, pipeline) {
         }
     });
 }
+function ChannelCount(src) {
+    const matType = src.type();
+    if (matType >= 24) return 4;
+    if (matType >= 16) return 3;
+    if (matType >= 8) return 2;
+    return 1;
+}
 async function TransparentFilter(src, dest) {
+    debugger;
     let rgbPlanes = new cv.MatVector();
+    let grayPlanes = new cv.MatVector();
     let mergedPlanes = new cv.MatVector();
-    cv.cvtColor(src, src, cv.COLOR_RGB2RGBA);
+    const grayMat = new cv.Mat();
+    const channelCount = ChannelCount(src);
+    if (channelCount == 1) {
+        grayMat = src.clone();
+        cv.cvtColor(src, src, cv.COLOR_GRAY2RGB);
+    }
+    if (channelCount == 3) cv.cvtColor(src, grayMat, cv.COLOR_RGB2GRAY);
+    if (channelCount == 4) cv.cvtColor(src, grayMat, cv.COLOR_RGBA2GRAY);
     cv.split(src, rgbPlanes);
+    cv.split(grayMat, grayPlanes);
     let R = rgbPlanes.get(0);
     let G = rgbPlanes.get(1);
     let B = rgbPlanes.get(2);
-    const clipProtection = 1 / 3;
-    const ones = new cv.Mat(R.rows, R.cols, cv.CV_8UC1, new cv.Scalar(1));
-    const A = new cv.Mat(R.rows, R.cols, cv.CV_8UC1, new cv.Scalar(255));
-    let clipR = R.mul(ones, clipProtection);
-    let clipG = G.mul(ones, clipProtection);
-    let clipB = B.mul(ones, clipProtection);
-    cv.subtract(A, clipR, A);
-    cv.subtract(A, clipG, A);
-    cv.subtract(A, clipB, A);
+    let A = grayPlanes.get(0);
+    const invertA = new cv.Mat(R.rows, R.cols, cv.CV_8UC1, new cv.Scalar(255));
+    cv.subtract(invertA, A, A);
     mergedPlanes.push_back(R);
     mergedPlanes.push_back(G);
     mergedPlanes.push_back(B);
     mergedPlanes.push_back(A);
     cv.merge(mergedPlanes, dest);
     rgbPlanes.delete();
+    grayPlanes.delete();
     mergedPlanes.delete();
-    ones.delete();
+    grayMat.delete();
+    R.delete();
+    G.delete();
+    B.delete();
     A.delete();
 }
 async function Canny(src, dest, params) {
