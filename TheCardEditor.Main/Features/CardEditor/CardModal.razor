@@ -2,10 +2,13 @@
 @using Blazored.Modal;
 @using TheCardEditor.Shared;
 @using Toolbelt.Blazor.HotKeys2;
+@using Shared.Features.CardEditor;
 @using System.Text.Json.Nodes;
 @using System.Text.Json;
 <div @onclick="Close"
-    style="cursor:pointer;position:absolute;font-size:32px;top:5%;left:92%">x</div>
+     style="cursor:pointer;position:absolute;font-size:32px;top:5%;left:92%">
+    x
+</div>
 <div style="height:80vh;width:90vw;overflow:scroll" class="col-md-12 row">
     <canvas style="border:1px solid #000000" id="@CanvasId" width="@Width" height="@Height"></canvas>
     <div style="width: calc(85vw - @(Width)px)">
@@ -40,7 +43,8 @@
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Stroke,"red"))">Stroke</Button>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFont(CanvasFontStyle.Clear,true))">Clear</Button>
             <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await CenterObjects())">Center</Button>
-            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await FreeForm())">Free Form</Button>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFilter(new ImageFilterModel().For().FormFree()))">Free Form</Button>
+            <Button class="btn btn-primary col-md-1" OnClick="@(async ()=>await ApplyFilter(new ImageFilterModel().For().InvertColors()))">Invert</Button>
             <div class="col-md-6">
                 <DataList LabelText="Add Picture" SelectedItemChanged="SelectedPictureChanged" Items="@_pictureById.Values"></DataList>
                 @if (_selectedPicture != null)
@@ -67,15 +71,15 @@
         <Button OnClickAsync="@(async()=>await SendBackwards())" class="btn btn-dark mt-2">v</Button>
         <Button OnClickAsync="@(async()=>await BringForward())" class="btn btn-dark mt-2">^</Button>
         <div>
-            @foreach (var item in _currentCard.VirtualSerializedData().GetObjects().OrderByDescending(i=>i.Index))
+            @foreach (var item in _currentCard.VirtualSerializedData().GetObjects().OrderByDescending(i => i.Index))
             {
                 <div style="cursor:pointer;" class="hovery row alert p-1 m-0 @(_selectedIndex==item.Index?"alert-info":"")"
-                @onclick="@(async ()=>{_selectedIndex=item.Index; await SelectObject();})">
+                     @onclick="@(async ()=>{_selectedIndex=item.Index; await SelectObject();})">
                     <div class="col-md-1">
                         @item.Index
                     </div>
                     <div class="col-md-1">
-                        @(_pictureById.ContainsKey(item.PictureId)?"Picture":"Text")
+                        @(_pictureById.ContainsKey(item.PictureId) ? "Picture" : "Text")
                     </div>
                     <div class="col-md-5">
                         @(_pictureById.TryGetValue(item.PictureId, out var picture) ? picture.Name : item.Tag)

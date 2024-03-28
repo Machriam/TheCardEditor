@@ -148,20 +148,11 @@ namespace TheCardEditor.Main.Features.CardEditor
             return Task.CompletedTask;
         }
 
-        private async Task FreeForm()
+        private async Task ApplyFilter(params ImageFilterModel[] filter)
         {
             if (_selectedObjectParams == null || _multipleObjectsAreSelected) return;
             var base64Text = PictureService.Execute(ps => ps.GetBase64Picture(_selectedObjectParams.Value.PictureId)) ?? "";
-            var pipeline = new ImageFilterPipeline()
-            {
-                Filters = [
-                    new ImageFilterModel() { Name = "TransparentFilter", Parameters = [
-                    new FilterParameter() { Name="Threshold 1",Type=FilterParameterType.Double,Value="100" },
-                    new FilterParameter() { Name="Threshold 2",Type=FilterParameterType.Double,Value="300" },
-                    new FilterParameter() { Name="Aperture Size",Type=FilterParameterType.Int,Value="3" },
-                    new FilterParameter() { Name="L2 Gradient",Type=FilterParameterType.Bool,Value="false" },
-                ] } ]
-            };
+            var pipeline = new ImageFilterPipeline() { Filters = filter };
             var cannyImage = await JS.ExecuteModuleFunction<string>("ApplyFilterPipeline",
                 [base64Text, pipeline], "/lib/OpenCvInterop.js");
             await _canvasInterop.UpdateImage(cannyImage, pipeline);
