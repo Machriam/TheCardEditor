@@ -78,15 +78,21 @@
                 {
                     <tr style="cursor:pointer;" @onclick="@(async ()=>{_selectedIndex=item.Index; await SelectObject();})"
                         class="hovery @(_selectedIndex==item.Index?"alert-info":"")">
-                        <td> @item.Index </td>
-                        <td>
-                            @(_pictureById.ContainsKey(item.PictureId) ? "Picture" : "Text")
-                        </td>
-                        <td>
-                            @(_pictureById.TryGetValue(item.PictureId, out var picture) ? picture.Name : item.Tag)
-                        </td>
-                        <td>
-                        </td>
+                        @if (_pictureById.TryGetValue(item.PictureId, out var picture))
+                        {
+                            <td class="row">
+                                <div class="ps-3 col-md-1">@item.Index</div>
+                                <div class="ps-3 col-md-2">@picture.Name</div>
+                                <FilterChainSelection class="col-md-3 ps-3"></FilterChainSelection>
+                            </td>
+                        }
+                        else
+                        {
+                            <td class="row">
+                                <div class="ps-3 col-md-1">@item.Index</div>
+                                <div class="ps-3 col-md-2">@item.Tag</div>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>

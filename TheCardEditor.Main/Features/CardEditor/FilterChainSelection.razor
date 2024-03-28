@@ -1,0 +1,8 @@
+@using TheCardEditor.Shared.Features.CardEditor;
+@foreach (var (item, index) in _selectedFilters.WithIndex())
+{
+    <EnumDropDown class="@(string.Join(' ', Attributes.Where(a=>a.Key=="class").Select(a=>a.Value)))" T="ImageFilterType" SelectedItem="item.Type"
+                  SelectedItemChanged="x=>FilterChanged(x,index)" )"></EnumDropDown>
+}
+
+

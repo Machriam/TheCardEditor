@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -43,21 +44,21 @@ public class ImageFilterSelector(ImageFilterModel model)
 {
     public ImageFilterModel FormFree()
     {
-        model.Name = "TransparentFilter";
+        model.Name = nameof(ImageFilterType.TransparentFilter);
         model.Parameters = [];
         return model;
     }
 
     public ImageFilterModel InvertColors()
     {
-        model.Name = "InvertColors";
+        model.Name = nameof(ImageFilterType.InvertColors);
         model.Parameters = [];
         return model;
     }
 
     public ImageFilterModel Canny(double threshold1 = 100d, double threshold2 = 300d, int aperture = 3, bool l2Gradient = false)
     {
-        model.Name = "Canny";
+        model.Name = nameof(ImageFilterType.Canny);
         model.Parameters = [
             new FilterParameter() { Name="Threshold 1",Type=FilterParameterType.Double,Value=$"{threshold1}" },
             new FilterParameter() { Name="Threshold 2",Type=FilterParameterType.Double,Value=$"{threshold2}" },
@@ -71,4 +72,19 @@ public class ImageFilterSelector(ImageFilterModel model)
 public class ImageFilterPipeline
 {
     public IEnumerable<ImageFilterModel> Filters { get; set; } = [];
+}
+
+public enum ImageFilterType
+{
+    [Description("")]
+    NA,
+
+    [Description("Invert Colors")]
+    InvertColors,
+
+    [Description("Free Form")]
+    TransparentFilter,
+
+    [Description("Canny")]
+    Canny
 }
