@@ -9,7 +9,7 @@ export function DrawSourceImage(guid, data) {
     };
 }
 export async function ApplyFilterPipeline(base64Url, pipeline) {
-    const filterFunctions = [Canny, MedianBlur, TransparentFilter];
+    const filterFunctions = [Canny, MedianBlur, TransparentFilter, InvertColors];
     const filterByName = Object.assign({}, ...filterFunctions.map((x) => ({ [x.name]: x })));
     const source = document.createElement("img");
     source.src = base64Url;
@@ -28,6 +28,22 @@ function ChannelCount(src) {
     if (matType >= 16) return 3;
     if (matType >= 8) return 2;
     return 1;
+}
+async function InvertColors(src, dest) {
+    let planes = new cv.MatVector();
+    let mergedPlanes = new cv.MatVector();
+    cv.split(src, planes);
+    const invertA = new cv.Mat(src.rows, src.cols, cv.CV_8UC1, new cv.Scalar(255));
+    for (let i = 0; i < planes.size(); i++) {
+        let channel = planes.get(i);
+        if (i < 3) cv.subtract(invertA, channel, channel);
+        mergedPlanes.push_back(channel);
+        channel.delete();
+    }
+    cv.merge(mergedPlanes, dest);
+    planes.delete();
+    mergedPlanes.delete();
+    invertA.delete();
 }
 async function TransparentFilter(src, dest) {
     let rgbPlanes = new cv.MatVector();
