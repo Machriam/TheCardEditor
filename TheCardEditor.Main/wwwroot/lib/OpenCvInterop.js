@@ -251,7 +251,8 @@ function InvokeStep(source, modifyImage) {
     const src = cv.imread(source);
     const dest = new cv.Mat();
     modifyImage(src, dest);
-    cv.imshow(destImage, dest);
+    if (dest.cols > 0) cv.imshow(destImage, dest);
+    else cv.imshow(destImage, src);
     src.delete();
     dest.delete();
     const resultData = destImage.toDataURL();

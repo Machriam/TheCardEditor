@@ -83,7 +83,8 @@
                             <td class="row">
                                 <div class="ps-3 col-md-1">@item.Index</div>
                                 <div class="ps-3 col-md-2">@picture.Name</div>
-                                <FilterChainSelection class="col-md-3 ps-3"></FilterChainSelection>
+                                <FilterChainSelection FilterHasChanged="async x=>await ApplyChainFilter(x,item.Index)"
+                                                      class="col-md-3 ps-3"></FilterChainSelection>
                             </td>
                         }
                         else

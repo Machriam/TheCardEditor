@@ -42,6 +42,13 @@ public class ImageFilterModel
 
 public class ImageFilterSelector(ImageFilterModel model)
 {
+    public ImageFilterModel InvokeFilter(string name, params FilterParameter[] parameter)
+    {
+        model.Name = name;
+        model.Parameters = parameter;
+        return model;
+    }
+
     public ImageFilterModel FormFree()
     {
         model.Name = nameof(ImageFilterType.TransparentFilter);
