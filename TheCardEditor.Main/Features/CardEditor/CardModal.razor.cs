@@ -135,7 +135,7 @@ namespace TheCardEditor.Main.Features.CardEditor
         }
 
         [JSInvokable]
-        public async Task OnObjectSelected(ObjectParameter param)
+        public Task OnObjectSelected(ObjectParameter param)
         {
             _multipleObjectsAreSelected = false;
             _selectedObjectParams = param;
@@ -145,6 +145,7 @@ namespace TheCardEditor.Main.Features.CardEditor
             FontSize = param.TextSize ?? FontSize;
             AddTag = param.Tag ?? "";
             StateHasChanged();
+            return Task.CompletedTask;
         }
 
         private async Task FreeForm()
