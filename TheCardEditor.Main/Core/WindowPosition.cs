@@ -1,7 +1,10 @@
-﻿namespace TheCardEditor.Main.Core;
+﻿using System.Collections.Frozen;
+
+namespace TheCardEditor.Main.Core;
 
 public class AppSettings
 {
+    public static readonly FrozenSet<string> AllowedPictureTypes = new[] { ".png", ".jpg", ".jpeg" }.SelectMany(x => new[] { x.ToUpper(), x }).ToFrozenSet();
     public static string GetPath => Path.Combine(Path.GetFullPath(Directory.GetCurrentDirectory()), AppsettingsName);
 #if DEBUG
     public const string AppsettingsName = "appsettings.Development.json";

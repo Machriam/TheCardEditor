@@ -121,3 +121,56 @@ body {
 .same-space-ag-grid .ag-cell {
     font-family: Courier New, Courier, monospace
 }
+
+.ag-row-nocolor {
+}
+
+.ag-row-green {
+    background-color: LightGreen !important;
+}
+
+.ag-row-aquamarine {
+    background-color: aquamarine !important;
+}
+
+.ag-row-grey {
+    background-color: lightgrey !important;
+}
+
+.ag-row-red {
+    background-color: coral !important;
+}
+
+.ag-row-yellow {
+    background-color: yellow !important;
+}
+
+.ag-row-khaki {
+    background-color: khaki !important;
+}
+
+.ag-row-purple {
+    background-color: violet !important;
+}
+
+    .ag-row-yellow.ag-row-hover .ag-cell,
+    .ag-row-red.ag-row-hover .ag-cell,
+    .ag-row-green.ag-row-hover .ag-cell,
+    .ag-row-khaki.ag-row-hover .ag-cell,
+    .ag-row-aquamarine.ag-row-hover .ag-cell,
+    .ag-row-purple.ag-row-hover .ag-cell,
+    .ag-row-nocolor.ag-row-hover .ag-cell,
+    .ag-row-grey.ag-row-hover .ag-cell {
+        background-color: var(--ag-row-hover) !important;
+    }
+
+    .ag-row-yellow.ag-row-selected .ag-cell,
+    .ag-row-red.ag-row-selected .ag-cell,
+    .ag-row-green.ag-row-selected .ag-cell,
+    .ag-row-khaki.ag-row-selected .ag-cell,
+    .ag-row-aquamarine.ag-row-selected .ag-cell,
+    .ag-row-purple.ag-row-selected .ag-cell,
+    .ag-row-nocolor.ag-row-selected .ag-cell,
+    .ag-row-grey.ag-row-selected .ag-cell {
+        background-color: var(--ag-row-selected) !important;
+    }

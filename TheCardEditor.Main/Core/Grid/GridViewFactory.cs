@@ -2,6 +2,10 @@
 
 namespace TheCardEditor.Main.Core.Grid;
 
+public delegate Task SelectedRowHandlerAsync(long id);
+
+public delegate Task SelectedRowsHandlerAsync(long[] id);
+
 public delegate void SelectedRowHandler(long id);
 
 public delegate void SelectedRowsHandler(long[] id);

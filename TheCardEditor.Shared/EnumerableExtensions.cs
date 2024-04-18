@@ -2,6 +2,12 @@
 
 public static class EnumerableExtensions
 {
+    public static IEnumerable<T> AppendRange<T>(this IEnumerable<T> source, IEnumerable<T> target)
+    {
+        foreach (var item in source) yield return item;
+        foreach (var item in target) yield return item;
+    }
+
     public static List<T> PushIf<T>(this List<T> list, T item, Func<T, bool> condition)
     {
         if (condition(item)) return list.Push(item);

@@ -28,9 +28,29 @@ public class PictureService(DataContext dataContext)
         return result;
     }
 
+    public void DeletePictures(long[] ids)
+    {
+        _dataContext.Pictures.RemoveRange(_dataContext.Pictures.Where(p => ids.Contains(p.Id)));
+        _dataContext.SaveChanges();
+    }
+
     public void DeletePicture(long id)
     {
         _dataContext.Pictures.Remove(_dataContext.Pictures.First(p => p.Id == id));
+        _dataContext.SaveChanges();
+    }
+
+    public void AddPicturesByPath(IEnumerable<string> newPictures)
+    {
+        var importedPictures = _dataContext.Pictures.Select(p => p.Path).ToHashSet();
+        foreach (var newPicture in newPictures.Where(r => !importedPictures.Contains(r)))
+        {
+            _dataContext.Pictures.Add(new Picture()
+            {
+                Name = Path.GetFileName(newPicture),
+                Path = newPicture
+            });
+        }
         _dataContext.SaveChanges();
     }
 
