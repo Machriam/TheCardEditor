@@ -1,0 +1,54 @@
+name: Append Commit Messages to PR Description
+
+on:
+  pull_request:
+    branches:
+      - main
+permissions: 
+  pull-requests: write
+  issues: write
+jobs:
+  update-pr-description:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Append commit messages to PR description
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            const { data: commits } = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            const commitMessages = "\n- " + commits
+              .filter(commit=>commit.commit.message.indexOf("IGNORE")<0)
+              .map(commit =>commit.sha + " " + commit.commit.message)
+              .join("\n- ");
+            const issueNumber = pullRequest.head.ref.split("-")[0];
+            const newDescription = `${pullRequest.body??""}\n\n### Commit messages for #${issueNumber}\n${commitMessages}`;
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              body: `${newDescription}`
+            });
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `## Changes of Pull Request #${context.issue.number}\n\n${newDescription}`
+            });
