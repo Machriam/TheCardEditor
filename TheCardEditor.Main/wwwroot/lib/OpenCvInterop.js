@@ -49,22 +49,40 @@ async function FreeForm(src, dest) {
     let rgbPlanes = new cv.MatVector();
     let grayPlanes = new cv.MatVector();
     let mergedPlanes = new cv.MatVector();
+    let R = new cv.MatVector();
+    let G = new cv.MatVector();
+    let B = new cv.MatVector();
+    let A = new cv.MatVector();
     const grayMat = new cv.Mat();
     const channelCount = ChannelCount(src);
+    cv.split(src, rgbPlanes);
     if (channelCount == 1) {
         grayMat = src.clone();
         cv.cvtColor(src, src, cv.COLOR_GRAY2RGB);
     }
     if (channelCount == 3) cv.cvtColor(src, grayMat, cv.COLOR_RGB2GRAY);
-    if (channelCount == 4) cv.cvtColor(src, grayMat, cv.COLOR_RGBA2GRAY);
-    cv.split(src, rgbPlanes);
-    cv.split(grayMat, grayPlanes);
-    let R = rgbPlanes.get(0);
-    let G = rgbPlanes.get(1);
-    let B = rgbPlanes.get(2);
-    let A = grayPlanes.get(0);
-    const invertA = new cv.Mat(R.rows, R.cols, cv.CV_8UC1, new cv.Scalar(255));
-    cv.subtract(invertA, A, A);
+    if (channelCount == 4) {
+        cv.cvtColor(src, grayMat, cv.COLOR_RGBA2GRAY);
+        cv.split(grayMat, grayPlanes);
+        A = grayPlanes.get(0);
+        A.convertTo(A, cv.CV_32FC1);
+        let srcA = rgbPlanes.get(3);
+        srcA.convertTo(srcA, cv.CV_32FC1);
+        const invertA = new cv.Mat(srcA.rows, srcA.cols, cv.CV_32FC1, new cv.Scalar(1 / 255));
+        cv.multiply(invertA, A, A);
+        cv.multiply(A, srcA, A);
+        cv.subtract(srcA, A, A);
+        A.convertTo(A, cv.CV_8UC1);
+    }
+    else {
+        cv.split(grayMat, grayPlanes);
+        A = grayPlanes.get(0);
+        const invertA = new cv.Mat(A.rows, A.cols, cv.CV_8UC1, new cv.Scalar(255));
+        cv.subtract(invertA, A, A);
+    }
+    R = rgbPlanes.get(0);
+    G = rgbPlanes.get(1);
+    B = rgbPlanes.get(2);
     mergedPlanes.push_back(R);
     mergedPlanes.push_back(G);
     mergedPlanes.push_back(B);
