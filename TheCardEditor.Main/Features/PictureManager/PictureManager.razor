@@ -5,9 +5,14 @@
 </div>
 
 <div class="col-md-12 row">
-    <WindowsFolderPicker Name="Update Folder" class="col-md-2" OnFileDialogFinished="OnFolderSelected"></WindowsFolderPicker>
+    <WindowsFolderPicker Name="Add Folder" class="col-md-2" OnFileDialogFinished="OnFolderSelected"></WindowsFolderPicker>
     <WindowsFilePicker Name="Change Filepath" class="ms-2 col-md-2"
                        disabled="@(_selectedPictures==null)" OnFileDialogFinished="UpdatePicturePath"></WindowsFilePicker>
+    <Button class="ms-2 col-md-2 btn btn-primary" disabled="@(_selectedPictures==null)" OnClickAsync="ShowNewPictures">Search new Pictures</Button>
     <Button class="ms-2 col-md-2 btn btn-danger" disabled="@(_selectedPictures==null)" OnClickAsync="DeletePictures">Delete</Button>
+    @if (_selectedPictures?.Any(sp => _newPictureByNegativeId.ContainsKey(sp)) == true)
+    {
+        <Button class="ms-2 col-md-2 btn btn-success" disabled="@(_selectedPictures==null)" OnClickAsync="AddSelectedNewPictures">Add new Pictures</Button>
+    }
 </div>
 

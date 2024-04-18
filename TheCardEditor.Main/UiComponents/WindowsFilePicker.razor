@@ -19,7 +19,7 @@
             using var fileDialog = new OpenFileDialog()
                 {
                     InitialDirectory = initialDirectory,
-                    Filter = "Image Files (PNG, JPG) |*.png;*.jpg;*.jpeg;*.JPG;*.PNG;*.JPEG",
+                    Filter = $"Image Files (PNG, JPG) |{AppSettings.AllowedPictureTypes.Select(p => "*" + p).Concat(";")}",
                 };
             var dialogResult = fileDialog.ShowDialog();
             if (dialogResult == DialogResult.OK)

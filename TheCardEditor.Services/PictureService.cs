@@ -40,6 +40,20 @@ public class PictureService(DataContext dataContext)
         _dataContext.SaveChanges();
     }
 
+    public void AddPicturesByPath(IEnumerable<string> newPictures)
+    {
+        var importedPictures = _dataContext.Pictures.Select(p => p.Path).ToHashSet();
+        foreach (var newPicture in newPictures.Where(r => !importedPictures.Contains(r)))
+        {
+            _dataContext.Pictures.Add(new Picture()
+            {
+                Name = Path.GetFileName(newPicture),
+                Path = newPicture
+            });
+        }
+        _dataContext.SaveChanges();
+    }
+
     public void LoadPicturesFromPath(string path)
     {
         var result = RecursivePictureLoad(path);
