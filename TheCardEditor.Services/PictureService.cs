@@ -28,6 +28,12 @@ public class PictureService(DataContext dataContext)
         return result;
     }
 
+    public void DeletePictures(long[] ids)
+    {
+        _dataContext.Pictures.RemoveRange(_dataContext.Pictures.Where(p => ids.Contains(p.Id)));
+        _dataContext.SaveChanges();
+    }
+
     public void DeletePicture(long id)
     {
         _dataContext.Pictures.Remove(_dataContext.Pictures.First(p => p.Id == id));

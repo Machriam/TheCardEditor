@@ -30,69 +30,52 @@ public partial class PictureManager
     private List<PictureModel> _pictures = [];
     private string _selectedPath = "";
     private Dictionary<long, bool> _existingPictures = [];
-    private long? _selectedPicture;
+    private long[] _selectedPictures = [];
 
-    public void Initialize()
+    public async Task Initialize()
     {
-        _selectedPicture = null;
         _pictures = [.. PictureService.Execute(ps => ps.GetPictures())];
         _existingPictures = PictureService.Execute(ps => ps.ValidatePictures()) ?? [];
-        StateHasChanged();
-    }
-
-    public void DeletePicture()
-    {
-        if (_selectedPicture == null) return;
-        PictureService.Execute(ps => ps.DeletePicture(_selectedPicture.Value));
-        Initialize();
-    }
-
-    public string GetBackgroundColor(long id)
-    {
-        if (_selectedPicture == id) return "lightblue";
-        return _existingPictures.TryGetValue(id, out var exists) && exists ? "white" : "yellow";
-    }
-
-    public void OnFolderSelected(FileDialogResult result)
-    {
-        PictureService.Execute(ps => ps.LoadPicturesFromPath(result.FilePath));
-        Initialize();
-    }
-
-    public void PictureSelected(long id)
-    {
-        _selectedPicture = id;
-    }
-
-    public void UpdatePicturePath(FileDialogResult result)
-    {
-        if (_selectedPicture == null) return;
-        PictureService.Execute(ps => ps.UpdatePath(_selectedPicture.Value, result.FilePath));
-        Initialize();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender) return;
-        _gridView = GridViewFactory.CreateGrid(this, GridViewId, OnRowsSelected);
         var models = _pictures.Select(p => new PictureGridModel(p.Id)
         {
             PictureName = p.Name,
             Path = p.Path,
             Exists = _existingPictures[p.Id] ? "true" : "false",
             RowColorClass = _existingPictures[p.Id] ? AgGridResources.NoColorRow : AgGridResources.KhakiGridRow
-        }).OrderBy(m => m.Exists)
-        .ThenBy(m => m.Path);
+        }).OrderBy(m => m.Exists).ThenBy(m => m.Path);
         await _gridView.UpdateGrid(new DisplayGridModel<PictureGridModel>(models));
     }
 
-    private void OnRowsSelected(long[] id)
+    public async Task DeletePictures()
     {
+        if (_selectedPictures.Length == 0) return;
+        PictureService.Execute(ps => ps.DeletePictures(_selectedPictures));
+        await Initialize();
     }
 
-    protected override void OnInitialized()
+    public async Task OnFolderSelected(FileDialogResult result)
     {
-        Initialize();
-        base.OnInitialized();
+        PictureService.Execute(ps => ps.LoadPicturesFromPath(result.FilePath));
+        await Initialize();
+    }
+
+    public async Task UpdatePicturePath(FileDialogResult result)
+    {
+        if (_selectedPictures.Length != 1) return;
+        PictureService.Execute(ps => ps.UpdatePath(_selectedPictures[0], result.FilePath));
+        await Initialize();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        _gridView = GridViewFactory.CreateGrid(this, GridViewId, OnRowsSelected);
+        await Initialize();
+    }
+
+    [JSInvokable]
+    public void OnRowsSelected(long[] ids)
+    {
+        _selectedPictures = ids;
     }
 }
