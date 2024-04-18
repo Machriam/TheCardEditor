@@ -1,12 +1,21 @@
 ﻿using Microsoft.AspNetCore.Components.WebView.WindowsForms;
 using Microsoft.Extensions.DependencyInjection;
 using TheCardEditor.Main.Core;
+using System.Runtime.InteropServices;
 using TheCardEditor.Main.Features.AppLayout;
 
 namespace TheCardEditor;
 
 public partial class MainForm : Form
 {
+#if DEBUG
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool AllocConsole();
+
+#endif
+
     private readonly IServiceProvider _services;
 
     public MainForm(IServiceProvider services)
@@ -27,6 +36,9 @@ public partial class MainForm : Form
         Location = new(windowPosition.LocationX, windowPosition.LocationY);
         Size = new(windowPosition.SizeX, windowPosition.SizeY);
         WindowState = windowPosition.State;
+#if DEBUG
+        AllocConsole();
+#endif
     }
 
     private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
