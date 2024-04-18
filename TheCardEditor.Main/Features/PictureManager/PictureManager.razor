@@ -1,19 +1,6 @@
 <h1>Picture Manager</h1>
 <div class="col-md-12 row">
-    <div style="height:80vh;overflow-y:scroll" class="col-md-8">
-        @foreach (var picture in _pictures.Where(p => p.Path.StartsWith(_selectedPath)))
-        {
-            <div @onclick="()=>PictureSelected(picture.Id)"
-                 style="cursor:pointer;background-color:@(GetBackgroundColor(picture.Id))">
-                @picture.Name
-            </div>
-        }
-    </div>
-    <div style="height:80vh;overflow-y:scroll" class="col-md-4">
-        @foreach (var path in _relativePaths)
-        {
-            <div @onclick="@(()=>_selectedPath=path)" class="alert p-0 @(_selectedPath==path?"alert-info":"")">@path</div>
-        }
+    <div id="@GridViewId" style="height:80vh" class="col-md-12 ag-theme-alpine">
     </div>
 </div>
 
