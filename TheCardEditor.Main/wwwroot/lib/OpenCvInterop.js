@@ -16,9 +16,14 @@ export async function ApplyFilterPipeline(base64Url, pipeline) {
     await source.decode();
     return InvokeStep(source, (src, dest) => {
         if (pipeline.filters.length == 0) return;
-        filterByName[pipeline.filters[0].name](src, dest, pipeline.filters[0].parameters.map(p => p.parsedValue))
-        for (let i = 1; i < pipeline.filters.length; i++) {
-            filterByName[pipeline.filters[i].name](dest, dest, pipeline.filters[i].parameters.map(p => p.parsedValue))
+        for (let i = 0; i < pipeline.filters.length; i++) {
+            try {
+                if (i == 0) filterByName[pipeline.filters[0].name](src, dest, pipeline.filters[0].parameters.map(p => p.parsedValue))
+                else filterByName[pipeline.filters[i].name](dest, dest, pipeline.filters[i].parameters.map(p => p.parsedValue))
+            }
+            catch (ex) {
+                alert(`Pipeline error of ${pipeline.filters[i].name} Step ${i + 1}: ${ex}`);
+            }
         }
     });
 }
@@ -29,7 +34,7 @@ function ChannelCount(src) {
     if (matType >= 8) return 2;
     return 1;
 }
-async function InvertColors(src, dest) {
+function InvertColors(src, dest) {
     let planes = new cv.MatVector();
     let mergedPlanes = new cv.MatVector();
     cv.split(src, planes);
@@ -45,7 +50,7 @@ async function InvertColors(src, dest) {
     mergedPlanes.delete();
     invertA.delete();
 }
-async function FreeForm(src, dest) {
+function FreeForm(src, dest) {
     let rgbPlanes = new cv.MatVector();
     let grayPlanes = new cv.MatVector();
     let mergedPlanes = new cv.MatVector();
@@ -53,13 +58,14 @@ async function FreeForm(src, dest) {
     let G = new cv.MatVector();
     let B = new cv.MatVector();
     let A = new cv.MatVector();
-    const grayMat = new cv.Mat();
+    let grayMat = new cv.Mat();
     const channelCount = ChannelCount(src);
-    cv.split(src, rgbPlanes);
     if (channelCount == 1) {
+        grayMat.delete();
         grayMat = src.clone();
         cv.cvtColor(src, src, cv.COLOR_GRAY2RGB);
     }
+    cv.split(src, rgbPlanes);
     if (channelCount == 3) cv.cvtColor(src, grayMat, cv.COLOR_RGB2GRAY);
     if (channelCount == 4) {
         cv.cvtColor(src, grayMat, cv.COLOR_RGBA2GRAY);
@@ -97,7 +103,10 @@ async function FreeForm(src, dest) {
     B.delete();
     A.delete();
 }
-async function Canny(src, dest, params) {
+function Canny(src, dest, params) {
+    const channelCount = ChannelCount(src);
+    if (channelCount == 3) cv.cvtColor(src, src, cv.COLOR_RGB2GRAY)
+    if (channelCount == 4) cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY)
     cv.Canny(src, dest, params[0], params[1], params[2], params[3]);
 }
 
