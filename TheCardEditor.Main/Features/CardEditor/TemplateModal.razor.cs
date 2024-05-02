@@ -43,8 +43,8 @@ namespace TheCardEditor.Main.Features.CardEditor
         {
             if (ApplicationStorage.SelectedCardSet == null) return;
             _templateNamesById = TemplateService.Execute(ts => ts.TemplateNamesById(ApplicationStorage.SelectedCardSet.Id)) ?? new Dictionary<int, string>();
-            Height = ApplicationStorage.SelectedCardSet.Height;
-            Width = ApplicationStorage.SelectedCardSet.Width;
+            Height = (int)(ApplicationStorage.SelectedCardSet.Height * ApplicationStorage.SelectedCardSet.Zoom / 100f);
+            Width = (int)(ApplicationStorage.SelectedCardSet.Width * ApplicationStorage.SelectedCardSet.Zoom / 100f);
         }
 
         public async Task RenderCanvas(TemplateModel template)
@@ -54,6 +54,7 @@ namespace TheCardEditor.Main.Features.CardEditor
             var pictureData = template.SerializedData().GetPictureIds()
                 .Distinct()
                 .ToDictionary(id => id, id => PictureService.Execute(ps => ps.GetBase64Picture(id)) ?? "");
+            await _canvasInterop.Zoom(ApplicationStorage.SelectedCardSet?.Zoom ?? 100d);
             await _canvasInterop.ImportJson(template.SerializedData(), pictureData);
         }
 
