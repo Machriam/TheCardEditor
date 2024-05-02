@@ -30,6 +30,7 @@ public partial class PictureManager
     [Inject] public ServiceAccessor<PictureService> PictureService { get; set; } = default!;
     [Inject] public ServiceAccessor<CardService> CardService { get; set; } = default!;
     [Inject] private IGridViewFactory GridViewFactory { get; set; } = default!;
+    [Inject] private IModalHelper ModalHelper { get; set; } = default!;
     private IGridView _gridView = default!;
     private const string GridViewId = nameof(PictureManager) + nameof(GridViewId);
     private List<PictureModel> _pictures = [];
@@ -115,6 +116,15 @@ public partial class PictureManager
             PictureService.Execute(ps => ps.UpdatePath(_selectedPictures[0], result.FilePath));
         }
         await Initialize();
+    }
+
+    public void ShowModal()
+    {
+        ModalHelper.AddGlobalModalWindow(async (modal, guid) =>
+        {
+            return await modal.ShowModal<PictureManagerModal>("Card references", [], movable: true,
+            guid: guid, disableBackgroundCancel: true);
+        });
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

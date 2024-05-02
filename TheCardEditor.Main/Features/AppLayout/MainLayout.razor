@@ -14,13 +14,3 @@
     }
 </style>
 
-@code{
-    [Inject] IModalHelper ModalHelper { get; set; } = default!;
-    [Inject] IJSRuntime JSRuntime { get; set; } = default!;
-    [Inject] HotKeys HotKeys { get; set; } = default!;
-    [CascadingParameter] IModalService ModalService { get; set; } = default!;
-    protected override void OnInitialized()
-    {
-        ModalHelper.InitializeModalService(ModalService, JSRuntime, HotKeys);
-    }
-}
