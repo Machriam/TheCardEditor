@@ -11,4 +11,5 @@ public partial class Card
     public int CardSetFk { get; set; }
     public string Data { get; set; } = null!;
     public virtual CardSet CardSetFkNavigation { get; set; } = null!;
+    public virtual ICollection<PictureCardReference> PictureCardReferences { get; init; } = new List<PictureCardReference>();
 }

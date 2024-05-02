@@ -75,5 +75,27 @@ namespace TheCardEditor.DataModel.Migrations {
                 return ResourceManager.GetString("1.2.0", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CREATE TABLE &quot;PictureCardReference&quot; (
+        ///	&quot;Id&quot;	INTEGER,
+        ///	&quot;PictureFk&quot;	INTEGER NOT NULL,
+        ///	&quot;CardFk&quot;	INTEGER NOT NULL,
+        ///	FOREIGN KEY(&quot;PictureFk&quot;) REFERENCES &quot;Picture&quot;(&quot;Id&quot;),
+        ///	FOREIGN KEY(&quot;CardFk&quot;) REFERENCES &quot;Card&quot;(&quot;Id&quot;),
+        ///	PRIMARY KEY(&quot;Id&quot; AUTOINCREMENT)
+        ///);
+        ///UPDATE &quot;main&quot;.&quot;ApplicationData&quot; set &quot;Value&quot;=&apos;1.3.0&apos; where &quot;Name&quot;=&apos;Version&apos;;
+        ///WITH object AS (
+        ///    SELECT json_extract(json(&quot;Data&quot;)-&gt;&gt;&apos;objects&apos;,&apos;$&apos;) AS json_object, id as card_id FROM card
+        ///),
+        ///duplicated_result as 
+        ///(SELECT card_id,json_extract(value, &apos; [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string _1_3_0 {
+            get {
+                return ResourceManager.GetString("1.3.0", resourceCulture);
+            }
+        }
     }
 }

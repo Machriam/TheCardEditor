@@ -3,6 +3,8 @@ using TheCardEditor.Shared.DTO;
 
 namespace TheCardEditor.Services;
 
+public record struct PictureUsage(long PictureId, long CardId);
+
 public class CardService
 {
     private readonly DataContext _dataContext;

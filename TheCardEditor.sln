@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheCardEditor.Services", "T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheCardEditor.Shared", "TheCardEditor.Shared\TheCardEditor.Shared.csproj", "{2CDB3012-911A-454E-B367-236208F10747}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheCardEditor.Shared.Tests", "TheCardEditor.Tests\TheCardEditor.Shared.Tests.csproj", "{E2163B1A-B63B-496D-97EA-D35006146DE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheCardEditor.Shared.Tests", "TheCardEditor.Tests\TheCardEditor.Shared.Tests.csproj", "{E2163B1A-B63B-496D-97EA-D35006146DE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
