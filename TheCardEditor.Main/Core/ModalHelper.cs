@@ -76,7 +76,7 @@ public class ModalHelper : IModalHelper
             HideCloseButton = hideCloseButton,
             Size = ModalSize.Automatic,
             Position = position,
-            Class = movable ? "blazored-modal-draggable" : "",
+            Class = movable ? $"blazored-modal-draggable {guid}" : "",
             OverlayCustomClass = movable ? "blazored-disable-overlay" : "",
         };
         var modal = _modalService.Show<TModal>(title, parameters, options);

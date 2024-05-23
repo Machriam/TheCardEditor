@@ -1,12 +1,13 @@
 ﻿window.BlazorModalExtensions =
 {
     Draggable: async function (ref, guid, method, initialTop, initialLeft) {
-        let draggableElements = document.getElementsByClassName("blazored-modal-draggable");
+        let draggableElements = document.getElementsByClassName(guid);
         while (!draggableElements || draggableElements.length == 0) {
             await new Promise(resolve => setTimeout(resolve, 10));
+            draggableElements = document.getElementsByClassName(guid);
         }
         const modalWindow = draggableElements[0];
-        modalWindow.style.width = document.getElementsByClassName("bm-content")[0].children[0].clientWidth + "px";
+        modalWindow.style.width = draggableElements[0].querySelectorAll("div.bm-content")[0].children[0].clientWidth + "px";
         const maxTop = screen.height - modalWindow.offsetHeight;
         const maxLeft = screen.width - modalWindow.offsetWidth;
         modalWindow.parentElement.style.width = "0%";
