@@ -7,6 +7,16 @@ namespace TheCardEditor.Shared.DTO;
 
 public class CardModel
 {
+    public static CardModel WithoutData(Card card)
+    {
+        return new CardModel()
+        {
+            Id = card.Id,
+            Name = card.Name,
+            CardSetFk = card.CardSetFk,
+        };
+    }
+
     public CardModel()
     {
     }

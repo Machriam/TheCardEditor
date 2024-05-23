@@ -1,5 +1,22 @@
+@using TheCardEditor.Shared.DTO
 
-<div class="col-md-12 row" style="height:20vh;width:20vw">bla</div>
+<div style="width:22vw;height:25vh">
+    <div class="col-md-12" style="overflow-y:auto;height:100%;width:96%">
+        @foreach (var game in _gameSetById)
+        {
+            <hr />
+            <div class="col-md-12 d-flex flex-row fw-bold">
+                <div class="me-4">@game.Value.Game</div>
+                <div>@game.Value.CardSet</div>
+            </div>
+            <hr />
+            @foreach (var card in Cards.Where(c => game.Key == c.CardSetFk))
+            {
+                <div class="col-md-12 d-flex flex-row">
+                    <div>@card.Name</div>
+                </div>
+            }
+        }
+    </div>
+</div>
 
-@code {
-}

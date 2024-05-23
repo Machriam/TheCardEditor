@@ -51,18 +51,27 @@ public class CardService
         return card == null ? new CardModel() : new CardModel(card);
     }
 
-    public IEnumerable<CardModel> GetCards(long cardSetFk)
+    public IEnumerable<CardModel> GetCardsWithoutData(HashSet<long> cardIds)
+    {
+        return _dataContext.Cards
+            .Where(cs => cardIds.Contains(cs.Id))
+            .Select(c => CardModel.WithoutData(c));
+    }
+
+    public IEnumerable<CardModel> CardsOfSet(long cardSetFk)
     {
         return _dataContext.Cards.Where(cs => cs.CardSetFk == cardSetFk).Select(g => new CardModel(g));
     }
 
-    public IEnumerable<PictureReferenceModel> GetPictureReferences()
+    public IEnumerable<PictureReferenceModel> GetPictureReferences(HashSet<long>? pictureIds = null)
     {
-        return _dataContext.PictureCardReferences.Select(r => new PictureReferenceModel()
-        {
-            Id = r.Id,
-            CardFk = r.CardFk,
-            PictureFk = r.PictureFk
-        });
+        return _dataContext.PictureCardReferences
+            .Where(p => pictureIds == null || pictureIds.Contains(p.PictureFk))
+            .Select(r => new PictureReferenceModel()
+            {
+                Id = r.Id,
+                CardFk = r.CardFk,
+                PictureFk = r.PictureFk
+            });
     }
 }

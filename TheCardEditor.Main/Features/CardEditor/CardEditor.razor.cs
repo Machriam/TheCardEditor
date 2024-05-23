@@ -51,7 +51,7 @@ namespace TheCardEditor.Main.Features.CardEditor
         public async Task UpdateGrid()
         {
             if (ApplicationStorage.SelectedCardSet == null) return;
-            var cards = CardService.Execute(cs => cs.GetCards(ApplicationStorage.SelectedCardSet.Id));
+            var cards = CardService.Execute(cs => cs.CardsOfSet(ApplicationStorage.SelectedCardSet.Id));
             Tags = cards.SelectMany(c => c.SerializedData().GetTags().Select(t => t.Tag)).Distinct().OrderBy(t => t).ToList();
             _cardById = cards.Select(c =>
             {

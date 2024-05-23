@@ -29,6 +29,7 @@ public partial class PictureManager
 {
     [Inject] public ServiceAccessor<PictureService> PictureService { get; set; } = default!;
     [Inject] public ServiceAccessor<CardService> CardService { get; set; } = default!;
+    [Inject] public ServiceAccessor<GameService> GameService { get; set; } = default!;
     [Inject] private IGridViewFactory GridViewFactory { get; set; } = default!;
     [Inject] private IModalHelper ModalHelper { get; set; } = default!;
     private IGridView _gridView = default!;
@@ -120,9 +121,18 @@ public partial class PictureManager
 
     public void ShowModal()
     {
+        if (_selectedPictures.Length != 1) return;
+        var references = CardService.Execute(cs => cs.GetPictureReferences([.. _selectedPictures]));
+        var cards = CardService.Execute(cs => cs.GetCardsWithoutData(references.Select(r => r.CardFk).ToHashSet())).ToList();
+        var cardSets = GameService.Execute(g => g.AllCardSets()).ToList();
+        var picture = _pictures.Find(p => p.Id == _selectedPictures[0]);
         ModalHelper.AddGlobalModalWindow(async (modal, guid) =>
         {
-            return await modal.ShowModal<PictureManagerModal>("Card references", [], movable: true,
+            return await modal.ShowModal<PictureManagerModal>($"{picture?.Name ?? "NA"}",
+                new() {
+                    { nameof(PictureManagerModal.Sets), cardSets },
+                    { nameof(PictureManagerModal.Cards), cards},
+                }, movable: true,
             guid: guid, disableBackgroundCancel: true);
         });
     }
