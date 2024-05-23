@@ -1,33 +1,36 @@
-﻿using TheCardEditor.DataModel.DataModel;
+﻿using Microsoft.EntityFrameworkCore;
+using TheCardEditor.DataModel.DataModel;
 using TheCardEditor.Shared.DTO;
 
 namespace TheCardEditor.Services;
 
-public class GameService
+public class GameService(DataContext dataContext)
 {
-    private readonly DataContext _dataContext;
-
-    public GameService(DataContext dataContext)
-    {
-        _dataContext = dataContext;
-    }
-
     public void DeleteGame(GameModel model)
     {
-        _dataContext.Games.Remove(_dataContext.Games.First(f => f.Id == model.Id));
-        _dataContext.SaveChanges();
+        dataContext.Games.Remove(dataContext.Games.First(f => f.Id == model.Id));
+        dataContext.SaveChanges();
     }
 
     public void UpdateGame(GameModel model)
     {
-        var game = _dataContext.Games.FirstOrDefault(f => f.Id == model.Id);
-        if (game == null) _dataContext.Games.Add(model.GetDataModel());
+        var game = dataContext.Games.FirstOrDefault(f => f.Id == model.Id);
+        if (game == null) dataContext.Games.Add(model.GetDataModel());
         else game.Name = model.Name;
-        _dataContext.SaveChanges();
+        dataContext.SaveChanges();
+    }
+
+    public IEnumerable<GameSet> AllCardSets()
+    {
+        return dataContext.Games
+            .Include(g => g.CardSets)
+            .ToList()
+            .SelectMany(g => g.CardSets.Select(cs => new GameSet(new CardSetModel(cs), new GameModel(g))));
     }
 
     public IEnumerable<GameModel> GetGames()
     {
-        return _dataContext.Games.Select(g => new GameModel(g));
+        return dataContext.Games
+            .Select(g => new GameModel(g));
     }
 }

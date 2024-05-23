@@ -20,12 +20,18 @@ public class PictureGridModel(long id) : AbstractGridModel(id)
 
     [GridMetaData(HeaderName = "Found")]
     public string Status { get; set; } = "";
+
+    [GridMetaData(HeaderName = "Ref. Count")]
+    public int ReferenceCount { get; set; }
 }
 
 public partial class PictureManager
 {
     [Inject] public ServiceAccessor<PictureService> PictureService { get; set; } = default!;
+    [Inject] public ServiceAccessor<CardService> CardService { get; set; } = default!;
+    [Inject] public ServiceAccessor<GameService> GameService { get; set; } = default!;
     [Inject] private IGridViewFactory GridViewFactory { get; set; } = default!;
+    [Inject] private IModalHelper ModalHelper { get; set; } = default!;
     private IGridView _gridView = default!;
     private const string GridViewId = nameof(PictureManager) + nameof(GridViewId);
     private List<PictureModel> _pictures = [];
@@ -63,10 +69,12 @@ public partial class PictureManager
     {
         _pictures = [.. PictureService.Execute(ps => ps.GetPictures())];
         _existingPictures = PictureService.Execute(ps => ps.ValidatePictures()) ?? [];
+        var references = CardService.Execute(cs => cs.GetPictureReferences()).ToLookup(r => r.PictureFk);
         var models = _pictures.Select(p => new PictureGridModel(p.Id)
         {
             PictureName = p.Name,
             Path = p.Path,
+            ReferenceCount = references.Contains(p.Id) ? references[p.Id].Count() : 0,
             Status = _existingPictures.TryGetValue(p.Id, out var exists) ? exists ? "true" : "false" : "new",
             RowColorClass = _existingPictures[p.Id] ? AgGridResources.NoColorRow : AgGridResources.KhakiGridRow
         })
@@ -93,9 +101,40 @@ public partial class PictureManager
 
     public async Task UpdatePicturePath(FileDialogResult result)
     {
-        if (_selectedPictures.Length != 1 && _selectedPictures[0] <= 0) return;
-        PictureService.Execute(ps => ps.UpdatePath(_selectedPictures[0], result.FilePath));
+        if (_selectedPictures.Length == 0 || _selectedPictures.Any(p => p <= 0)) return;
+        var picturesById = _pictures.ToDictionary(p => p.Id);
+        if (_selectedPictures.Length > 1)
+        {
+            var path = Path.GetDirectoryName(result.FilePath) ?? throw new Exception("No Directory found");
+            foreach (var picture in _selectedPictures)
+            {
+                var newPath = Path.Combine(path, Path.GetFileName(picturesById[picture].Path));
+                PictureService.Execute(ps => ps.UpdatePath(picture, newPath));
+            }
+        }
+        else
+        {
+            PictureService.Execute(ps => ps.UpdatePath(_selectedPictures[0], result.FilePath));
+        }
         await Initialize();
+    }
+
+    public void ShowModal()
+    {
+        if (_selectedPictures.Length != 1) return;
+        var references = CardService.Execute(cs => cs.GetPictureReferences([.. _selectedPictures]));
+        var cards = CardService.Execute(cs => cs.GetCardsWithoutData(references.Select(r => r.CardFk).ToHashSet())).ToList();
+        var cardSets = GameService.Execute(g => g.AllCardSets()).ToList();
+        var picture = _pictures.Find(p => p.Id == _selectedPictures[0]);
+        ModalHelper.AddGlobalModalWindow(async (modal, guid) =>
+        {
+            return await modal.ShowModal<PictureManagerModal>($"{picture?.Name ?? "NA"}",
+                new() {
+                    { nameof(PictureManagerModal.Sets), cardSets },
+                    { nameof(PictureManagerModal.Cards), cards},
+                }, movable: true,
+            guid: guid, disableBackgroundCancel: true);
+        });
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

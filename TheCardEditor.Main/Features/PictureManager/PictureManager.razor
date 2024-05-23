@@ -14,5 +14,6 @@
     {
         <Button class="ms-2 col-md-2 btn btn-success" disabled="@(_selectedPictures==null)" OnClickAsync="AddSelectedNewPictures">Add new Pictures</Button>
     }
+    <Button class="ms-2 col-md-2 btn btn-dark" disabled="@(_selectedPictures==null || _selectedPictures.Length!=1)" OnClick="ShowModal">Card References</Button>
 </div>
 

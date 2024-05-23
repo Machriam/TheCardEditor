@@ -1,16 +1,19 @@
 ﻿window.BlazorModalExtensions =
 {
-    Draggable: function () {
-        let draggableElements = document.getElementsByClassName("blazored-modal-draggable");
-        if (!draggableElements || draggableElements.length == 0) return;
+    Draggable: async function (ref, guid, method, initialTop, initialLeft) {
+        let draggableElements = document.getElementsByClassName(guid);
+        while (!draggableElements || draggableElements.length == 0) {
+            await new Promise(resolve => setTimeout(resolve, 10));
+            draggableElements = document.getElementsByClassName(guid);
+        }
         const modalWindow = draggableElements[0];
-        modalWindow.style.width = document.getElementsByClassName("blazored-modal-content")[0].children[0].clientWidth + "px";
+        modalWindow.style.width = draggableElements[0].querySelectorAll("div.bm-content")[0].children[0].clientWidth + "px";
         const maxTop = screen.height - modalWindow.offsetHeight;
         const maxLeft = screen.width - modalWindow.offsetWidth;
         modalWindow.parentElement.style.width = "0%";
         modalWindow.parentElement.style.height = "0%";
-        modalWindow.style.top = "50px";
-        modalWindow.style.left = "0px";
+        modalWindow.style.top = `${initialTop ?? 50}px`;
+        modalWindow.style.left = `${initialLeft ?? 0}px`;
         dragElement(modalWindow);
 
         function dragElement() {
@@ -34,9 +37,11 @@
                 diffPosY = startPosY - e.clientY;
                 startPosX = e.clientX;
                 startPosY = e.clientY;
-
-                modalWindow.style.top = Math.min(maxTop, Math.max(50, (modalWindow.offsetTop - diffPosY))) + "px";
-                modalWindow.style.left = Math.min(maxLeft, Math.max(0, (modalWindow.offsetLeft - diffPosX))) + "px";
+                const newTop = Math.min(maxTop, Math.max(50, (modalWindow.offsetTop - diffPosY)));
+                const newLeft = Math.min(maxLeft, Math.max(0, (modalWindow.offsetLeft - diffPosX)));
+                modalWindow.style.top = newTop + "px";
+                modalWindow.style.left = newLeft + "px";
+                ref.invokeMethodAsync(method, guid, newTop, newLeft);
             }
 
             function closeDragElement() {

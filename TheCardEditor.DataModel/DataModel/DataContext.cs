@@ -10,6 +10,7 @@ public partial class DataContext : DbContext
     public virtual DbSet<Font> Fonts { get; set; }
     public virtual DbSet<Game> Games { get; set; }
     public virtual DbSet<Picture> Pictures { get; set; }
+    public virtual DbSet<PictureCardReference> PictureCardReferences { get; set; }
     public virtual DbSet<Template> Templates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -55,6 +56,19 @@ public partial class DataContext : DbContext
         modelBuilder.Entity<Picture>(entity =>
         {
             entity.ToTable("Picture");
+        });
+
+        modelBuilder.Entity<PictureCardReference>(entity =>
+        {
+            entity.ToTable("PictureCardReference");
+
+            entity.HasOne(d => d.CardFkNavigation).WithMany(p => p.PictureCardReferences)
+                .HasForeignKey(d => d.CardFk)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.PictureFkNavigation).WithMany(p => p.PictureCardReferences)
+                .HasForeignKey(d => d.PictureFk)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<Template>(entity =>
