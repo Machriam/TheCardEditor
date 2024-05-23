@@ -10,6 +10,7 @@ using TheCardEditor.Main.Core;
 using TheCardEditor.Main.Core.Grid;
 using TheCardEditor.Services;
 using TheCardEditor.Shared;
+using TheCardEditor.SheetComponent;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 namespace TheCardEditor.Main;
@@ -48,6 +49,7 @@ internal static class Program
         services.AddTransient(s => new ServiceAccessor<CardService>(s));
         services.AddTransient(s => new ServiceAccessor<PictureService>(s));
         services.AddTransient(s => new ServiceAccessor<TemplateService>(s));
+        services.AddTransient<ISheetViewFactory, SheetViewFactory>();
         services.AddTransient<ICanvasInteropFactory, CanvasInteropFactory>();
         services.AddTransient<IShortcutRegistrator, ShortcutRegistrator>();
         services.AddBlazoredModal();

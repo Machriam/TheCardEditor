@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TheCardEditor.Services\TheCardEditor.Services.csproj" />
     <ProjectReference Include="..\TheCardEditor.Shared\TheCardEditor.Shared.csproj" />
+    <ProjectReference Include="..\TheCardEditor.SheetComponent\TheCardEditor.SheetComponent.csproj" />
   </ItemGroup>
 
 </Project>

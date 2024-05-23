@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheCardEditor.Shared", "The
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheCardEditor.Shared.Tests", "TheCardEditor.Tests\TheCardEditor.Shared.Tests.csproj", "{E2163B1A-B63B-496D-97EA-D35006146DE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheCardEditor.SheetComponent", "TheCardEditor.SheetComponent\TheCardEditor.SheetComponent.csproj", "{609A00CB-55E0-4FD6-A3DA-7EFC7FF081A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{E2163B1A-B63B-496D-97EA-D35006146DE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2163B1A-B63B-496D-97EA-D35006146DE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2163B1A-B63B-496D-97EA-D35006146DE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{609A00CB-55E0-4FD6-A3DA-7EFC7FF081A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{609A00CB-55E0-4FD6-A3DA-7EFC7FF081A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{609A00CB-55E0-4FD6-A3DA-7EFC7FF081A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{609A00CB-55E0-4FD6-A3DA-7EFC7FF081A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
