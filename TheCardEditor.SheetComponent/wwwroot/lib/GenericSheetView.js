@@ -115,6 +115,7 @@
     timeout;
     onCellSelected() {
         var rows = this.xs.datas[0].rows["_"];
+        const updateNumber = Math.random();
         Object.getOwnPropertyNames(rows).forEach(ri => {
             if (!GenericSheetView.isNumeric(ri) || ri == "0") return;
             Object.getOwnPropertyNames(rows[ri].cells).forEach(ci => {
@@ -122,10 +123,30 @@
                     this.xs.cell(ri, ci).text = this.xs.cell(ri, ci).text.trim();
                 let result = this.validate(ri, ci);
                 if (result[0]) this.xs.cell(ri, ci).text = result[1];
+                this.hightlightCells(ri, ci, updateNumber);
             });
         });
         this.xs.reRender();
     };
+    hightlightCells(ri, ci, updateNumber) {
+        const cell = this.xs.cell(ri, ci);
+        if (cell.updateNumber != updateNumber) delete cell.style;
+        if (this.parameter.ColumnDefinitions.length <= ci) return;
+        if (!this.parameter.HighlightCellsDictionary.hasOwnProperty(this.parameter.ColumnDefinitions[ci].PropertyName)) return;
+        const dictionary = this.parameter.HighlightCellsDictionary[this.parameter.ColumnDefinitions[ci].PropertyName];
+        if (!dictionary.hasOwnProperty(cell.text)) return;
+        const styleIndex = this.styleByColor[dictionary[cell.text].Color].index;
+        if (dictionary[cell.text].WholeRow) {
+            for (let i = 0; i < this.parameter.ColumnDefinitions.length; i++) {
+                this.xs.cell(ri, i).style = styleIndex;
+                this.xs.cell(ri, i).updateNumber = updateNumber;
+            }
+        }
+        else {
+            cell.style = styleIndex;
+            cell.updateNumber = updateNumber;
+        }
+    }
     validate(ri, ci) {
         let value = this.xs.getParsedData(this.xs.cell(ri, ci).text);
         if (this.parameter.ColumnDefinitions.length <= ci) return [false, ""];
@@ -150,6 +171,7 @@
         let instance = GenericSheetView.getInstance();
         instance.sheetData = JSON.parse(data);
         instance.parameter = JSON.parse(parameter);
+        instance.createStyles(parameter);
         data = instance.sheetData;
         parameter = instance.parameter;
         let cols = {
@@ -180,19 +202,7 @@
             }
         }).loadData([{
             freeze: 'A2',
-            styles: [
-                {
-                    bgcolor: '#E9967A',
-                    textwrap: true,
-                    color: '#000000',
-                    border: {
-                        top: ['thin', '#0366d6'],
-                        bottom: ['thin', '#0366d6'],
-                        right: ['thin', '#0366d6'],
-                        left: ['thin', '#0366d6'],
-                    },
-                },
-            ],
+            styles: Object.keys(instance.styleByColor).map(k => instance.styleByColor[k].style),
             cols, rows,
         }]);
         instance.xs.on("cell-selected", () => {
@@ -200,6 +210,31 @@
             this.timeout = setTimeout(() => instance.onCellSelected(), 200);
         });
         document.getElementsByClassName("x-spreadsheet-bottombar")[0].remove();
+        instance.onCellSelected();
+    }
+
+    createStyles() {
+        let styleCounter = 0;
+        const createStyle = function (color) {
+            return {
+                bgcolor: color,
+                textwrap: true,
+                color: '#000000',
+                border: {
+                    top: ['thin', '#0366d6'],
+                    bottom: ['thin', '#0366d6'],
+                    right: ['thin', '#0366d6'],
+                    left: ['thin', '#0366d6'],
+                },
+            };
+        };
+        this.styleByColor = {};
+        const colors = new Set(Object.keys(this.parameter.HighlightCellsDictionary)
+            .flatMap(x => Object.keys(this.parameter.HighlightCellsDictionary[x])
+                .map(y => this.parameter.HighlightCellsDictionary[x][y].Color)));
+        colors.forEach(c => {
+            this.styleByColor[`${c}`] = { index: styleCounter++, style: createStyle(c) };
+        });
     }
 }
 

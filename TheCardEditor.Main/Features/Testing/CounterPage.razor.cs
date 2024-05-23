@@ -15,6 +15,9 @@ public partial class CounterPage : IDisposable
 
         [SheetMetaData(HeaderName = "Number Test", SheetConverter = SheetConverter.Numeric)]
         public int Second { get; set; } = Random.Shared.Next(1000);
+
+        [SheetMetaData(HeaderName = "Test")]
+        public string Third { get; set; } = "asdf";
     }
 
     [Inject] private IJSRuntime JS { get; set; } = default!;
@@ -37,7 +40,14 @@ public partial class CounterPage : IDisposable
     {
         if (!firstRender) return;
         _sheetView = SheetViewFactory.CreateSheet(this, SheetviewGridId);
-        await _sheetView.UpdateGrid(new DisplaySheetModel<SheetDataModel>(Enumerable.Range(0, 100).Select(_ => new SheetDataModel())));
+        var data = Enumerable.Range(0, 10000).Select(_ => new SheetDataModel()).ToList();
+        await _sheetView.UpdateGrid(new DisplaySheetModel<SheetDataModel>(data,
+            highlightCellsDictionary: new() {
+                { nameof(SheetDataModel.FirstColumn), new HighlightData[] {
+                        new(data[20].FirstColumn, "red", true), } },
+                 { nameof(SheetDataModel.Second), new HighlightData[] {
+                        new(data[10].Second.ToString(), "yellow", false), } }
+            }));
         AvailableFonts.AddRange(await JS.GetAvailableFonts());
         _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, ObjectSelected, ObjectDeselected, MultiObjectSelected);
         StateHasChanged();
