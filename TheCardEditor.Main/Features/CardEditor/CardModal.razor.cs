@@ -278,6 +278,7 @@ namespace TheCardEditor.Main.Features.CardEditor
         public void Dispose()
         {
             ShortcutRegistrator.Dispose();
+            _canvasInterop.Dispose();
         }
 
         public async Task Close()
