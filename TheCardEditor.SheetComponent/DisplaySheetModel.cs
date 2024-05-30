@@ -25,6 +25,7 @@ public class DisplaySheetModel<TData> where TData : AbstractSheetModel
             {
                 var templateCopy = template.Clone();
                 templateCopy.HeaderName = field;
+                templateCopy.IsDynamicColumn = true;
                 Parameter.ColumnDefinitions = Parameter.ColumnDefinitions.Append(templateCopy);
             }
             Parameter.ColumnDefinitions = Parameter.ColumnDefinitions.Where(cd => cd.HeaderName != column.Key);

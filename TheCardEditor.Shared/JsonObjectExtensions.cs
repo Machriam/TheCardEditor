@@ -11,6 +11,16 @@ public static class JsonObjectExtensions
                                 .Where(s => !string.IsNullOrEmpty(s.Item1)) ?? Array.Empty<(string, string)>();
     }
 
+    public static JsonObject UpdateTags(this JsonObject json, Dictionary<string, string> newTags)
+    {
+        foreach (var item in json["objects"]?.AsArray() ?? [])
+        {
+            if (item == null || item["tag"] == null) continue;
+            item["text"] = newTags.TryGetValue(item["tag"]?.ToString() ?? "", out var newTag) ? newTag : "";
+        }
+        return json;
+    }
+
     public static IEnumerable<(string Tag, long PictureId, int Index)> GetObjects(this JsonObject json)
     {
         return json?["objects"]?.AsArray()

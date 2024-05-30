@@ -21,6 +21,7 @@ public class SheetColumnDefinition(string? headerName, int width, bool editable,
 
     public string PropertyName { get; set; } = propertyName;
     public string HeaderName { get; set; } = headerName ?? "";
+    public bool IsDynamicColumn { get; set; }
 
     public int Width { get; set; } = width;
 

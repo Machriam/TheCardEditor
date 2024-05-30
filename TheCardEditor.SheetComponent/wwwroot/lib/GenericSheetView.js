@@ -260,9 +260,9 @@ window.genericSheetFunctions = {
             if (row == "0") return;
             rowData = {};
             instance.parameter.ColumnDefinitions.forEach((e, ci) => {
-                if (data[row].cells[ci] !== undefined) rowData[e.PropertyName] = instance.validate(row, ci)[1];
+                if (data[row].cells[ci] !== undefined) rowData[e.IsDynamicColumn ? e.HeaderName : e.PropertyName] = instance.validate(row, ci)[1];
             });
-            result.push(rowData);
+            if (Object.entries(rowData).length > 0) result.push(rowData);
         });
         return JSON.stringify(result);
     },
