@@ -132,7 +132,7 @@
         const cell = this.xs.cell(ri, ci);
         if (cell.updateNumber != updateNumber) delete cell.style;
         if (this.parameter.ColumnDefinitions.length <= ci) return;
-        if (!this.parameter.HighlightCellsDictionary.hasOwnProperty(this.parameter.ColumnDefinitions[ci].PropertyName)) return;
+        if (!this.parameter.HighlightCellsDictionary?.hasOwnProperty(this.parameter.ColumnDefinitions[ci].PropertyName)) return;
         const dictionary = this.parameter.HighlightCellsDictionary[this.parameter.ColumnDefinitions[ci].PropertyName];
         if (!dictionary.hasOwnProperty(cell.text)) return;
         const styleIndex = this.styleByColor[dictionary[cell.text].Color].index;
@@ -229,7 +229,7 @@
             };
         };
         this.styleByColor = {};
-        const colors = new Set(Object.keys(this.parameter.HighlightCellsDictionary)
+        const colors = new Set(Object.keys(this.parameter.HighlightCellsDictionary ?? [])
             .flatMap(x => Object.keys(this.parameter.HighlightCellsDictionary[x])
                 .map(y => this.parameter.HighlightCellsDictionary[x][y].Color)));
         colors.forEach(c => {

@@ -1,0 +1,14 @@
+<div class="col-md-12 row">
+    <div class="col-md-2">
+        @foreach (var template in _templateById)
+        {
+            <div class="alert @(template.Key==_selectedTemplate?"alert-info":"")"
+                 @onclick="async ()=>await OnTemplateSelected(template.Key)"
+                 style="cursor:pointer">
+                @template.Value
+            </div>
+        }
+    </div>
+    <div id="@ImportManagerSheet" class="col-md-10" style="height:80vh"></div>
+</div>
+

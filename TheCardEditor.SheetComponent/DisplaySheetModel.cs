@@ -5,7 +5,8 @@ public record struct HighlightData(string Value, string Color, bool WholeRow);
 public class DisplaySheetModel<TData> where TData : AbstractSheetModel
 {
     public DisplaySheetModel(IEnumerable<TData> data, Dictionary<string, string[]>? validValuesFor = null,
-        Dictionary<string, HighlightData[]>? highlightCellsDictionary = null, int minimumRows = 1)
+        Dictionary<string, HighlightData[]>? highlightCellsDictionary = null, int minimumRows = 1,
+        Dictionary<string, List<string>>? dynamicColumns = null)
     {
         Parameter = new SheetParameter()
         {
@@ -16,6 +17,18 @@ public class DisplaySheetModel<TData> where TData : AbstractSheetModel
                 .ToDictionary(v => v.Key, v => v.FirstOrDefault())),
             MinimumRows = minimumRows
         };
+        foreach (var column in dynamicColumns ?? new())
+        {
+            var template = Parameter.ColumnDefinitions
+                .First(cd => cd.HeaderName.Equals(column.Key, StringComparison.InvariantCultureIgnoreCase));
+            foreach (var field in column.Value)
+            {
+                var templateCopy = template.Clone();
+                templateCopy.HeaderName = field;
+                Parameter.ColumnDefinitions = Parameter.ColumnDefinitions.Append(templateCopy);
+            }
+            Parameter.ColumnDefinitions = Parameter.ColumnDefinitions.Where(cd => cd.HeaderName != column.Key);
+        }
         Data = data;
     }
 
