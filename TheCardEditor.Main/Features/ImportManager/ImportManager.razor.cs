@@ -1,5 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Services;
 using TheCardEditor.Shared;
@@ -26,6 +28,7 @@ public partial class ImportManager : IDisposable
     [Inject] private ServiceAccessor<TemplateService> TemplateService { get; set; } = default!;
     [Inject] private ApplicationStorage Application { get; set; } = default!;
     [Inject] private ServiceAccessor<CardService> CardService { get; set; } = default!;
+    [Inject] private IJSRuntime JS { get; set; } = default!;
 
     private static readonly HighlightData[] _rowColors = [new HighlightData("yellow"), new HighlightData("red")];
 
@@ -60,6 +63,29 @@ public partial class ImportManager : IDisposable
             highlightCellsDictionary: _rowColors,
             minimumRows: 1000,
             dynamicColumns: new() { { "Tags", tags.Select(t => t.Tag).ToList() } }));
+    }
+
+    public async Task CopyData()
+    {
+        var sheetData = (await _sheetView.GetSheetData<ImportSheetModel>() ?? []).ToList();
+        if (sheetData.Count == 0) return;
+
+        var headers = sheetData[0].TagTexts.Select(tt => tt.Key).ToList();
+        var result = new StringBuilder();
+        result.Append("Card Name").Append('\t');
+        foreach (var header in headers) result.Append(header).Append('\t');
+        foreach (var data in sheetData.Skip(1))
+        {
+            result.Remove(result.Length - 1, 1).AppendLine();
+            result.Append(data.CardName).Append('\t');
+            foreach (var header in headers)
+            {
+                var appendText = data.TagTexts.TryGetValue(header, out var value) ? value.ToString() : "";
+                result.Append(value).Append('\t');
+            }
+        }
+        result.Remove(result.Length - 1, 1);
+        await JS.CopyToClipboard(result.ToString());
     }
 
     public async Task<IEnumerable<SheetRowCard>> DataToImport()

@@ -78,6 +78,11 @@ public static partial class JsRuntimeExtensions
         await jsRuntime.InvokeVoidAsync("alert", message);
     }
 
+    public static async Task CopyToClipboard(this IJSRuntime js, string data)
+    {
+        await js.InvokeVoidAsync("navigator.clipboard.writeText", data);
+    }
+
     public static async Task ConsoleLog(this IJSRuntime jsRuntime, string message)
     {
         await jsRuntime.InvokeVoidAsync("console.log", message);
