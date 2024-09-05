@@ -1,4 +1,19 @@
-﻿class GenericSheetView {
+﻿/**
+ * @typedef {Object} SheetColumnDefinition
+ * @property {string} PropertyName}
+ * @property {string} HeaderName}
+ * @property {boolean} IsDynamicColumn}
+ * @property {number} Width}
+ * @property {boolean} Editable}
+ * @property {string} Converter}
+ */
+/**
+ * @typedef {Object} HighlightData
+ * @property {string} Color
+ * @property {string} Value
+ * @property {boolean} WholeRow
+ */
+class GenericSheetView {
     static objectIsNullOrEmpty(obj) {
         if (obj === null) return true;
         if (obj === undefined) return true;
@@ -156,6 +171,11 @@
         }
         return [true, this.converter[this.parameter.ColumnDefinitions[ci].Converter](value)];
     };
+
+    /**
+     *
+     * @returns {{data:Object.<string,any>[],parameter:{ColumnDefinitions:SheetColumnDefinition,AllowedValuesFor:Object.<string,string[]>,HighlightCellsDictionary:Object.<string,Object.<string,HighlightData>>,MinimumRows:number}}
+     */
     static getInstance() {
         if (!window.genericSheetFunctions.instance
             || (Object.keys(window.genericSheetFunctions.instance).length === 0
@@ -167,6 +187,7 @@
     static resetInstance() {
         window.genericSheetFunctions.instance = {};
     }
+
     loadData(data, parameter, gridId) {
         let instance = GenericSheetView.getInstance();
         instance.sheetData = JSON.parse(data);
@@ -245,6 +266,26 @@ window.genericSheetFunctions = {
         document.getElementById(gridId).innerHTML = "";
         let instance = GenericSheetView.getInstance();
         instance.loadData(data, parameter, gridId);
+    },
+    /**
+     *
+     * @param {string} gridId
+     * @param {Object.<number,string>} colorByIndex
+     */
+    colorRows: function (gridId, colorByIndex) {
+        let instance = GenericSheetView.getInstance();
+        const data = instance.xs.datas[0].rows["_"];
+        const rowIndices = Object.getOwnPropertyNames(colorByIndex);
+        for (let i = 0; i < rowIndices.length; i++) {
+            const row = rowIndices[i];
+            const color = colorByIndex[row];
+            const cell = data[row].cells;
+            const cellProperties = Object.getOwnPropertyNames(cell);
+            for (let ci = 0; ci < cellProperties.length; ci++) {
+                cell[cellProperties[ci]].style = instance.styleByColor[color].index;
+            }
+        }
+        instance.xs.reRender();
     },
     initialize: function (data, parameter, gridId) {
         let instance = GenericSheetView.getInstance();

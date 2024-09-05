@@ -9,6 +9,8 @@ public interface IXSheetView : IDisposable
     ValueTask UpdateGrid<TData>(DisplaySheetModel<TData> sheetModel) where TData : AbstractSheetModel;
 
     ValueTask CopyToClipboard();
+
+    ValueTask HighlightRows(Dictionary<int, string> colorByIndex);
 }
 
 public class XSheetView<TView>(IJSRuntime jsRuntime, string divId, TView objectReference) : IXSheetView where TView : class
@@ -20,6 +22,7 @@ public class XSheetView<TView>(IJSRuntime jsRuntime, string divId, TView objectR
     private const string DisposeSheet = Namespace + ".dispose";
     private const string SheetData = Namespace + ".getSheetData";
     private const string CopyDataToClipboard = Namespace + ".copyDataToClipboard";
+    private const string ColorRows = Namespace + ".colorRows";
     private readonly DotNetObjectReference<TView> _objectReference = DotNetObjectReference.Create(objectReference);
 
     public ValueTask UpdateGrid<TData>(DisplaySheetModel<TData> sheetModel) where TData : AbstractSheetModel
@@ -40,6 +43,11 @@ public class XSheetView<TView>(IJSRuntime jsRuntime, string divId, TView objectR
     public async ValueTask CopyToClipboard()
     {
         await jsRuntime.InvokeVoidAsync(CopyDataToClipboard, divId);
+    }
+
+    public async ValueTask HighlightRows(Dictionary<int, string> colorByIndex)
+    {
+        await jsRuntime.InvokeVoidAsync(ColorRows, divId, colorByIndex);
     }
 
     public void Dispose()
