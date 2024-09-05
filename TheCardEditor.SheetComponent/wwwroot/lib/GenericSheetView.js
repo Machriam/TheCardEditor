@@ -10,8 +10,6 @@
 /**
  * @typedef {Object} HighlightData
  * @property {string} Color
- * @property {string} Value
- * @property {boolean} WholeRow
  */
 class GenericSheetView {
     static objectIsNullOrEmpty(obj) {
@@ -138,30 +136,10 @@ class GenericSheetView {
                     this.xs.cell(ri, ci).text = this.xs.cell(ri, ci).text.trim();
                 let result = this.validate(ri, ci);
                 if (result[0]) this.xs.cell(ri, ci).text = result[1];
-                this.hightlightCells(ri, ci, updateNumber);
             });
         });
         this.xs.reRender();
     };
-    hightlightCells(ri, ci, updateNumber) {
-        const cell = this.xs.cell(ri, ci);
-        if (cell.updateNumber != updateNumber) delete cell.style;
-        if (this.parameter.ColumnDefinitions.length <= ci) return;
-        if (!this.parameter.HighlightCellsDictionary?.hasOwnProperty(this.parameter.ColumnDefinitions[ci].PropertyName)) return;
-        const dictionary = this.parameter.HighlightCellsDictionary[this.parameter.ColumnDefinitions[ci].PropertyName];
-        if (!dictionary.hasOwnProperty(cell.text)) return;
-        const styleIndex = this.styleByColor[dictionary[cell.text].Color].index;
-        if (dictionary[cell.text].WholeRow) {
-            for (let i = 0; i < this.parameter.ColumnDefinitions.length; i++) {
-                this.xs.cell(ri, i).style = styleIndex;
-                this.xs.cell(ri, i).updateNumber = updateNumber;
-            }
-        }
-        else {
-            cell.style = styleIndex;
-            cell.updateNumber = updateNumber;
-        }
-    }
     validate(ri, ci) {
         let value = this.xs.getParsedData(this.xs.cell(ri, ci).text);
         if (this.parameter.ColumnDefinitions.length <= ci) return [false, ""];
@@ -174,7 +152,7 @@ class GenericSheetView {
 
     /**
      *
-     * @returns {{data:Object.<string,any>[],parameter:{ColumnDefinitions:SheetColumnDefinition,AllowedValuesFor:Object.<string,string[]>,HighlightCellsDictionary:Object.<string,Object.<string,HighlightData>>,MinimumRows:number}}
+     * @returns {{data:Object.<string,any>[],parameter:{ColumnDefinitions:SheetColumnDefinition,AllowedValuesFor:Object.<string,string[]>,PossibleRowColors:HighlightData[],MinimumRows:number}}
      */
     static getInstance() {
         if (!window.genericSheetFunctions.instance
@@ -250,11 +228,9 @@ class GenericSheetView {
             };
         };
         this.styleByColor = {};
-        const colors = new Set(Object.keys(this.parameter.HighlightCellsDictionary ?? [])
-            .flatMap(x => Object.keys(this.parameter.HighlightCellsDictionary[x])
-                .map(y => this.parameter.HighlightCellsDictionary[x][y].Color)));
-        colors.forEach(c => {
-            this.styleByColor[`${c}`] = { index: styleCounter++, style: createStyle(c) };
+        debugger;
+        this.parameter.PossibleRowColors.forEach(c => {
+            this.styleByColor[`${c.Color}`] = { index: styleCounter++, style: createStyle(c.Color) };
         });
     }
 }

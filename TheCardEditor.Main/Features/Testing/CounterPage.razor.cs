@@ -41,13 +41,7 @@ public partial class CounterPage : IDisposable
         if (!firstRender) return;
         _sheetView = SheetViewFactory.CreateSheet(this, SheetviewGridId);
         var data = Enumerable.Range(0, 10000).Select(_ => new SheetDataModel()).ToList();
-        await _sheetView.UpdateGrid(new DisplaySheetModel<SheetDataModel>(data,
-            highlightCellsDictionary: new() {
-                { nameof(SheetDataModel.FirstColumn), new HighlightData[] {
-                        new(data[20].FirstColumn, "red", true), } },
-                 { nameof(SheetDataModel.Second), new HighlightData[] {
-                        new(data[10].Second.ToString(), "yellow", false), } }
-            }));
+        await _sheetView.UpdateGrid(new DisplaySheetModel<SheetDataModel>(data));
         AvailableFonts.AddRange(await JS.GetAvailableFonts());
         _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, ObjectSelected, ObjectDeselected, MultiObjectSelected);
         StateHasChanged();

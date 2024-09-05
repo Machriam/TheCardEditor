@@ -27,9 +27,7 @@ public partial class ImportManager : IDisposable
     [Inject] private ApplicationStorage Application { get; set; } = default!;
     [Inject] private ServiceAccessor<CardService> CardService { get; set; } = default!;
 
-    private static readonly Dictionary<string, HighlightData[]> _rowColors =
-        new[] { new HighlightData("", "yellow", true), new HighlightData("", "red", true) }
-        .ToDictionary(x => x.GetHashCode().ToString(), x => new[] { x });
+    private static readonly HighlightData[] _rowColors = [new HighlightData("yellow"), new HighlightData("red")];
 
     private IXSheetView _sheetView = default!;
     private IReadOnlyDictionary<int, string> _templateById = new Dictionary<int, string>();
