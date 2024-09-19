@@ -176,9 +176,14 @@ namespace TheCardEditor.Main.Features.CardEditor
             await _canvasInterop.ImportJson(jsonObject ?? [], _pictureData);
         }
 
-        public async Task CenterObjects()
+        public async Task CenterObjectsVertical()
         {
-            await _canvasInterop.CenterObjects();
+            await _canvasInterop.CenterObjectsVertical();
+        }
+
+        public async Task CenterObjectsHorizontal()
+        {
+            await _canvasInterop.CenterObjectsHorizontal();
         }
 
         public async Task RemoveObject()
@@ -268,7 +273,7 @@ namespace TheCardEditor.Main.Features.CardEditor
 
         private async ValueTask ApplyFont(CanvasFontStyle style, object value)
         {
-            if (style == CanvasFontStyle.Fill)
+            if (style == CanvasFontStyle.Fill | style == CanvasFontStyle.Stroke)
             {
                 value = await JS.GetUserString("Enter colorcode:");
             }

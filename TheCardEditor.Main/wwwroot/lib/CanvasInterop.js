@@ -213,7 +213,7 @@ window.canvasInteropFunctions = {
             instance.canvas.remove(objects[i]);
         }
     },
-    centerObjects: function (divId) {
+    centerObjectsHorizontal: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
         const objects = instance.canvas.getActiveObjects();
         if (objects.length > 1) {
@@ -228,6 +228,22 @@ window.canvasInteropFunctions = {
         }
         instance.canvas.renderAll();
     },
+    centerObjectsVertical: function (divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        const objects = instance.canvas.getActiveObjects();
+        if (objects.length > 1) {
+            objects[0].group.viewportCenterV();
+            for (var i = 0; i < objects.length; i++) {
+                objects[i].set({ top: - objects[i].height / 2 });
+                objects[i].setCoords();
+            }
+        }
+        else {
+            objects[0].viewportCenterV();
+        }
+        instance.canvas.renderAll();
+    },
+
     exportJson: function (divId) {
         const instance = CanvasInterop.getInstance(divId);
         let result = instance.canvas.toJSON(["tag", "pictureFilter", "pictureId", "name", "lockScalingY"]);
