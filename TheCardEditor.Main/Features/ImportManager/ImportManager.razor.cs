@@ -29,8 +29,9 @@ public partial class ImportManager : IDisposable
     [Inject] private ApplicationStorage Application { get; set; } = default!;
     [Inject] private ServiceAccessor<CardService> CardService { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
+    private const string NewLineReplacement = "{br}";
 
-    private static readonly HighlightData[] _rowColors = [new HighlightData("yellow"), new HighlightData("red")];
+    private static readonly HighlightData[] _rowColors = [new HighlightData("yellow"), new HighlightData("red"), new HighlightData("white")];
 
     private IXSheetView _sheetView = default!;
     private IReadOnlyDictionary<int, string> _templateById = new Dictionary<int, string>();
@@ -58,7 +59,8 @@ public partial class ImportManager : IDisposable
         var template = TemplateService.Execute(ts => ts.GetTemplate(templateId));
         if (template == null) return;
         var tags = template.SerializedData().GetTags();
-        var modelList = new List<ImportSheetModel>() { new() { CardName = template.Name, TagTexts = tags.ToDictionary(t => t.Tag, t => (object)t.Text) } };
+        var modelList = new List<ImportSheetModel>() { new() { CardName = template.Name,
+            TagTexts = tags.ToDictionary(t => t.Tag, t => (object)t.Text.Replace("\n",NewLineReplacement)) } };
         await _sheetView.UpdateGrid(new DisplaySheetModel<ImportSheetModel>(modelList,
             highlightCellsDictionary: _rowColors,
             minimumRows: 1000,
@@ -114,9 +116,11 @@ public partial class ImportManager : IDisposable
                 result.Add(new(newData.Item, cardId, "yellow", false, newData.Index + 2));
                 continue;
             }
-            result.Add(new(newData.Item, null, "", false, newData.Index + 2));
+            if (!existingCardNames.ContainsKey(newData.Item.CardName))
+                existingCardNames.Add(newData.Item.CardName, 0);
+            result.Add(new(newData.Item, null, "white", false, newData.Index + 2));
         }
-        await _sheetView.HighlightRows(result.Where(r => !r.Color.IsEmpty()).ToDictionary(r => r.RowIndex, r => r.Color));
+        await _sheetView.HighlightRows(result.ToDictionary(r => r.RowIndex, r => r.Color));
         return result;
     }
 
@@ -128,7 +132,8 @@ public partial class ImportManager : IDisposable
         var importData = await DataToImport();
         foreach (var newData in importData.Where(d => !d.IgnoreInImport))
         {
-            var tagDictionary = newData.SheetModel.TagTexts.ToDictionary(tt => tt.Key, tt => tt.Value?.ToString() ?? "") ?? [];
+            var tagDictionary = newData.SheetModel.TagTexts
+                .ToDictionary(tt => tt.Key, tt => tt.Value?.ToString()?.Replace(NewLineReplacement, "\n") ?? "") ?? [];
             var newCard = template.SerializedData().UpdateTags(tagDictionary);
             CardService.Execute(cs => cs.UpdateCard(new Shared.DTO.CardModel()
             {

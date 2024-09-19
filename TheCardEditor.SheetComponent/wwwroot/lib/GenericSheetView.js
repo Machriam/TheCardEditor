@@ -228,7 +228,6 @@ class GenericSheetView {
             };
         };
         this.styleByColor = {};
-        debugger;
         this.parameter.PossibleRowColors.forEach(c => {
             this.styleByColor[`${c.Color}`] = { index: styleCounter++, style: createStyle(c.Color) };
         });
