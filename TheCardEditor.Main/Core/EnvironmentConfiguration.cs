@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using TheCardEditor.Shared;
 
 namespace TheCardEditor.Main.Core;
 
@@ -10,6 +11,8 @@ public interface IEnvironmentConfiguration
     WindowPosition WindowPosition { get; }
 
     void SaveNewWindowPosition(WindowPosition newWindowPosition);
+
+    void SaveDatabaseLocation(string location);
 }
 
 public class EnvironmentConfiguration : IEnvironmentConfiguration
@@ -21,9 +24,28 @@ public class EnvironmentConfiguration : IEnvironmentConfiguration
         _configuration = configuration;
     }
 
-    public string DatabasePath => _configuration.GetConnectionString(nameof(DatabasePath)) ?? throw new Exception("No database path defined");
+    public string DatabasePath
+    {
+        get
+        {
+            var connection = _configuration.GetConnectionString(nameof(DatabasePath)) ?? "";
+            if (!connection.Pipe(File.Exists))
+                return Environment.SpecialFolder.MyDocuments
+                    .Pipe(Environment.GetFolderPath)
+                    .Pipe(x => Path.Combine(x, "CardEditor.sqlite3"));
+            return connection;
+        }
+    }
 
     public WindowPosition WindowPosition => _configuration.GetSection(WindowPosition.Key).Get<WindowPosition>() ?? new();
+
+    public void SaveDatabaseLocation(string location)
+    {
+        var appsettings = File.ReadAllText(AppSettings.GetPath);
+        var data = JsonSerializer.Deserialize<AppSettings>(appsettings) ?? new();
+        data.ConnectionStrings[nameof(DatabasePath)] = location;
+        File.WriteAllText(AppSettings.GetPath, JsonSerializer.Serialize(data, new JsonSerializerOptions() { WriteIndented = true }));
+    }
 
     public void SaveNewWindowPosition(WindowPosition newWindowPosition)
     {

@@ -19,6 +19,12 @@ public partial class DataContext
         var resourceSet = DatabaseMigrations.ResourceManager.GetResourceSet(CultureInfo.InvariantCulture, true, true) ??
             throw new Exception("No Migration Resource found");
         var currentVersion = "0.0.0";
+        if (!version.Any())
+        {
+            var lastVersion = IVersionSort.CreateDefault(currentVersion).GetPatchesToApply(resourceSet).Last().VersionText;
+            Database.ExecuteSqlInterpolated($"insert into ApplicationData (Name, Value) values ('Version', {lastVersion})");
+            return;
+        }
         try
         {
             currentVersion = version.FirstOrDefault() ?? currentVersion;

@@ -90,7 +90,7 @@ namespace TheCardEditor.DataModel.Migrations {
         ///    SELECT json_extract(json(&quot;Data&quot;)-&gt;&gt;&apos;objects&apos;,&apos;$&apos;) AS json_object, id as card_id FROM card
         ///),
         ///duplicated_result as 
-        ///(SELECT card_id,json_extract(value, &apos; [rest of string was truncated]&quot;;.
+        ///(SELECT card_id,json_extract(value, &apos;$.pictureId&apos;) [rest of string was truncated]&quot;;.
         /// </summary>
         public static string _1_3_0 {
             get {

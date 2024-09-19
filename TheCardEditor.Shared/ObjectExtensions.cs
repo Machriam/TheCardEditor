@@ -6,6 +6,8 @@ namespace TheCardEditor.Shared;
 
 public static class ObjectExtensions
 {
+    public static TOut Pipe<TIn, TOut>(this TIn obj, Func<TIn, TOut> func) => func(obj);
+
     public static T? Try<T, V>(this V obj, Func<V, T> function, out string? error)
     {
         error = null;

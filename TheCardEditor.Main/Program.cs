@@ -59,6 +59,8 @@ internal static class Program
         var provider = services.BuildServiceProvider();
         using (var scope = provider.CreateScope())
         {
+            var environment = scope.ServiceProvider.GetRequiredService<IEnvironmentConfiguration>();
+            environment.SaveDatabaseLocation(environment.DatabasePath);
             var db = scope.ServiceProvider.GetRequiredService<DataContext>();
             db.Migrate();
         }

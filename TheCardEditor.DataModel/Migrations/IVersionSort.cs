@@ -6,15 +6,18 @@ namespace TheCardEditor.DataModel.Migrations;
 
 public static class IVersionSortExtensions
 {
-    public static IOrderedEnumerable<(int[] Version, string SQL)> GetPatchesToApply(this IVersionSort version, ResourceSet set)
+    public record struct VersionModel(int[] Version, string SQL, string VersionText);
+
+    public static IOrderedEnumerable<VersionModel> GetPatchesToApply(this IVersionSort version, ResourceSet set)
     {
         var currentVersionNumber = version.CurrentVersion.Split(".").Select(int.Parse).ToArray();
         var migrations = new List<string>();
-        var versions = new List<(int[] Version, string SQL)>();
+        var versions = new List<VersionModel>();
         foreach (DictionaryEntry entry in set ?? throw new Exception("No Migrations found"))
         {
             var resourceVersion = entry.Key.ToString()?.Split(".").Select(int.Parse) ?? throw new Exception("Invalid Migration entry");
-            versions.Add((resourceVersion.ToArray(), entry.Value?.ToString() ?? throw new Exception("Invalid Migration entry")));
+            versions.Add(new(resourceVersion.ToArray(),
+                entry.Value?.ToString() ?? throw new Exception("Invalid Migration entry"), entry.Key.ToString() ?? ""));
         }
         return versions.Where(v => v.Version[0] > currentVersionNumber[0] ||
                            (v.Version[0] == currentVersionNumber[0] && v.Version[1] > currentVersionNumber[1]) ||
