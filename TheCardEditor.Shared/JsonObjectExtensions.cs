@@ -16,7 +16,9 @@ public static class JsonObjectExtensions
         foreach (var item in json["objects"]?.AsArray() ?? [])
         {
             if (item == null || item["tag"] == null) continue;
+            var oldTextLines = item["text"]?.GetValue<string>().Split("\n") ?? [];
             item["text"] = newTags.TryGetValue(item["tag"]?.ToString() ?? "", out var newTag) ? newTag : "";
+            var newTextLines = newTag?.Split("\n") ?? [];
         }
         return json;
     }
