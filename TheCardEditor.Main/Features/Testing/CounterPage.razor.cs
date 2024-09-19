@@ -33,22 +33,16 @@ public partial class CounterPage : IDisposable
     private int currentCount = 0;
     private int FontSize { get; set; } = 12;
     private int SelectIndex { get; set; } = 0;
-    private string selectedFont = "";
-    private List<string> AvailableFonts = new();
+    private string _selectedFont = "";
+    private List<string> _availableFonts = [];
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
         _sheetView = SheetViewFactory.CreateSheet(this, SheetviewGridId);
         var data = Enumerable.Range(0, 10000).Select(_ => new SheetDataModel()).ToList();
-        await _sheetView.UpdateGrid(new DisplaySheetModel<SheetDataModel>(data,
-            highlightCellsDictionary: new() {
-                { nameof(SheetDataModel.FirstColumn), new HighlightData[] {
-                        new(data[20].FirstColumn, "red", true), } },
-                 { nameof(SheetDataModel.Second), new HighlightData[] {
-                        new(data[10].Second.ToString(), "yellow", false), } }
-            }));
-        AvailableFonts.AddRange(await JS.GetAvailableFonts());
+        await _sheetView.UpdateGrid(new DisplaySheetModel<SheetDataModel>(data));
+        _availableFonts.AddRange(await JS.GetAvailableFonts());
         _canvasInterop = CanvasInteropFactory.CreateCanvas(this, CanvasId, ObjectSelected, ObjectDeselected, MultiObjectSelected);
         StateHasChanged();
     }
@@ -57,7 +51,7 @@ public partial class CounterPage : IDisposable
     {
         var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ShittyFont.woff2");
         await JS.LoadFont("Shitty Test Font", Convert.ToBase64String(File.ReadAllBytes(path)));
-        AvailableFonts.Add("Shitty Test Font");
+        _availableFonts.Add("Shitty Test Font");
         StateHasChanged();
     }
 

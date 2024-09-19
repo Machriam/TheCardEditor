@@ -1,4 +1,17 @@
-﻿class GenericSheetView {
+﻿/**
+ * @typedef {Object} SheetColumnDefinition
+ * @property {string} PropertyName}
+ * @property {string} HeaderName}
+ * @property {boolean} IsDynamicColumn}
+ * @property {number} Width}
+ * @property {boolean} Editable}
+ * @property {string} Converter}
+ */
+/**
+ * @typedef {Object} HighlightData
+ * @property {string} Color
+ */
+class GenericSheetView {
     static objectIsNullOrEmpty(obj) {
         if (obj === null) return true;
         if (obj === undefined) return true;
@@ -123,30 +136,10 @@
                     this.xs.cell(ri, ci).text = this.xs.cell(ri, ci).text.trim();
                 let result = this.validate(ri, ci);
                 if (result[0]) this.xs.cell(ri, ci).text = result[1];
-                this.hightlightCells(ri, ci, updateNumber);
             });
         });
         this.xs.reRender();
     };
-    hightlightCells(ri, ci, updateNumber) {
-        const cell = this.xs.cell(ri, ci);
-        if (cell.updateNumber != updateNumber) delete cell.style;
-        if (this.parameter.ColumnDefinitions.length <= ci) return;
-        if (!this.parameter.HighlightCellsDictionary.hasOwnProperty(this.parameter.ColumnDefinitions[ci].PropertyName)) return;
-        const dictionary = this.parameter.HighlightCellsDictionary[this.parameter.ColumnDefinitions[ci].PropertyName];
-        if (!dictionary.hasOwnProperty(cell.text)) return;
-        const styleIndex = this.styleByColor[dictionary[cell.text].Color].index;
-        if (dictionary[cell.text].WholeRow) {
-            for (let i = 0; i < this.parameter.ColumnDefinitions.length; i++) {
-                this.xs.cell(ri, i).style = styleIndex;
-                this.xs.cell(ri, i).updateNumber = updateNumber;
-            }
-        }
-        else {
-            cell.style = styleIndex;
-            cell.updateNumber = updateNumber;
-        }
-    }
     validate(ri, ci) {
         let value = this.xs.getParsedData(this.xs.cell(ri, ci).text);
         if (this.parameter.ColumnDefinitions.length <= ci) return [false, ""];
@@ -156,6 +149,11 @@
         }
         return [true, this.converter[this.parameter.ColumnDefinitions[ci].Converter](value)];
     };
+
+    /**
+     *
+     * @returns {{data:Object.<string,any>[],parameter:{ColumnDefinitions:SheetColumnDefinition,AllowedValuesFor:Object.<string,string[]>,PossibleRowColors:HighlightData[],MinimumRows:number}}
+     */
     static getInstance() {
         if (!window.genericSheetFunctions.instance
             || (Object.keys(window.genericSheetFunctions.instance).length === 0
@@ -167,6 +165,7 @@
     static resetInstance() {
         window.genericSheetFunctions.instance = {};
     }
+
     loadData(data, parameter, gridId) {
         let instance = GenericSheetView.getInstance();
         instance.sheetData = JSON.parse(data);
@@ -229,11 +228,8 @@
             };
         };
         this.styleByColor = {};
-        const colors = new Set(Object.keys(this.parameter.HighlightCellsDictionary)
-            .flatMap(x => Object.keys(this.parameter.HighlightCellsDictionary[x])
-                .map(y => this.parameter.HighlightCellsDictionary[x][y].Color)));
-        colors.forEach(c => {
-            this.styleByColor[`${c}`] = { index: styleCounter++, style: createStyle(c) };
+        this.parameter.PossibleRowColors.forEach(c => {
+            this.styleByColor[`${c.Color}`] = { index: styleCounter++, style: createStyle(c.Color) };
         });
     }
 }
@@ -245,6 +241,26 @@ window.genericSheetFunctions = {
         document.getElementById(gridId).innerHTML = "";
         let instance = GenericSheetView.getInstance();
         instance.loadData(data, parameter, gridId);
+    },
+    /**
+     *
+     * @param {string} gridId
+     * @param {Object.<number,string>} colorByIndex
+     */
+    colorRows: function (gridId, colorByIndex) {
+        let instance = GenericSheetView.getInstance();
+        const data = instance.xs.datas[0].rows["_"];
+        const rowIndices = Object.getOwnPropertyNames(colorByIndex);
+        for (let i = 0; i < rowIndices.length; i++) {
+            const row = rowIndices[i];
+            const color = colorByIndex[row];
+            const cell = data[row].cells;
+            const cellProperties = Object.getOwnPropertyNames(cell);
+            for (let ci = 0; ci < cellProperties.length; ci++) {
+                cell[cellProperties[ci]].style = instance.styleByColor[color].index;
+            }
+        }
+        instance.xs.reRender();
     },
     initialize: function (data, parameter, gridId) {
         let instance = GenericSheetView.getInstance();
@@ -260,9 +276,9 @@ window.genericSheetFunctions = {
             if (row == "0") return;
             rowData = {};
             instance.parameter.ColumnDefinitions.forEach((e, ci) => {
-                if (data[row].cells[ci] !== undefined) rowData[e.PropertyName] = instance.validate(row, ci)[1];
+                if (data[row].cells[ci] !== undefined) rowData[e.IsDynamicColumn ? e.HeaderName : e.PropertyName] = instance.validate(row, ci)[1];
             });
-            result.push(rowData);
+            if (Object.entries(rowData).length > 0) result.push(rowData);
         });
         return JSON.stringify(result);
     },

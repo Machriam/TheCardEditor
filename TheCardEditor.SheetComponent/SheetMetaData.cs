@@ -6,5 +6,4 @@ public class SheetMetaData : Attribute
     public int Width { get; set; } = 200;
     public string? HeaderName { get; set; }
     public SheetConverter SheetConverter { get; set; } = SheetConverter.Default;
-    public bool Hide { get; set; } = false;
 }

@@ -34,7 +34,7 @@ public class ServiceAccessor<TService> : IServiceAccessor<TService> where TServi
         }
         catch (Exception ex)
         {
-            _errorLogger.LogError(ex.Message);
+            _errorLogger.LogError(ex.Message, ex.StackTrace ?? "");
         }
     }
 
@@ -46,7 +46,7 @@ public class ServiceAccessor<TService> : IServiceAccessor<TService> where TServi
         }
         catch (Exception ex)
         {
-            _errorLogger.LogError(ex.Message);
+            _errorLogger.LogError(ex.Message, ex.StackTrace ?? "");
             return default;
         }
     }
