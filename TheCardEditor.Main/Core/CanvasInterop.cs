@@ -122,7 +122,7 @@ public interface ICanvasInterop : IDisposable
 
     ValueTask SelectObject(int index);
 
-    ValueTask CenterObjects();
+    ValueTask CenterObjectsHorizontal();
 
     ValueTask ApplyFont(CanvasFontStyle style, object value);
 
@@ -141,6 +141,8 @@ public interface ICanvasInterop : IDisposable
     ValueTask<ObjectParameter> GetObjectParameter();
 
     ValueTask UpdateImage(string base64Image, ImageFilterPipeline filterPipeline);
+
+    ValueTask CenterObjectsVertical();
 }
 
 public class CanvasInterop<TView> : ICanvasInterop where TView : class
@@ -171,7 +173,8 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
     private static string OnKeyDown => Namespace + ".onKeyDown";
     private static string JsDispose => Namespace + ".dispose";
     private static string JsZoom => Namespace + ".zoom";
-    private static string JsCenterObjects => Namespace + ".centerObjects";
+    private static string JsCenterObjectsHorizontal => Namespace + ".centerObjectsHorizontal";
+    private static string JsCenterObjectsVertical => Namespace + ".centerObjectsVertical";
     private static string JsReset => Namespace + ".reset";
     private static string JsGetObjectParameter => Namespace + ".getObjectParameter";
     private static string JsUpdateImage => Namespace + ".updateImage";
@@ -294,10 +297,16 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await _jsRuntime.HandledInvokeVoid(JsSetCoordinates, _divId, left, top, angle);
     }
 
-    public async ValueTask CenterObjects()
+    public async ValueTask CenterObjectsHorizontal()
     {
         await Initialize();
-        await _jsRuntime.HandledInvokeVoid(JsCenterObjects, _divId);
+        await _jsRuntime.HandledInvokeVoid(JsCenterObjectsHorizontal, _divId);
+    }
+
+    public async ValueTask CenterObjectsVertical()
+    {
+        await Initialize();
+        await _jsRuntime.HandledInvokeVoid(JsCenterObjectsVertical, _divId);
     }
 
     public async ValueTask Reset()
