@@ -31,7 +31,8 @@ public partial class ImportManager : IDisposable
     [Inject] private IJSRuntime JS { get; set; } = default!;
     private const string NewLineReplacement = "{br}";
 
-    private static readonly HighlightData[] _rowColors = [new HighlightData("yellow"), new HighlightData("red"), new HighlightData("white")];
+    private static readonly HighlightData[] _rowColors = [new HighlightData("yellow"), new HighlightData("red"),
+        new HighlightData("white"),new HighlightData("lightgrey")];
 
     private IXSheetView _sheetView = default!;
     private IReadOnlyDictionary<int, string> _templateById = new Dictionary<int, string>();
@@ -65,6 +66,7 @@ public partial class ImportManager : IDisposable
             highlightCellsDictionary: _rowColors,
             minimumRows: 1000,
             dynamicColumns: new() { { "Tags", tags.Select(t => t.Tag).ToList() } }));
+        await _sheetView.HighlightRows(new() { { 0, "lightgrey" }, { 1, "lightgrey" } });
     }
 
     public async Task CopyData()
@@ -101,6 +103,11 @@ public partial class ImportManager : IDisposable
             .ToDictionary(c => c.Name, c => c.Id);
         foreach (var newData in (await _sheetView.GetSheetData<ImportSheetModel>() ?? []).Skip(1).WithIndex())
         {
+            if (newData.Item.CardName.IsEmpty())
+            {
+                result.Add(new(newData.Item, null, "white", true, newData.Index + 2));
+                continue;
+            }
             var existingCard = existingCardNames.TryGetValue(newData.Item.CardName, out var cardRef) ?
                 CardService.Execute(cs => cs.GetCard(cardRef)) : null;
             var tagsOfCard = existingCard?.SerializedData().GetTags()
