@@ -9,7 +9,7 @@ public interface IStyleMerger
 {
     IEnumerable<Style> ExtractStyles(JsonNode oldStyle);
 
-    JsonNode? GetMergedStyle(IEnumerable<Style> styles, string[] inputLines, string[] outputLines);
+    JsonNode? GetMergedStyle(IEnumerable<Style> styles, string[] oldTextLines, string[] newTextLines);
 }
 
 public class StyleMerger() : IStyleMerger
@@ -27,11 +27,7 @@ public class StyleMerger() : IStyleMerger
 
     public JsonNode? GetMergedStyle(IEnumerable<Style> styles, string[] inputLines, string[] outputLines)
     {
-        var styleToUse = styles
-            .FirstOrDefault(s => s.StyleNode != null).StyleNode?
-            .AsObject()
-            .ToDictionary(o => o.Key, o => (object?)(o.Value?.GetValueKind() == JsonValueKind.String ?
-                o.Value.GetValue<string>() : o.Value?.GetValue<int>())) ?? new();
+        var styleToUse = styles.FirstOrDefault(s => s.StyleNode != null).StyleNode;
         var newStyle = outputLines.WithIndex().ToDictionary(l => l.Index.ToString(),
             l => l.Item.WithIndex().ToDictionary(c => c.Index.ToString(), _ => styleToUse));
         return JsonNode.Parse(newStyle.AsJson());

@@ -5,6 +5,7 @@ using Microsoft.JSInterop;
 using TheCardEditor.Main.Core;
 using TheCardEditor.Services;
 using TheCardEditor.Shared;
+using TheCardEditor.Shared.Features.CardEditor;
 using TheCardEditor.SheetComponent;
 
 namespace TheCardEditor.Main.Features.ImportManager;
@@ -26,6 +27,7 @@ public partial class ImportManager : IDisposable
     private const string ImportManagerSheet = nameof(ImportManagerSheet);
     [Inject] private ISheetViewFactory SheetViewFactory { get; set; } = default!;
     [Inject] private ServiceAccessor<TemplateService> TemplateService { get; set; } = default!;
+    [Inject] private IStyleMerger StyleMerger { get; set; } = default!;
     [Inject] private ApplicationStorage Application { get; set; } = default!;
     [Inject] private ServiceAccessor<CardService> CardService { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
@@ -141,7 +143,7 @@ public partial class ImportManager : IDisposable
         {
             var tagDictionary = newData.SheetModel.TagTexts
                 .ToDictionary(tt => tt.Key, tt => tt.Value?.ToString()?.Replace(NewLineReplacement, "\n") ?? "") ?? [];
-            var newCard = template.SerializedData().UpdateTags(tagDictionary);
+            var newCard = template.SerializedData().UpdateTags(tagDictionary, StyleMerger);
             CardService.Execute(cs => cs.UpdateCard(new Shared.DTO.CardModel()
             {
                 CardSetFk = template.CardSetFk,
