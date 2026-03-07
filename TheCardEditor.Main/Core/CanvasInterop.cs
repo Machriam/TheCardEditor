@@ -289,6 +289,7 @@ public class CanvasInterop<TView> : ICanvasInterop where TView : class
         await _jsRuntime.HandledInvokeVoid(JsDispose, _divId);
         _hotKeys.KeyDown -= HotKeys_KeyDown;
         _hotKeysContext?.Dispose();
+        _objectReference.Dispose();
     }
 
     public async ValueTask SetCoordinates(int left, int top, decimal angle)

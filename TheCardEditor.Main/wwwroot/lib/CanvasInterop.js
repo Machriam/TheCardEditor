@@ -280,6 +280,14 @@ window.canvasInteropFunctions = {
         return result;
     },
     dispose: function (divId) {
+        const instance = CanvasInterop.getInstance(divId);
+        if (instance.canvas) {
+            instance.canvas.getObjects().slice().forEach(function (obj) {
+                obj.dispose && obj.dispose();
+            });
+            instance.canvas.clear();
+            instance.canvas.off();
+        }
         CanvasInterop.removeInstance(divId);
     }
 }
